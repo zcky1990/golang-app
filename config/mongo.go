@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"context"
 	"log"
 	"os"
@@ -11,6 +10,7 @@ import (
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 //initializing the db object as a package-level variable
@@ -39,11 +39,10 @@ func findRootDir(dir string) string {
 func init() {
 	currentDir, err := os.Getwd()
 	if err != nil {
-		fmt.Println("Error:", err)
+		log.Fatal("Error get current directory", err)
 		return
 	}
 	rootDir := findRootDir(currentDir)
-	fmt.Println(rootDir)
 	err = godotenv.Load(rootDir + "/.env")
 	if err != nil {
 		log.Fatal("Error loading .env file", err)
@@ -101,7 +100,6 @@ func ConnectMongoDB(env string) ( error) {
     }
 
     mongoURL := mongoType + "://" + url
-    fmt.Println(mongoURL)
 
     serverAPI := options.ServerAPI(options.ServerAPIVersion1)
     clientOptions := options.Client().ApplyURI(mongoURL).SetServerAPIOptions(serverAPI)
@@ -117,6 +115,7 @@ func ConnectMongoDB(env string) ( error) {
 
     db = client.Database(databaseName)
     log.Println("Connected to MongoDB!")
+	createUserIndex()
 	return nil
 }
 
@@ -130,4 +129,20 @@ func DisconnectMongoDB() {
             log.Println("Disconnected from MongoDB")
         }
     }
+}
+
+func createUserIndex()(error){
+	indexOptions := options.Index().SetUnique(true)
+    indexModel := mongo.IndexModel{
+        Keys: bson.M{
+            "email": 1, // Index the email field in ascending order
+        },
+        Options: indexOptions,
+    }
+    _, err := db.Collection("User").Indexes().CreateOne(context.Background(), indexModel)
+    if err != nil {
+        log.Printf("Error creating index: %v\n", err)
+        return err
+    }
+    return nil
 }

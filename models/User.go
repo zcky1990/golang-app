@@ -25,7 +25,7 @@ type User struct {
 func AddUser(user User) (string, error) {
     result, err := config.GetDB().Collection("User").InsertOne(context.Background(), user)
     if err != nil {
-        log.Printf("Error while inserting user: %v\n", err)
+        // log.Printf("Error while inserting user: %v\n", err)
         return "", err
     }
 
@@ -42,29 +42,29 @@ func GetUserByEmail(email string) *User {
 	result := User{}
 	err := config.GetDB().Collection("User").FindOne(context.TODO(), bson.M{"email": email}).Decode(&result)
 	if err != nil {
-		log.Printf("Error while getting a single todo, Reason: %v\n", err)
+		// log.Printf("Error while getting a single todo, Reason: %v\n", err)
 		return nil
 	}
 	return &result
 }
 
-func DeleteUserById(id string){
+func DeleteUserById(id string) (error){
 	objID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		log.Printf("Error convert string Id to primitive Object ID: %v\n", err)
+		return err
 	}
-	result, err := config.GetDB().Collection("User").DeleteOne(context.TODO(), bson.M{"_id": objID})
+	_,err = config.GetDB().Collection("User").DeleteOne(context.TODO(), bson.M{"_id": objID})
 	if err != nil {
-		log.Printf("Error while Deleting single document, Reason: %v\n",err)
+		return err
 	}
-	log.Printf("Number of Deleted document : %v\n",result.DeletedCount)
+	return nil
 }
 
 func GetUserByEmailAndPassword(email string, password string) (User, error) {
 	result := User{}
 	err := config.GetDB().Collection("User").FindOne(context.TODO(), bson.M{"email": email, "password": password}).Decode(&result)
 	if err != nil {
-		log.Printf("Error while getting a single todo, Reason: %v\n", err)
+		// log.Printf("Error while getting a single todo, Reason: %v\n", err)
 		return result, err
 	}
 	return result, nil

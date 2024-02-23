@@ -15,9 +15,9 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		Lastname: "Doe",
     }
 
-	data,err :=models.AddUser(userModel)
+	data,err := models.AddUser(userModel)
 	if err != nil {
-		fmt.Fprintf(w, "Hi there, I love %s!", err)
+		fmt.Fprintf(w, "Hi there, I love %s!", err.Error())
 	}else {
 		fmt.Fprintf(w, "Hi there, I love %s!", data)
 	}
