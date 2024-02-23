@@ -80,7 +80,7 @@ func GetAllUserList(page, pageSize int) ([]User, error) {
 
     cursor, err := config.GetDB().Collection("User").Find(context.TODO(), bson.M{}, options)
     if err != nil {
-        log.Printf("Error while getting all users: %v\n", err)
+        // log.Printf("Error while getting all users: %v\n", err)
         return nil, err
     }
     defer cursor.Close(context.TODO())
@@ -88,7 +88,7 @@ func GetAllUserList(page, pageSize int) ([]User, error) {
     for cursor.Next(context.TODO()) {
         var user User
         if err := cursor.Decode(&user); err != nil {
-            log.Printf("Error decoding user: %v\n", err)
+            // log.Printf("Error decoding user: %v\n", err)
             continue
         }
         results = append(results, user)
@@ -117,7 +117,7 @@ func SearchUser(searchType string, query string) *[]User {
 
 	cursor, err := config.GetDB().Collection("User").Find(context.TODO(), filter)
 	if err != nil {
-		log.Printf("Error while searching for users: %v\n", err)
+		// log.Printf("Error while searching for users: %v\n", err)
 		return nil
 	}
 	defer cursor.Close(context.TODO())
