@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 //use omitempty to automatically add id if we add empty id
@@ -21,7 +22,6 @@ type User struct {
 	Authtoken string             `json:"auth_token"`
 }
 
-//we add all query in models
 func AddUser(user User) (*mongo.InsertOneResult, error) {
 	result, err := config.GetDB().Collection("User").InsertOne(context.Background(), user)
 	if err != nil {
@@ -31,14 +31,26 @@ func AddUser(user User) (*mongo.InsertOneResult, error) {
 	return result, nil
 }
 
-func GetUserByEmail(email string) User {
+func GetUserByEmail(email string) *User {
 	result := User{}
 	err := config.GetDB().Collection("User").FindOne(context.TODO(), bson.M{"email": email}).Decode(&result)
 	if err != nil {
 		log.Printf("Error while getting a single todo, Reason: %v\n", err)
-		return result
+		return nil
 	}
-	return result
+	return &result
+}
+
+func DeleteUserById(id string){
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Printf("Error convert string Id to primitive Object ID: %v\n", err)
+	}
+	result, err := config.GetDB().Collection("User").DeleteOne(context.TODO(), bson.M{"_id": objID})
+	if err != nil {
+		log.Printf("Error while Deleting single document, Reason: %v\n",err)
+	}
+	log.Printf("Number of Deleted document : %v\n",result.DeletedCount)
 }
 
 func GetUserByEmailAndPassword(email string, password string) (User, error) {
@@ -51,49 +63,69 @@ func GetUserByEmailAndPassword(email string, password string) (User, error) {
 	return result, nil
 }
 
-func GetAllUserList() []User {
-	results := []User{}
-	cursor, err := config.GetDB().Collection("User").Find(context.TODO(), bson.M{})
+func GetAllUserList(page, pageSize int) ([]User, error) {
+    var results []User
+    offset := (page - 1) * pageSize
 
-	if err != nil {
-		log.Printf("Error while getting all todos, Reason: %v\n", err)
-		return results
-	}
+    options := options.Find().
+        SetSkip(int64(offset)).
+        SetLimit(int64(pageSize))
 
-	for cursor.Next(context.TODO()) {
-		var user User
-		cursor.Decode(&user)
-		results = append(results, user)
-	}
-	return results
+    cursor, err := config.GetDB().Collection("User").Find(context.TODO(), bson.M{}, options)
+    if err != nil {
+        log.Printf("Error while getting all users: %v\n", err)
+        return nil, err
+    }
+    defer cursor.Close(context.TODO())
+
+    for cursor.Next(context.TODO()) {
+        var user User
+        if err := cursor.Decode(&user); err != nil {
+            log.Printf("Error decoding user: %v\n", err)
+            continue
+        }
+        results = append(results, user)
+    }
+
+    if len(results) == 0 {
+        return nil, nil
+    }
+
+    return results, nil
 }
 
-func SearchUser(search_type string, query string) []User {
+func SearchUser(searchType string, query string) *[]User {
 	results := []User{}
 	filter := bson.M{}
-	if search_type == "name" {
+	if searchType == "name" {
 		filter = bson.M{"$or": []interface{}{
-			bson.M{"firstName": bson.M{"$regex": query, "$options": "im"}},
-			bson.M{"lastName": bson.M{"$regex": query, "$options": "im"}},
-		},
-		}
+			bson.M{"firstname": bson.M{"$regex": query, "$options": "im"}},
+			bson.M{"lastname": bson.M{"$regex": query, "$options": "im"}},
+		}}
 	}
 
-	if search_type == "email" {
+	if searchType == "email" {
 		filter = bson.M{"email": query}
 	}
 
 	cursor, err := config.GetDB().Collection("User").Find(context.TODO(), filter)
-
 	if err != nil {
-		log.Printf("Error while getting all todos, Reason: %v\n", err)
-		return results
+		log.Printf("Error while searching for users: %v\n", err)
+		return nil
 	}
+	defer cursor.Close(context.TODO())
 
 	for cursor.Next(context.TODO()) {
 		var user User
-		cursor.Decode(&user)
+		if err := cursor.Decode(&user); err != nil {
+			log.Printf("Error decoding user: %v\n", err)
+			continue
+		}
 		results = append(results, user)
 	}
-	return results
+
+	if len(results) == 0 {
+		return nil // No users found, return nil
+	}
+	return &results
 }

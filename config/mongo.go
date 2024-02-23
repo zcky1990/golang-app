@@ -65,6 +65,7 @@ func ConnectMongoDB(env string) ( error) {
 	var mongoOption string
 	var mongoUsername string
 	var mongoPassword string
+	var databaseName string
 
 	if env != "test" {
 		mongoHost = os.Getenv("MONGO_HOST")
@@ -73,6 +74,7 @@ func ConnectMongoDB(env string) ( error) {
 		mongoOption = os.Getenv("MONGO_OPTION")
 		mongoUsername = os.Getenv("MONGO_USERNAME")
 		mongoPassword = os.Getenv("MONGO_PASSWORD")
+		databaseName = os.Getenv("MONGO_DATABASE_NAME")
 	}else {
 		mongoHost = os.Getenv("MONGO_HOST_TEST")
 		mongoPort = os.Getenv("MONGO_PORT_TEST")
@@ -80,6 +82,7 @@ func ConnectMongoDB(env string) ( error) {
 		mongoOption = os.Getenv("MONGO_OPTION_TEST")
 		mongoUsername = os.Getenv("MONGO_USERNAME_TEST")
 		mongoPassword = os.Getenv("MONGO_PASSWORD_TEST")
+		databaseName = os.Getenv("MONGO_DATABASE_NAME_TEST")
 	}
 
     var url string
@@ -112,7 +115,7 @@ func ConnectMongoDB(env string) ( error) {
 
     log.Println("MongoDB connected successfully!")
 
-    db = client.Database(os.Getenv("MONGO_DATABASE_NAME"))
+    db = client.Database(databaseName)
     log.Println("Connected to MongoDB!")
 	return nil
 }
