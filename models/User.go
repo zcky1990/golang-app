@@ -23,7 +23,7 @@ type User struct {
 
 //we add all query in models
 func AddUser(user User) (*mongo.InsertOneResult, error) {
-	result, err := config.Db.Collection("User").InsertOne(context.Background(), user)
+	result, err := config.GetDB().Collection("User").InsertOne(context.Background(), user)
 	if err != nil {
 		log.Printf("Error while getting a single todo, Reason: %v\n", err)
 		return nil, err
@@ -33,7 +33,7 @@ func AddUser(user User) (*mongo.InsertOneResult, error) {
 
 func GetUserByEmail(email string) User {
 	result := User{}
-	err := config.Db.Collection("User").FindOne(context.TODO(), bson.M{"email": email}).Decode(&result)
+	err := config.GetDB().Collection("User").FindOne(context.TODO(), bson.M{"email": email}).Decode(&result)
 	if err != nil {
 		log.Printf("Error while getting a single todo, Reason: %v\n", err)
 		return result
@@ -43,7 +43,7 @@ func GetUserByEmail(email string) User {
 
 func GetUserByEmailAndPassword(email string, password string) (User, error) {
 	result := User{}
-	err := config.Db.Collection("User").FindOne(context.TODO(), bson.M{"email": email, "password": password}).Decode(&result)
+	err := config.GetDB().Collection("User").FindOne(context.TODO(), bson.M{"email": email, "password": password}).Decode(&result)
 	if err != nil {
 		log.Printf("Error while getting a single todo, Reason: %v\n", err)
 		return result, err
@@ -53,7 +53,7 @@ func GetUserByEmailAndPassword(email string, password string) (User, error) {
 
 func GetAllUserList() []User {
 	results := []User{}
-	cursor, err := config.Db.Collection("User").Find(context.TODO(), bson.M{})
+	cursor, err := config.GetDB().Collection("User").Find(context.TODO(), bson.M{})
 
 	if err != nil {
 		log.Printf("Error while getting all todos, Reason: %v\n", err)
@@ -83,7 +83,7 @@ func SearchUser(search_type string, query string) []User {
 		filter = bson.M{"email": query}
 	}
 
-	cursor, err := config.Db.Collection("User").Find(context.TODO(), filter)
+	cursor, err := config.GetDB().Collection("User").Find(context.TODO(), filter)
 
 	if err != nil {
 		log.Printf("Error while getting all todos, Reason: %v\n", err)
