@@ -3,11 +3,11 @@ package models
 import (
 	"context"
 	"log"
+	"fmt"
 
 	"golang_app/golangApp/config"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -22,13 +22,20 @@ type User struct {
 	Authtoken string             `json:"auth_token"`
 }
 
-func AddUser(user User) (*mongo.InsertOneResult, error) {
-	result, err := config.GetDB().Collection("User").InsertOne(context.Background(), user)
-	if err != nil {
-		log.Printf("Error while getting a single todo, Reason: %v\n", err)
-		return nil, err
-	}
-	return result, nil
+func AddUser(user User) (string, error) {
+    result, err := config.GetDB().Collection("User").InsertOne(context.Background(), user)
+    if err != nil {
+        log.Printf("Error while inserting user: %v\n", err)
+        return "", err
+    }
+
+    insertedID, ok := result.InsertedID.(primitive.ObjectID)
+    if !ok {
+        return "", fmt.Errorf("failed to extract inserted ID")
+    }
+
+    insertedIDString := insertedID.Hex()
+    return insertedIDString, nil
 }
 
 func GetUserByEmail(email string) *User {
