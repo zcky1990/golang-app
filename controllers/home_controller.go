@@ -38,7 +38,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	var err error
 	var token string
 	var responseUser *models.User
-	
+
 	w.Header().Set("Content-Type", "application/json")
 
 	err = SetParams(r.Body, &params)
@@ -49,7 +49,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	responseUser, err = models.GetUserByEmailAndPassword(params.Email, params.Password)
-	fmt.Println(responseUser)
 	if err == nil  {
 		if (responseUser != nil) {
 			token = middlewares.GenerateToken(params.Email, params.Password)
