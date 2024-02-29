@@ -10,6 +10,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"errors"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 //use omitempty to automatically add id if we add empty id
@@ -60,14 +62,16 @@ func DeleteUserById(id string) (error){
 	return nil
 }
 
-func GetUserByEmailAndPassword(email string, password string) (User, error) {
-	result := User{}
+func GetUserByEmailAndPassword(email string, password string) (*User, error) {
+	var result User
 	err := config.GetDB().Collection("User").FindOne(context.TODO(), bson.M{"email": email, "password": password}).Decode(&result)
 	if err != nil {
-		// log.Printf("Error while getting a single todo, Reason: %v\n", err)
-		return result, err
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
+		return nil, err
 	}
-	return result, nil
+	return &result, nil
 }
 
 func GetAllUserList(page, pageSize int) ([]User, error) {

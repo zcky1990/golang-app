@@ -5,6 +5,7 @@ import (
 	"log"
 	"golang_app/golangApp/config"
 	"golang_app/golangApp/controllers"
+	"golang_app/golangApp/middlewares"
 	
 	"net/http"
 )
@@ -17,9 +18,13 @@ func main() {
     }
     defer config.DisconnectMongoDB()
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /", controller.Index)
+	r := http.NewServeMux()
 
-	http.ListenAndServe(":10000", mux)
+	indexHandler := http.HandlerFunc(controller.Index)
+	r.Handle("GET /", middlewares.UserAuthenticate(indexHandler))
+
+	r.HandleFunc("POST /login", controller.Login)
+
+	http.ListenAndServe(":10000", r)
 	fmt.Println("Run Server on : localhost:10000")
 }

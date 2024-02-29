@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"path/filepath"
+	"golang_app/golangApp/lib"
 
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -18,31 +18,13 @@ var db *mongo.Database
 //initializing the client object as a package-level variable
 var client *mongo.Client
 
-func findRootDir(dir string) string {
-	knownProjectItems := []string{"go.mod", "main.go"}
-	for {
-		for _, item := range knownProjectItems {
-			if _, err := os.Stat(filepath.Join(dir, item)); err == nil {
-				return dir
-			}
-		}
-
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break
-		}
-		dir = parent
-	}
-	return ""
-}
-
 func init() {
 	currentDir, err := os.Getwd()
 	if err != nil {
 		log.Fatal("Error get current directory", err)
 		return
 	}
-	rootDir := findRootDir(currentDir)
+	rootDir := lib.FindRootDir(currentDir)
 	err = godotenv.Load(rootDir + "/.env")
 	if err != nil {
 		log.Fatal("Error loading .env file", err)
