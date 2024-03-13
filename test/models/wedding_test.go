@@ -13,15 +13,22 @@ func TestCreateWeddingData(t *testing.T) {
 	var userResult string
 	var objID primitive.ObjectID
 	var result string
-	user := models.User{
-		Username:  "weedingDataUser1",
-		Email:     "weedingdatauser1@example.com",
-		Firstname: "Test",
-		Lastname:  "User",
-		Authtoken: "testtoken",
+
+	email := "weedingdatauser1@example.com"
+	usrResult := models.GetUserByEmail(email)
+	if usrResult != nil {
+		objID = usrResult.Id
+	} else {
+		user := models.User{
+			Username:  "weedingDataUser1",
+			Email:     "weedingdatauser1@example.com",
+			Firstname: "Test",
+			Lastname:  "User",
+			Authtoken: "testtoken",
+		}
+		userResult, err = models.CreateUser(user)
+		objID, err = primitive.ObjectIDFromHex(userResult)
 	}
-	userResult, err = models.CreateUser(user)
-	objID, err = primitive.ObjectIDFromHex(userResult)
 
 	weddingData := models.WeddingData{
 		UserID: objID,
