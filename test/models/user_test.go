@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 func init() {
@@ -84,26 +83,30 @@ func TestSearchUser(t *testing.T) {
 }
 
 func TestUpdateUser(t *testing.T) {
+	var user models.User
 	email := "test@example.com"
 	result := models.GetUserByEmail(email)
 	id := result.Id.Hex()
-	updates := bson.M{"firstname": "nurfadillah"}
-	data, err := models.UpdateUserById(id, updates)
+
+	user = *result
+	user.Firstname = "Nurfadillah"
+
+	data, err := models.UpdateUserById(id, user)
 	assert.Nil(t, err, "expected error to be empty")
 	assert.NotNil(t, data, "expected result not to be nil")
 }
 
-// func TestDeleteUserById(t *testing.T) {
-// 	//search user by email
-// 	email := "test@example.com"
-// 	result := models.GetUserByEmail(email)
-// 	id := result.Id.Hex()
+func TestDeleteUserById(t *testing.T) {
+	//search user by email
+	email := "test@example.com"
+	result := models.GetUserByEmail(email)
+	id := result.Id.Hex()
 
-// 	//delete user by its id
-// 	err := models.DeleteUserById(id)
-// 	assert.Nil(t, err, "expected Error to be nil")
+	//delete user by its id
+	err := models.DeleteUserById(id)
+	assert.Nil(t, err, "expected Error to be nil")
 
-// 	//check if we can get user by email
-// 	result = models.GetUserByEmail(email)
-// 	assert.Nil(t, result, "expected Query result to be nil")
-// }
+	//check if we can get user by email
+	result = models.GetUserByEmail(email)
+	assert.Nil(t, result, "expected Query result to be nil")
+}

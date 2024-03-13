@@ -26,12 +26,20 @@ type User struct {
 	Password  string             `json:"password,omitempty"`
 }
 
-func ConvertUserToBSON(user User) ([]byte, error) {
-	bsonData, err := bson.Marshal(user)
+func ConvertUserToBSON(data User) (bson.M, error) {
+	// Marshal the struct to BSON
+	bsonData, err := bson.Marshal(data)
 	if err != nil {
 		return nil, err
 	}
-	return bsonData, nil
+	// Unmarshal the BSON to bson.M
+	var bsonMap bson.M
+	err = bson.Unmarshal(bsonData, &bsonMap)
+	if err != nil {
+		return nil, err
+	}
+
+	return bsonMap, nil
 }
 
 func CreateUser(user User) (string, error) {
@@ -48,12 +56,13 @@ func CreateUser(user User) (string, error) {
 	return insertedIDString, nil
 }
 
-func UpdateUserById(id string, updates bson.M) (string, error) {
+func UpdateUserById(id string, updates User) (string, error) {
 	objID, _ := primitive.ObjectIDFromHex(id)
+	data, _ := ConvertUserToBSON(updates)
 	result, err := config.GetDB().Collection("User").UpdateOne(
 		context.TODO(),
 		bson.M{"_id": objID},
-		bson.M{"$set": updates},
+		bson.M{"$set": data},
 	)
 	if err != nil {
 		return "", err

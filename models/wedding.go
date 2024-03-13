@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"golang_app/golangApp/config"
 
@@ -90,6 +91,22 @@ type WeddingData struct {
 	Gifts     []Gift             `json:"gifts"`
 }
 
+func ConvertWeddingDataToBSON(data WeddingData) (bson.M, error) {
+	// Marshal the struct to BSON
+	bsonData, err := bson.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
+	// Unmarshal the BSON to bson.M
+	var bsonMap bson.M
+	err = bson.Unmarshal(bsonData, &bsonMap)
+	if err != nil {
+		return nil, err
+	}
+
+	return bsonMap, nil
+}
+
 func CreateWeddingData(data WeddingData) (string, error) {
 	result, err := config.GetDB().Collection("wedding_data").InsertOne(context.Background(), data)
 	if err != nil {
@@ -103,6 +120,23 @@ func CreateWeddingData(data WeddingData) (string, error) {
 
 	insertedIDString := insertedID.Hex()
 	return insertedIDString, nil
+}
+
+func UpdateWeddingDataById(id string, updates WeddingData) (string, error) {
+	objID, _ := primitive.ObjectIDFromHex(id)
+	data, _ := ConvertWeddingDataToBSON(updates)
+	result, err := config.GetDB().Collection("wedding_data").UpdateOne(
+		context.TODO(),
+		bson.M{"_id": objID},
+		bson.M{"$set": data},
+	)
+	if err != nil {
+		return "", err
+	}
+	if result.ModifiedCount == 0 {
+		return "", errors.New("no wedding data updated")
+	}
+	return "success update wedding data", nil
 }
 
 func GetWeddingDataById(id string) *WeddingData {

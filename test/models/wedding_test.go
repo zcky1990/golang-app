@@ -112,3 +112,42 @@ func TestGetWeddingDataByUserId(t *testing.T) {
 	assert.NotNil(t, result, "expected Get result not to be nil")
 
 }
+
+func TestUpdateWeddingData(t *testing.T) {
+	var updates models.WeddingData
+	email := "weedingdatauser1@example.com"
+	//get user
+	user := models.GetUserByEmail(email)
+	id := user.Id.Hex()
+
+	//get weddingData
+	result := models.GetWeddingDataByUserId(id)
+	weddingId := result.Id.Hex()
+
+	//convert pointer to normal
+	updates = *result
+
+	updates.Bride.Firstname = "test1"
+	updates.Bride.Lastname = "test2"
+
+	//update weddingData
+	data, err := models.UpdateWeddingDataById(weddingId, updates)
+
+	assert.Nil(t, err, "expected error to be empty")
+	assert.NotNil(t, data, "expected result not to be nil")
+}
+
+func TestDeleteWeddingData(t *testing.T) {
+	email := "weedingdatauser1@example.com"
+	userId := models.GetUserByEmail(email)
+	result := models.GetWeddingDataByUserId(userId.Id.Hex())
+	id := result.Id.Hex()
+
+	err := models.DeleteWeddingDataById(id)
+	assert.Nil(t, err, "expected Error to be nil")
+
+	//check if we can get weddingData by userId
+	result = models.GetWeddingDataByUserId(userId.Id.Hex())
+	assert.Nil(t, result, "expected Query result to be nil")
+
+}
