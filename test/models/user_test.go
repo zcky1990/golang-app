@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"golang_app/golangApp/config"
 	"golang_app/golangApp/models"
 	"log"
@@ -88,10 +87,7 @@ func TestUpdateUser(t *testing.T) {
 	email := "test@example.com"
 	result := models.GetUserByEmail(email)
 	id := result.Id.Hex()
-	fmt.Println(id)
-	updates := bson.M{
-		"firstname": "asdsafasdasdsa",
-	}
+	updates := bson.M{"firstname": "nurfadillah"}
 	data, err := models.UpdateUserById(id, updates)
 	assert.Nil(t, err, "expected error to be empty")
 	assert.NotNil(t, data, "expected result not to be nil")

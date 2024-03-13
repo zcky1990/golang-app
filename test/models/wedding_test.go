@@ -14,8 +14,8 @@ func TestCreateWeddingData(t *testing.T) {
 	var objID primitive.ObjectID
 	var result string
 	user := models.User{
-		Username:  "testuser1",
-		Email:     "test1@example.com",
+		Username:  "weedingDataUser1",
+		Email:     "weedingdatauser1@example.com",
 		Firstname: "Test",
 		Lastname:  "User",
 		Authtoken: "testtoken",
@@ -106,7 +106,7 @@ func TestCreateWeddingData(t *testing.T) {
 }
 
 func TestGetWeddingDataByUserId(t *testing.T) {
-	email := "test1@example.com"
+	email := "weedingdatauser1@example.com"
 	userId := models.GetUserByEmail(email)
 	result := models.GetWeddingDataByUserId(userId.Id.Hex())
 	assert.NotNil(t, result, "expected Get result not to be nil")

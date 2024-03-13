@@ -107,11 +107,8 @@ func CreateWeddingData(data WeddingData) (string, error) {
 
 func GetWeddingDataById(id string) *WeddingData {
 	result := WeddingData{}
-	objID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil
-	}
-	err = config.GetDB().Collection("wedding_data").FindOne(context.TODO(), bson.M{"_id": objID}).Decode(&result)
+	objID, _ := primitive.ObjectIDFromHex(id)
+	err := config.GetDB().Collection("wedding_data").FindOne(context.TODO(), bson.M{"_id": objID}).Decode(&result)
 	if err != nil {
 		return nil
 	}
@@ -120,11 +117,8 @@ func GetWeddingDataById(id string) *WeddingData {
 
 func GetWeddingDataByUserId(userId string) *WeddingData {
 	result := WeddingData{}
-	objID, err := primitive.ObjectIDFromHex(userId)
-	if err != nil {
-		return nil
-	}
-	err = config.GetDB().Collection("wedding_data").FindOne(context.TODO(), bson.M{"user_id": objID}).Decode(&result)
+	objID, _ := primitive.ObjectIDFromHex(userId)
+	err := config.GetDB().Collection("wedding_data").FindOne(context.TODO(), bson.M{"user_id": objID}).Decode(&result)
 	if err != nil {
 		return nil
 	}
@@ -132,11 +126,8 @@ func GetWeddingDataByUserId(userId string) *WeddingData {
 }
 
 func DeleteWeddingDataById(id string) error {
-	objID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return err
-	}
-	_, err = config.GetDB().Collection("wedding_data").DeleteOne(context.TODO(), bson.M{"_id": objID})
+	objID, _ := primitive.ObjectIDFromHex(id)
+	_, err := config.GetDB().Collection("wedding_data").DeleteOne(context.TODO(), bson.M{"_id": objID})
 	if err != nil {
 		return err
 	}

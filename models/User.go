@@ -26,6 +26,14 @@ type User struct {
 	Password  string             `json:"password,omitempty"`
 }
 
+func ConvertUserToBSON(user User) ([]byte, error) {
+	bsonData, err := bson.Marshal(user)
+	if err != nil {
+		return nil, err
+	}
+	return bsonData, nil
+}
+
 func CreateUser(user User) (string, error) {
 	result, err := config.GetDB().Collection("User").InsertOne(context.Background(), user)
 	if err != nil {
@@ -42,10 +50,9 @@ func CreateUser(user User) (string, error) {
 
 func UpdateUserById(id string, updates bson.M) (string, error) {
 	objID, _ := primitive.ObjectIDFromHex(id)
-	filter := bson.M{{"_id", objID}}
 	result, err := config.GetDB().Collection("User").UpdateOne(
 		context.TODO(),
-		filter,
+		bson.M{"_id": objID},
 		bson.M{"$set": updates},
 	)
 	if err != nil {
@@ -67,11 +74,8 @@ func GetUserByEmail(email string) *User {
 }
 
 func DeleteUserById(id string) error {
-	objID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return err
-	}
-	_, err = config.GetDB().Collection("User").DeleteOne(context.TODO(), bson.M{"_id": objID})
+	objID, _ := primitive.ObjectIDFromHex(id)
+	_, err := config.GetDB().Collection("User").DeleteOne(context.TODO(), bson.M{"_id": objID})
 	if err != nil {
 		return err
 	}
