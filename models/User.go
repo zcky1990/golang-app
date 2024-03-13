@@ -2,19 +2,20 @@ package models
 
 import (
 	"context"
-	"log"
 	"fmt"
+	"log"
 
 	"golang_app/golangApp/config"
 
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"errors"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-//use omitempty to automatically add id if we add empty id
+// use omitempty to automatically add id if we add empty id
 type User struct {
 	Id        primitive.ObjectID `bson:"_id,omitempty"`
 	Username  string             `json:"username,omitempty"`
@@ -22,23 +23,23 @@ type User struct {
 	Firstname string             `json:"firstname,omitempty"`
 	Lastname  string             `json:"lastname,omitempty"`
 	Authtoken string             `json:"auth_token,omitempty"`
-	Password  string 			 `json:"password,omitempty"`
+	Password  string             `json:"password,omitempty"`
 }
 
-func AddUser(user User) (string, error) {
-    result, err := config.GetDB().Collection("User").InsertOne(context.Background(), user)
-    if err != nil {
-        // log.Printf("Error while inserting user: %v\n", err)
-        return "", err
-    }
+func CreateUser(user User) (string, error) {
+	result, err := config.GetDB().Collection("User").InsertOne(context.Background(), user)
+	if err != nil {
+		// log.Printf("Error while inserting user: %v\n", err)
+		return "", err
+	}
 
-    insertedID, ok := result.InsertedID.(primitive.ObjectID)
-    if !ok {
-        return "", fmt.Errorf("failed to extract inserted ID")
-    }
+	insertedID, ok := result.InsertedID.(primitive.ObjectID)
+	if !ok {
+		return "", fmt.Errorf("failed to extract inserted ID")
+	}
 
-    insertedIDString := insertedID.Hex()
-    return insertedIDString, nil
+	insertedIDString := insertedID.Hex()
+	return insertedIDString, nil
 }
 
 func GetUserByEmail(email string) *User {
@@ -51,12 +52,12 @@ func GetUserByEmail(email string) *User {
 	return &result
 }
 
-func DeleteUserById(id string) (error){
+func DeleteUserById(id string) error {
 	objID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return err
 	}
-	_,err = config.GetDB().Collection("User").DeleteOne(context.TODO(), bson.M{"_id": objID})
+	_, err = config.GetDB().Collection("User").DeleteOne(context.TODO(), bson.M{"_id": objID})
 	if err != nil {
 		return err
 	}
@@ -76,34 +77,34 @@ func GetUserByEmailAndPassword(email string, password string) (*User, error) {
 }
 
 func GetAllUserList(page, pageSize int) ([]User, error) {
-    var results []User
-    offset := (page - 1) * pageSize
+	var results []User
+	offset := (page - 1) * pageSize
 
-    options := options.Find().
-        SetSkip(int64(offset)).
-        SetLimit(int64(pageSize))
+	options := options.Find().
+		SetSkip(int64(offset)).
+		SetLimit(int64(pageSize))
 
-    cursor, err := config.GetDB().Collection("User").Find(context.TODO(), bson.M{}, options)
-    if err != nil {
-        // log.Printf("Error while getting all users: %v\n", err)
-        return nil, err
-    }
-    defer cursor.Close(context.TODO())
+	cursor, err := config.GetDB().Collection("User").Find(context.TODO(), bson.M{}, options)
+	if err != nil {
+		// log.Printf("Error while getting all users: %v\n", err)
+		return nil, err
+	}
+	defer cursor.Close(context.TODO())
 
-    for cursor.Next(context.TODO()) {
-        var user User
-        if err := cursor.Decode(&user); err != nil {
-            // log.Printf("Error decoding user: %v\n", err)
-            continue
-        }
-        results = append(results, user)
-    }
+	for cursor.Next(context.TODO()) {
+		var user User
+		if err := cursor.Decode(&user); err != nil {
+			// log.Printf("Error decoding user: %v\n", err)
+			continue
+		}
+		results = append(results, user)
+	}
 
-    if len(results) == 0 {
-        return nil, nil
-    }
+	if len(results) == 0 {
+		return nil, nil
+	}
 
-    return results, nil
+	return results, nil
 }
 
 func SearchUser(searchType string, query string) *[]User {

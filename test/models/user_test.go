@@ -1,42 +1,42 @@
 package models
 
 import (
-	"testing"
-    "github.com/stretchr/testify/assert"
+	"golang_app/golangApp/config"
+	"golang_app/golangApp/models"
 	"log"
 	"os"
-    "golang_app/golangApp/models"
-	"golang_app/golangApp/config"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func init() {
 	err := config.ConnectMongoDB("test")
-    if err != nil {
-        log.Fatalf("Error connecting to MongoDB: %v", err)
-    }
+	if err != nil {
+		log.Fatalf("Error connecting to MongoDB: %v", err)
+	}
 }
 
 func TestMain(m *testing.M) {
-    exitVal := m.Run()
-    config.DisconnectMongoDB()
-    os.Exit(exitVal)
+	exitVal := m.Run()
+	config.DisconnectMongoDB()
+	os.Exit(exitVal)
 }
 
+func TestCreateUser(t *testing.T) {
+	user := models.User{
+		Username:  "testuser",
+		Email:     "test@example.com",
+		Firstname: "Test",
+		Lastname:  "User",
+		Authtoken: "testtoken",
+	}
+	result, err := models.CreateUser(user)
+	assert.Nil(t, err, "expected no error")
+	assert.NotNil(t, result, "expected insert result not to be nil")
 
-func TestAddUser(t *testing.T) {
-    user :=models.User{
-        Username:  "testuser",
-        Email:     "test@example.com",
-        Firstname: "Test",
-        Lastname:  "User",
-        Authtoken: "testtoken",
-    }
-	result,err :=models.AddUser(user)
-    assert.Nil(t, err, "expected no error")
-    assert.NotNil(t, result, "expected insert result not to be nil")
-
-	result,err =models.AddUser(user)
-    assert.NotNil(t, err, "expected Got error")
+	result, err = models.CreateUser(user)
+	assert.NotNil(t, err, "expected Got error")
 }
 
 func TestGetUserByEmail(t *testing.T) {
@@ -54,20 +54,20 @@ func TestGetUserByEmail(t *testing.T) {
 
 func TestGetAllUserList(t *testing.T) {
 	//get user on page 1, max 10
-	result,err := models.GetAllUserList(1,10)
+	result, err := models.GetAllUserList(1, 10)
 	assert.Nil(t, err, "expected no error")
-	assert.NotEmpty(t, result,  "expected Query result not to be empty")
+	assert.NotEmpty(t, result, "expected Query result not to be empty")
 
 	//get user on page 2, max 10
-	result,err = models.GetAllUserList(2,10)
+	result, err = models.GetAllUserList(2, 10)
 	assert.Nil(t, err, "expected no error")
-	assert.Nil(t, result,  "expected Query result to be empty")
-}	
+	assert.Nil(t, result, "expected Query result to be empty")
+}
 
 func TestSearchUser(t *testing.T) {
 	//search by firstname
 	result := models.SearchUser("name", "test")
-	assert.NotEmpty(t, result,  "expected Query result not to be empty")
+	assert.NotEmpty(t, result, "expected Query result not to be empty")
 
 	//search by lastname
 	result = models.SearchUser("name", "User")
@@ -89,7 +89,7 @@ func TestDeleteUserById(t *testing.T) {
 	id := result.Id.Hex()
 
 	//delete user by its id
-	err:= models.DeleteUserById(id)
+	err := models.DeleteUserById(id)
 	assert.Nil(t, err, "expected Error to be nil")
 
 	//check if we can get user by email

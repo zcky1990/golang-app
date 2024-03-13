@@ -1,0 +1,119 @@
+package models
+
+import (
+	"context"
+	"fmt"
+	"golang_app/golangApp/config"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+
+type SocialMedia struct {
+	Username string `json:"username"`
+	Link     string `json:"link"`
+	Platform string `json:"platform"`
+}
+
+type Parent struct {
+	Father struct {
+		Firstname string `json:"firstname"`
+		Lastname  string `json:"lastname"`
+	} `json:"father"`
+	Mother struct {
+		Firstname string `json:"firstname"`
+		Lastname  string `json:"lastname"`
+	} `json:"mother"`
+}
+
+type AkadResepsi struct {
+	Date    string `json:"date"`
+	Start   string `json:"start"`
+	End     string `json:"end"`
+	Address string `json:"address"`
+	MapURL  string `json:"mapUrl"`
+}
+
+type LoveStory struct {
+	Date        string `json:"date"`
+	Description string `json:"description"`
+	ImageURL    string `json:"imageUrl"`
+}
+
+type Envelop struct {
+	BackgroundImage string `json:"backgroundImage"`
+	BackgroundColor string `json:"backgroundColor"`
+}
+
+type Guest struct {
+	Name    string `json:"name"`
+	Address string `json:"address"`
+}
+
+type Streaming struct {
+	Platform   string `json:"platform"`
+	StreamLink string `json:"streamLink"`
+}
+
+type Gift struct {
+	Name     string `json:"name"`
+	Account  string `json:"account"`
+	BankName string `json:"bankname"`
+	Link     string `json:"link"`
+}
+
+type Wedding struct {
+	Date    string      `json:"date"`
+	Akad    AkadResepsi `json:"akad"`
+	Resepsi AkadResepsi `json:"resepsi"`
+}
+
+type BrideGroom struct {
+	Firstname   string        `json:"firstname"`
+	Lastname    string        `json:"lastname"`
+	ProfileURL  string        `json:"profileUrl"`
+	SocialMedia []SocialMedia `json:"socialMedia"`
+	Parent      Parent        `json:"parent"`
+}
+
+type WeddingData struct {
+	Id        primitive.ObjectID `bson:"_id,omitempty"`
+	UserID    primitive.ObjectID `bson:"user_id,omitempty"`
+	Bride     BrideGroom         `json:"bride"`
+	Groom     BrideGroom         `json:"groom"`
+	Wedding   Wedding            `json:"wedding"`
+	LoveStory []LoveStory        `json:"loveStory"`
+	Envelop   Envelop            `json:"envelop"`
+	Gallery   []string           `json:"gallery"`
+	Guest     Guest              `json:"guest"`
+	Streaming []Streaming        `json:"streaming"`
+	Gifts     []Gift             `json:"gifts"`
+}
+
+func CreateWeddingData(data WeddingData) (string, error) {
+	result, err := config.GetDB().Collection("wedding_data").InsertOne(context.Background(), data)
+	if err != nil {
+		return "", err
+	}
+
+	insertedID, ok := result.InsertedID.(primitive.ObjectID)
+	if !ok {
+		return "", fmt.Errorf("failed to extract inserted ID")
+	}
+
+	insertedIDString := insertedID.Hex()
+	return insertedIDString, nil
+}
+
+func GetWeddingDataById(id string) *WeddingData {
+	result := WeddingData{}
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil
+	}
+	err = config.GetDB().Collection("wedding_data").FindOne(context.TODO(), bson.M{"_id": objID}).Decode(&result)
+	if err != nil {
+		return nil
+	}
+	return &result
+}
