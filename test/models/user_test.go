@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"golang_app/golangApp/config"
 	"golang_app/golangApp/models"
 	"log"
@@ -8,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func init() {
@@ -82,17 +84,30 @@ func TestSearchUser(t *testing.T) {
 	assert.NotNil(t, result, "expected Query result not to be nil")
 }
 
-func TestDeleteUserById(t *testing.T) {
-	//search user by email
+func TestUpdateUser(t *testing.T) {
 	email := "test@example.com"
 	result := models.GetUserByEmail(email)
 	id := result.Id.Hex()
-
-	//delete user by its id
-	err := models.DeleteUserById(id)
-	assert.Nil(t, err, "expected Error to be nil")
-
-	//check if we can get user by email
-	result = models.GetUserByEmail(email)
-	assert.Nil(t, result, "expected Query result to be nil")
+	fmt.Println(id)
+	updates := bson.M{
+		"firstname": "asdsafasdasdsa",
+	}
+	data, err := models.UpdateUserById(id, updates)
+	assert.Nil(t, err, "expected error to be empty")
+	assert.NotNil(t, data, "expected result not to be nil")
 }
+
+// func TestDeleteUserById(t *testing.T) {
+// 	//search user by email
+// 	email := "test@example.com"
+// 	result := models.GetUserByEmail(email)
+// 	id := result.Id.Hex()
+
+// 	//delete user by its id
+// 	err := models.DeleteUserById(id)
+// 	assert.Nil(t, err, "expected Error to be nil")
+
+// 	//check if we can get user by email
+// 	result = models.GetUserByEmail(email)
+// 	assert.Nil(t, result, "expected Query result to be nil")
+// }

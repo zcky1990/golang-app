@@ -117,3 +117,28 @@ func GetWeddingDataById(id string) *WeddingData {
 	}
 	return &result
 }
+
+func GetWeddingDataByUserId(userId string) *WeddingData {
+	result := WeddingData{}
+	objID, err := primitive.ObjectIDFromHex(userId)
+	if err != nil {
+		return nil
+	}
+	err = config.GetDB().Collection("wedding_data").FindOne(context.TODO(), bson.M{"user_id": objID}).Decode(&result)
+	if err != nil {
+		return nil
+	}
+	return &result
+}
+
+func DeleteWeddingDataById(id string) error {
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	_, err = config.GetDB().Collection("wedding_data").DeleteOne(context.TODO(), bson.M{"_id": objID})
+	if err != nil {
+		return err
+	}
+	return nil
+}

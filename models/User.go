@@ -32,21 +32,35 @@ func CreateUser(user User) (string, error) {
 		// log.Printf("Error while inserting user: %v\n", err)
 		return "", err
 	}
-
 	insertedID, ok := result.InsertedID.(primitive.ObjectID)
 	if !ok {
 		return "", fmt.Errorf("failed to extract inserted ID")
 	}
-
 	insertedIDString := insertedID.Hex()
 	return insertedIDString, nil
+}
+
+func UpdateUserById(id string, updates bson.M) (string, error) {
+	objID, _ := primitive.ObjectIDFromHex(id)
+	filter := bson.M{{"_id", objID}}
+	result, err := config.GetDB().Collection("User").UpdateOne(
+		context.TODO(),
+		filter,
+		bson.M{"$set": updates},
+	)
+	if err != nil {
+		return "", err
+	}
+	if result.ModifiedCount == 0 {
+		return "", errors.New("no user updated")
+	}
+	return "success update", nil
 }
 
 func GetUserByEmail(email string) *User {
 	result := User{}
 	err := config.GetDB().Collection("User").FindOne(context.TODO(), bson.M{"email": email}).Decode(&result)
 	if err != nil {
-		// log.Printf("Error while getting a single todo, Reason: %v\n", err)
 		return nil
 	}
 	return &result
@@ -79,18 +93,15 @@ func GetUserByEmailAndPassword(email string, password string) (*User, error) {
 func GetAllUserList(page, pageSize int) ([]User, error) {
 	var results []User
 	offset := (page - 1) * pageSize
-
 	options := options.Find().
 		SetSkip(int64(offset)).
 		SetLimit(int64(pageSize))
-
 	cursor, err := config.GetDB().Collection("User").Find(context.TODO(), bson.M{}, options)
 	if err != nil {
 		// log.Printf("Error while getting all users: %v\n", err)
 		return nil, err
 	}
 	defer cursor.Close(context.TODO())
-
 	for cursor.Next(context.TODO()) {
 		var user User
 		if err := cursor.Decode(&user); err != nil {
@@ -99,11 +110,9 @@ func GetAllUserList(page, pageSize int) ([]User, error) {
 		}
 		results = append(results, user)
 	}
-
 	if len(results) == 0 {
 		return nil, nil
 	}
-
 	return results, nil
 }
 
@@ -116,18 +125,15 @@ func SearchUser(searchType string, query string) *[]User {
 			bson.M{"lastname": bson.M{"$regex": query, "$options": "im"}},
 		}}
 	}
-
 	if searchType == "email" {
 		filter = bson.M{"email": query}
 	}
-
 	cursor, err := config.GetDB().Collection("User").Find(context.TODO(), filter)
 	if err != nil {
 		// log.Printf("Error while searching for users: %v\n", err)
 		return nil
 	}
 	defer cursor.Close(context.TODO())
-
 	for cursor.Next(context.TODO()) {
 		var user User
 		if err := cursor.Decode(&user); err != nil {
@@ -136,7 +142,6 @@ func SearchUser(searchType string, query string) *[]User {
 		}
 		results = append(results, user)
 	}
-
 	if len(results) == 0 {
 		return nil // No users found, return nil
 	}
