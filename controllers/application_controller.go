@@ -1,15 +1,14 @@
 package controller
 
 import (
-	"io"
 	"encoding/json"
+	"io"
 )
 
 type successResponse struct {
 	Status string      `json:"status"`
 	Data   interface{} `json:"data"`
 }
-
 
 func SuccessResponse(data interface{}) []byte {
 	response := successResponse{
@@ -26,15 +25,14 @@ func SuccessResponse(data interface{}) []byte {
 }
 
 type failedResponse struct {
-	Status string      `json:"status"`
-	ErrorMessage   interface{} `json:"error_message"`
+	Status       string      `json:"status"`
+	ErrorMessage interface{} `json:"error_message"`
 }
-
 
 func ErrorResponse(erroMessage string) []byte {
 	response := failedResponse{
-		Status: "Error",
-		ErrorMessage:   erroMessage,
+		Status:       "Error",
+		ErrorMessage: erroMessage,
 	}
 
 	jsonData, err := json.Marshal(response)
@@ -49,6 +47,6 @@ func SetParams(body io.Reader, v interface{}) error {
 	err := json.NewDecoder(body).Decode(v)
 	if err != nil {
 		return err
-    }
+	}
 	return nil
 }

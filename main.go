@@ -2,21 +2,20 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"golang_app/golangApp/config"
-	"golang_app/golangApp/controllers"
+	controller "golang_app/golangApp/controllers"
 	"golang_app/golangApp/middlewares"
-	
+	"log"
+
 	"net/http"
 )
 
-
 func main() {
 	err := config.ConnectMongoDB("production")
-    if err != nil {
-        log.Fatalf("Error connecting to MongoDB: %v", err)
-    }
-    defer config.DisconnectMongoDB()
+	if err != nil {
+		log.Fatalf("Error connecting to MongoDB: %v", err)
+	}
+	defer config.DisconnectMongoDB()
 
 	r := http.NewServeMux()
 
@@ -24,6 +23,8 @@ func main() {
 	r.Handle("GET /", middlewares.UserAuthenticate(indexHandler))
 
 	r.HandleFunc("POST /login", controller.Login)
+
+	r.HandleFunc("POST /upload-image", controller.UploadFile)
 
 	http.ListenAndServe(":10000", r)
 	fmt.Println("Run Server on : localhost:10000")

@@ -4,11 +4,14 @@ go 1.22
 
 require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
+	github.com/cloudinary/cloudinary-go/v2 v2.7.0 // indirect
+	github.com/creasty/defaults v1.5.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gofiber/fiber/v2 v2.52.1 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.0 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/google/uuid v1.5.0 // indirect
+	github.com/gorilla/schema v1.2.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/klauspost/compress v1.17.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect

@@ -156,5 +156,4 @@ func TestDeleteWeddingData(t *testing.T) {
 	//check if we can get weddingData by userId
 	result = models.GetWeddingDataByUserId(userId.Id.Hex())
 	assert.Nil(t, result, "expected Query result to be nil")
-
 }
