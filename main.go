@@ -18,6 +18,7 @@ func main() {
 	defer config.DisconnectMongoDB()
 
 	config.InitializeCloudinary("production")
+	config.InitializeRedis("production")
 
 	r := http.NewServeMux()
 
