@@ -1,29 +1,30 @@
 # golang-app
-This is Golang repository project,this repository used to practice and learning how to create application using GO
+This is Golang repository project, this repository used to practice and learning how to create REST API Application using GO.
+In this repository, we are following Ruby On Rails(ROR) stucture folder as base.
 
-to run application: 
+To running application: 
 ```
 go run .
 ```
 
-to run all unit test :
+To running all unit test :
 ```
 go test ./test/*
 ```
 
-to run spesific unit test :
+To running spesific unit test :
 ```
 go test ./test/models
 ```
 
-if you want to split environment variable to seperate file between production and test create new file with name `.env.test`
+If you want to split environment variable to seperate file between production and test create new file with name `.env.test`
 
-to run all unit test with .env.test:
+To running all unit test with .env.test:
 ```
 ENV=test go test ./test/*
 ```
 
-to run spesific unit test with .env.test:
+To running spesific unit test with .env.test:
 ```
 ENV=test go test ./test/models
 ```
