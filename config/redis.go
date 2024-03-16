@@ -2,7 +2,6 @@ package config
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"strconv"
 	"time"
@@ -22,7 +21,6 @@ func InitializeRedis(env string) {
 	var username string
 	var password string
 	var address string
-	var err error
 	var redisUrl string
 
 	if env != "test" {
@@ -31,23 +29,14 @@ func InitializeRedis(env string) {
 		password = os.Getenv("REDIS_PASSWORD")
 		host = os.Getenv("REDIS_HOST")
 		port = os.Getenv("REDIS_PORT")
-		db, err = strconv.Atoi(os.Getenv("REDIS_DB"))
-		if err != nil {
-			fmt.Println("Error:", err)
-			return
-		}
-
+		db, _ = strconv.Atoi(os.Getenv("REDIS_DB"))
 	} else {
 		redisUrl = os.Getenv("REDIS_URL_TEST")
 		username = os.Getenv("REDIS_USERNAME_TEST")
 		password = os.Getenv("REDIS_PASSWORD_TEST")
 		host = os.Getenv("REDIS_HOST_TEST")
 		port = os.Getenv("REDIS_PORT_TEST")
-		db, err = strconv.Atoi(os.Getenv("REDIS_DB_TEST"))
-		if err != nil {
-			fmt.Println("Error:", err)
-			return
-		}
+		db, _ = strconv.Atoi(os.Getenv("REDIS_DB_TEST"))
 	}
 	// log.Println("Initialize Redis")
 	if host != "" && port != "" {
