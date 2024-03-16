@@ -17,6 +17,8 @@ func main() {
 	}
 	defer config.DisconnectMongoDB()
 
+	config.InitializeCloudinary("production")
+
 	r := http.NewServeMux()
 
 	indexHandler := http.HandlerFunc(controller.Index)
