@@ -8,14 +8,15 @@ import (
 	"golang_app/golangApp/lib"
 
 	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
-//initializing the db object as a package-level variable
+// initializing the db object as a package-level variable
 var db *mongo.Database
-//initializing the client object as a package-level variable
+
+// initializing the client object as a package-level variable
 var client *mongo.Client
 
 func init() {
@@ -31,7 +32,7 @@ func init() {
 	}
 }
 
-func GetDB() *mongo.Database{
+func GetDB() *mongo.Database {
 	return db
 }
 
@@ -39,7 +40,7 @@ func GetClient() *mongo.Client {
 	return client
 }
 
-func ConnectMongoDB(env string) ( error) {
+func ConnectMongoDB(env string) error {
 	var mongoHost string
 	var mongoPort string
 	var mongoType string
@@ -56,7 +57,7 @@ func ConnectMongoDB(env string) ( error) {
 		mongoUsername = os.Getenv("MONGO_USERNAME")
 		mongoPassword = os.Getenv("MONGO_PASSWORD")
 		databaseName = os.Getenv("MONGO_DATABASE_NAME")
-	}else {
+	} else {
 		mongoHost = os.Getenv("MONGO_HOST_TEST")
 		mongoPort = os.Getenv("MONGO_PORT_TEST")
 		mongoType = os.Getenv("MONGO_TYPE_TEST")
@@ -66,65 +67,65 @@ func ConnectMongoDB(env string) ( error) {
 		databaseName = os.Getenv("MONGO_DATABASE_NAME_TEST")
 	}
 
-    var url string
-    if mongoPort != "" {
-        url = mongoHost + ":" + mongoPort
-    } else {
-        url = mongoHost
-    }
+	var url string
+	if mongoPort != "" {
+		url = mongoHost + ":" + mongoPort
+	} else {
+		url = mongoHost
+	}
 
-    if mongoUsername != "" && mongoPassword != "" {
-        url = mongoUsername + ":" + mongoPassword + "@" + url
-    }
+	if mongoUsername != "" && mongoPassword != "" {
+		url = mongoUsername + ":" + mongoPassword + "@" + url
+	}
 
-    if mongoOption != "" {
-        url = url + "/" + mongoOption
-    }
+	if mongoOption != "" {
+		url = url + "/" + mongoOption
+	}
 
-    mongoURL := mongoType + "://" + url
+	mongoURL := mongoType + "://" + url
 
-    serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-    clientOptions := options.Client().ApplyURI(mongoURL).SetServerAPIOptions(serverAPI)
-	
+	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+	clientOptions := options.Client().ApplyURI(mongoURL).SetServerAPIOptions(serverAPI)
+
 	var err error
-    client, err = mongo.Connect(context.TODO(), clientOptions)
-    if err != nil {
-        log.Fatal("Error creating MongoDB client:", err)
-        return err
-    }
+	client, err = mongo.Connect(context.TODO(), clientOptions)
+	if err != nil {
+		log.Fatal("Error creating MongoDB client:", err)
+		return err
+	}
 
-    log.Println("MongoDB connected successfully!")
+	log.Println("MongoDB connected successfully!")
 
-    db = client.Database(databaseName)
-    log.Println("Connected to MongoDB!")
+	db = client.Database(databaseName)
+	log.Println("Connected to MongoDB!")
 	createUserIndex()
 	return nil
 }
 
 func DisconnectMongoDB() {
-    if client != nil {
-        err := client.Disconnect(context.Background())
-        if err != nil {
-            log.Printf("Error disconnecting from MongoDB: %v", err)
-        } else {
+	if client != nil {
+		err := client.Disconnect(context.Background())
+		if err != nil {
+			log.Printf("Error disconnecting from MongoDB: %v", err)
+		} else {
 			client = nil
-            log.Println("Disconnected from MongoDB")
-        }
-    }
+			log.Println("Disconnected from MongoDB")
+		}
+	}
 }
 
-func createUserIndex()(error){
+func createUserIndex() error {
 	indexOptions := options.Index().SetUnique(true)
-    indexModel := mongo.IndexModel{
-        Keys: bson.M{
-            "email": 1, // Index the email field in ascending order
-        },
-        Options: indexOptions,
-    }
-    _, err := db.Collection("User").Indexes().CreateOne(context.Background(), indexModel)
-    if err != nil {
-        log.Printf("Error creating index: %v\n", err)
-        return err
-    }
-    return nil
+	indexModel := mongo.IndexModel{
+		Keys: bson.M{
+			"email": 1, // Index the email field in ascending order
+		},
+		Options: indexOptions,
+	}
+	_, err := db.Collection("User").Indexes().CreateOne(context.Background(), indexModel)
+	if err != nil {
+		log.Printf("Error creating index: %v\n", err)
+		return err
+	}
+	return nil
 }
