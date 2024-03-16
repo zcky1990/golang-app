@@ -2,7 +2,6 @@ package config
 
 import (
 	"context"
-	"golang_app/golangApp/lib"
 	"log"
 	"mime/multipart"
 	"os"
@@ -11,29 +10,15 @@ import (
 
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
-	"github.com/joho/godotenv"
 )
 
 // initialize the context directly
-var ctx = context.Background()
+var cloudinaryCtx = context.Background()
 var cld *cloudinary.Cloudinary
 
 type UploadImageResponse struct {
 	SecureUrl string `json:"secure_url"`
 	PublicId  string `json:"public_id"`
-}
-
-func init() {
-	currentDir, err := os.Getwd()
-	if err != nil {
-		log.Fatal("Error get current directory", err)
-		return
-	}
-	rootDir := lib.FindRootDir(currentDir)
-	err = godotenv.Load(rootDir + "/.env")
-	if err != nil {
-		log.Fatal("Error loading .env file", err)
-	}
 }
 
 func InitializeCloudinary(env string) {
@@ -51,14 +36,13 @@ func InitializeCloudinary(env string) {
 		secret = os.Getenv("CLOUD_API_SECRET_TEST")
 	}
 
-	log.Println("Initialize cloudinary")
-
+	// log.Println("Initialize cloudinary")
 	cld, _ = cloudinary.NewFromParams(name, api, secret)
 }
 
 // upload image to cloudinary to spesific folder
 func UploadImageToFolder(file multipart.File, filename string, folder string) (*UploadImageResponse, error) {
-	resp, err := cld.Upload.Upload(ctx, file, uploader.UploadParams{PublicID: s.Join([]string{folder, filename}, "/")})
+	resp, err := cld.Upload.Upload(cloudinaryCtx, file, uploader.UploadParams{PublicID: s.Join([]string{folder, filename}, "/")})
 	if err != nil {
 		log.Printf("Error while Upload File, Reason: %v\n", err)
 		return nil, err
@@ -73,7 +57,7 @@ func UploadImageToFolder(file multipart.File, filename string, folder string) (*
 
 // upload image to cloudinary
 func UploadImage(file multipart.File, filename string) (*UploadImageResponse, error) {
-	resp, err := cld.Upload.Upload(ctx, file, uploader.UploadParams{PublicID: filename})
+	resp, err := cld.Upload.Upload(cloudinaryCtx, file, uploader.UploadParams{PublicID: filename})
 	if err != nil {
 		log.Printf("Error while Upload File, Reason: %v\n", err)
 		return nil, err

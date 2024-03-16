@@ -28,7 +28,7 @@ func TestUploadImageToFolder(t *testing.T) {
 	expectedPublicId := "test_folder/test.jpg"
 	expectedSecureUrl := "https://res.cloudinary.com/dzzp8z3ad/raw/upload/v1710605591/test_folder/test.jpg"
 
-	// Initialize Cloudinary
+	// Initialize Cloudinary  with test env
 	config.InitializeCloudinary("test")
 
 	// Create a mock multipart file with image content
@@ -53,7 +53,7 @@ func TestUploadImage(t *testing.T) {
 	expectedPublicId := "test.jpg"
 	expectedSecureUrl := "https://res.cloudinary.com/dzzp8z3ad/raw/upload/v1710605591/test.jpg"
 
-	// Initialize Cloudinary
+	// Initialize Cloudinary  with test env
 	config.InitializeCloudinary("test")
 
 	// Create a mock multipart file with image content

@@ -1,14 +1,15 @@
 package config
 
 import (
-    "testing"
 	"golang_app/golangApp/config"
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 )
 
 func TestConnectMongoDB(t *testing.T) {
-    env := "test"
-	err := config.ConnectMongoDB(env)
+	// Initialize Cloudinary  with test env
+	err := config.ConnectMongoDB("test")
 	assert.Nil(t, err, "expected no error")
 }
 

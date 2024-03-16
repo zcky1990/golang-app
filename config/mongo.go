@@ -5,9 +5,6 @@ import (
 	"log"
 	"os"
 
-	"golang_app/golangApp/lib"
-
-	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -18,19 +15,6 @@ var db *mongo.Database
 
 // initializing the client object as a package-level variable
 var client *mongo.Client
-
-func init() {
-	currentDir, err := os.Getwd()
-	if err != nil {
-		log.Fatal("Error get current directory", err)
-		return
-	}
-	rootDir := lib.FindRootDir(currentDir)
-	err = godotenv.Load(rootDir + "/.env")
-	if err != nil {
-		log.Fatal("Error loading .env file", err)
-	}
-}
 
 func GetDB() *mongo.Database {
 	return db
@@ -94,10 +78,10 @@ func ConnectMongoDB(env string) error {
 		return err
 	}
 
-	log.Println("MongoDB connected successfully!")
+	// log.Println("MongoDB connected successfully!")
 
 	db = client.Database(databaseName)
-	log.Println("Connected to MongoDB!")
+	// log.Println("Connected to MongoDB!")
 	createUserIndex()
 	return nil
 }
