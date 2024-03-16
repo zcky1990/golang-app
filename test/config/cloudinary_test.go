@@ -20,9 +20,10 @@ func (m *MockFile) Close() error {
 }
 
 // Function to create a mock multipart file with image content
-func createMockMultipartFile(content []byte, filename string) multipart.File {
+func createMockMultipartFile(content []byte) multipart.File {
 	return &MockFile{bytes.NewReader(content)}
 }
+
 func TestUploadImageToFolder(t *testing.T) {
 	expectedPublicId := "test_folder/test.jpg"
 	expectedSecureUrl := "https://res.cloudinary.com/dzzp8z3ad/raw/upload/v1710605591/test_folder/test.jpg"
@@ -31,7 +32,7 @@ func TestUploadImageToFolder(t *testing.T) {
 	config.InitializeCloudinary("test")
 
 	// Create a mock multipart file with image content
-	mockFile := createMockMultipartFile([]byte("mock image content"), "test.jpg")
+	mockFile := createMockMultipartFile([]byte("mock image content"))
 
 	filename := "test.jpg"
 	folder := "test_folder"
@@ -44,7 +45,7 @@ func TestUploadImageToFolder(t *testing.T) {
 
 	//expected to have equal value for public_id and secure_id
 	assert.EqualValues(t, expectedPublicId, resp.PublicId, "public_id should be equal")
-	assert.EqualValues(t, expectedSecureUrl, resp.SecureUrl, "public_id should be equal")
+	assert.EqualValues(t, expectedSecureUrl, resp.SecureUrl, "secure_url should be equal")
 
 }
 func TestUploadImage(t *testing.T) {
@@ -56,7 +57,7 @@ func TestUploadImage(t *testing.T) {
 	config.InitializeCloudinary("test")
 
 	// Create a mock multipart file with image content
-	mockFile := createMockMultipartFile([]byte("mock image content"), "test.jpg")
+	mockFile := createMockMultipartFile([]byte("mock image content"))
 
 	filename := "test.jpg"
 
@@ -68,5 +69,5 @@ func TestUploadImage(t *testing.T) {
 
 	//expected to have equal value for public_id and secure_id
 	assert.EqualValues(t, expectedPublicId, resp.PublicId, "public_id should be equal")
-	assert.EqualValues(t, expectedSecureUrl, resp.SecureUrl, "public_id should be equal")
+	assert.EqualValues(t, expectedSecureUrl, resp.SecureUrl, "secure_url should be equal")
 }
