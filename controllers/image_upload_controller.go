@@ -2,44 +2,40 @@ package controller
 
 import (
 	"context"
-	"log"
-	"net/http"
+	"golang_app/golangApp/config"
 
 	"github.com/cloudinary/cloudinary-go/v2"
-
-	"golang_app/golangApp/config"
+	"github.com/gofiber/fiber/v2"
 )
 
 var ctx context.Context
 var cld *cloudinary.Cloudinary
 
-func UploadFile(w http.ResponseWriter, r *http.Request) {
-	var uploadResp *config.UploadImageResponse
-	var response []byte
-	var err error
-	r.ParseMultipartForm(10 << 20)
-	file, handler, err := r.FormFile("file")
-	fileName := handler.Filename
-	folder := r.Form.Get("folder")
+func UploadFile() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var uploadResp *config.UploadImageResponse
+		form, err := c.MultipartForm()
+		if err != nil {
+			return c.JSON(ErrorResponse(err.Error()))
+		}
+		files := form.File["file"]
 
-	defer file.Close()
+		file, err := files[0].Open()
+		if err != nil {
+			return c.JSON(ErrorResponse("Failed to open file"))
+		}
+		defer file.Close()
+		fileName := files[0].Filename
+		folder := form.Value["folder"][0]
 
-	if folder != "" {
-		uploadResp, err = config.UploadImageToFolder(file, fileName, folder)
-	} else {
-		uploadResp, err = config.UploadImage(file, fileName)
+		if folder != "" {
+			uploadResp, err = config.UploadImageToFolder(file, fileName, folder)
+		} else {
+			uploadResp, err = config.UploadImage(file, fileName)
+		}
+		if err != nil {
+			return c.JSON(ErrorResponse(err.Error()))
+		}
+		return c.JSON(SuccessResponse(uploadResp))
 	}
-
-	if err != nil {
-		log.Printf("Error while Upload File, Reason: %v\n", err)
-		response = ErrorResponse(err.Error())
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write(response)
-		return
-	} else {
-		response = SuccessResponse(uploadResp)
-	}
-	// Write the JSON response
-	w.WriteHeader(http.StatusOK)
-	w.Write(response)
 }

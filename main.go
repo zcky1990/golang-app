@@ -6,7 +6,7 @@ import (
 	"golang_app/golangApp/middlewares"
 	"log"
 
-	"net/http"
+	"github.com/gofiber/fiber/v2"
 )
 
 func main() {
@@ -19,17 +19,13 @@ func main() {
 	config.InitializeCloudinary("production")
 	config.InitializeRedis("production")
 
-	r := http.NewServeMux()
+	app := fiber.New()
+	api := app.Group("/api")
 
-	indexHandler := http.HandlerFunc(controller.Index)
-	r.Handle("GET /", middlewares.UserAuthenticate(indexHandler))
+	v1 := api.Group("/v1")
+	v1.Post("/users/sign-up", controller.Signup())
+	v1.Post("/users/login", controller.Login())
 
-	r.HandleFunc("POST /api/sign-up", controller.Signup)
-	r.HandleFunc("POST /api/login", controller.Login)
-
-	uploadImageHandler := http.HandlerFunc(controller.UploadFile)
-	r.Handle("POST /api/upload-image", middlewares.UserAuthenticate(uploadImageHandler))
-
-	http.ListenAndServe(":10000", r)
-	log.Println("Run Server on : localhost:10000")
+	v1.Post("/upload/image", middlewares.JWTMiddleware(), controller.UploadFile())
+	app.Listen(":10000")
 }

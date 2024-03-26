@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	// log.Println("Initialize Environtment Variable")
+	log.Println("Initialize Environtment Variable")
 	var env string
 	currentDir, err := os.Getwd()
 	if err != nil {
@@ -29,5 +29,5 @@ func init() {
 		log.Fatal("Error loading .env file", err)
 	}
 
-	// log.Println(os.Getenv("ENV"))
+	log.Println(os.Getenv("ENV"))
 }

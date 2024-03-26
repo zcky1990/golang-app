@@ -3,93 +3,69 @@ package middlewares
 import (
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"strings"
 	"time"
 
-	"golang_app/golangApp/lib"
-
+	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/joho/godotenv"
 )
 
-var secret string
+var jwtSecret string
 
 func init() {
-	currentDir, err := os.Getwd()
-	if err != nil {
-		log.Fatal("Error get current directory", err)
-		return
-	}
-	rootDir := lib.FindRootDir(currentDir)
-	err = godotenv.Load(rootDir + "/.env")
-	if err != nil {
-		log.Fatal("Error loading .env file", err)
-	}
-	secret = os.Getenv("SECRET")
-	log.Println(secret)
+	jwtSecret = os.Getenv("SECRET")
+	log.Println("secret : " + jwtSecret)
 }
 
-func UserAuthenticate(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-		log.Println(w, "Hi there, I love !")
-
-		tokenHeader := r.Header.Get("Authorization")
-
-		if tokenHeader == "" {
-			w.WriteHeader(http.StatusForbidden)
-			w.Write([]byte("Missing auth token"))
-			return
+func JWTMiddleware() func(c *fiber.Ctx) error {
+	return func(c *fiber.Ctx) error {
+		tokenString := c.Get("Authorization")
+		if tokenString == "" {
+			return c.JSON(fiber.Map{
+				"status":  "Error",
+				"message": "Missing Auth Token",
+			})
 		}
-
-		tokenSlice := strings.Split(tokenHeader, " ")
+		tokenSlice := strings.Split(tokenString, " ")
 		if len(tokenSlice) != 2 {
-			w.WriteHeader(http.StatusForbidden)
-			w.Write([]byte("Invalid/Malformed auth token"))
-			return
+			return c.JSON(fiber.Map{
+				"status":  "Error",
+				"message": "Invalid/Malformed Auth Token",
+			})
 		}
-
-		tokenString := tokenSlice[1]
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			return []byte(secret), nil
+			return []byte(jwtSecret), nil
 		})
 
-		if err != nil {
-			w.WriteHeader(http.StatusForbidden)
-			w.Write([]byte(err.Error()))
-			return
-		}
+		log.Println("tokenString : ", tokenString)
+		log.Println("token : ", token)
+		log.Println("valid : ", token.Valid)
 
-		if !token.Valid {
-			w.WriteHeader(http.StatusForbidden)
-			w.Write([]byte("Invalid token"))
-			return
+		if err != nil || !token.Valid {
+			return c.JSON(fiber.Map{
+				"status":  "Error",
+				"message": fiber.ErrUnauthorized,
+			})
 		}
-
-		next.ServeHTTP(w, r)
-	})
+		return c.Next()
+	}
 }
 
-func GenerateToken(username string, role string) string {
-	claims := createClaim(username, role)
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	t, err := token.SignedString([]byte(secret))
+func GenerateToken(username string, password string) (string, error) {
+	log.Println("jwtSecret : " + jwtSecret)
+	token := jwt.New(jwt.SigningMethodHS256)
+	claims := token.Claims.(jwt.MapClaims)
+	claims["username"] = username
+	claims["password"] = password
+	claims["expire"] = getExpireDate()
+
+	tokenString, err := token.SignedString(jwtSecret)
 	if err != nil {
-		return err.Error()
+		return "", err
 	}
-	return fmt.Sprintf("Bearer %s", t)
-}
-
-// private method here
-func createClaim(username string, role string) jwt.MapClaims {
-	claims := jwt.MapClaims{
-		"name": username,
-		"role": role,
-		"exp":  getExpireDate(),
-	}
-	return claims
+	stringtoken := fmt.Sprintf("Bearer %s", tokenString)
+	return stringtoken, nil
 }
 
 func getExpireDate() int64 {

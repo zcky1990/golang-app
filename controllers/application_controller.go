@@ -3,44 +3,22 @@ package controller
 import (
 	"encoding/json"
 	"io"
+
+	"github.com/gofiber/fiber/v2"
 )
 
-type successResponse struct {
-	Status string      `json:"status"`
-	Data   interface{} `json:"data"`
+func SuccessResponse(data interface{}) fiber.Map {
+	return fiber.Map{
+		"status": "Success",
+		"data":   data,
+	}
 }
 
-func SuccessResponse(data interface{}) []byte {
-	response := successResponse{
-		Status: "Success",
-		Data:   data,
+func ErrorResponse(message string) fiber.Map {
+	return fiber.Map{
+		"status": "Error",
+		"error":  message,
 	}
-
-	jsonData, err := json.Marshal(response)
-	if err != nil {
-		return nil
-	}
-
-	return jsonData
-}
-
-type failedResponse struct {
-	Status       string      `json:"status"`
-	ErrorMessage interface{} `json:"error_message"`
-}
-
-func ErrorResponse(erroMessage string) []byte {
-	response := failedResponse{
-		Status:       "Error",
-		ErrorMessage: erroMessage,
-	}
-
-	jsonData, err := json.Marshal(response)
-	if err != nil {
-		return nil
-	}
-
-	return jsonData
 }
 
 func SetParams(body io.Reader, v interface{}) error {
