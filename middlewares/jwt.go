@@ -2,15 +2,16 @@ package middlewares
 
 import (
 	"fmt"
-	"os"
-	"strings"
 	"log"
 	"net/http"
+	"os"
+	"strings"
 	"time"
+
+	"golang_app/golangApp/lib"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/joho/godotenv"
-	"golang_app/golangApp/lib"
 )
 
 var secret string
@@ -33,42 +34,42 @@ func init() {
 func UserAuthenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		fmt.Fprintf(w, "Hi there, I love !")
+		log.Println(w, "Hi there, I love !")
 
-        tokenHeader := r.Header.Get("Authorization")
+		tokenHeader := r.Header.Get("Authorization")
 
-        if tokenHeader == "" {
-            w.WriteHeader(http.StatusForbidden)
-            w.Write([]byte("Missing auth token"))
-            return
-        }
+		if tokenHeader == "" {
+			w.WriteHeader(http.StatusForbidden)
+			w.Write([]byte("Missing auth token"))
+			return
+		}
 
-        tokenSlice := strings.Split(tokenHeader, " ")
-        if len(tokenSlice) != 2 {
-            w.WriteHeader(http.StatusForbidden)
-            w.Write([]byte("Invalid/Malformed auth token"))
-            return
-        }
+		tokenSlice := strings.Split(tokenHeader, " ")
+		if len(tokenSlice) != 2 {
+			w.WriteHeader(http.StatusForbidden)
+			w.Write([]byte("Invalid/Malformed auth token"))
+			return
+		}
 
-        tokenString := tokenSlice[1]
-        token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-            return []byte(secret), nil
-        })
+		tokenString := tokenSlice[1]
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			return []byte(secret), nil
+		})
 
-        if err != nil {
-            w.WriteHeader(http.StatusForbidden)
-            w.Write([]byte(err.Error()))
-            return
-        }
+		if err != nil {
+			w.WriteHeader(http.StatusForbidden)
+			w.Write([]byte(err.Error()))
+			return
+		}
 
-        if !token.Valid {
-            w.WriteHeader(http.StatusForbidden)
-            w.Write([]byte("Invalid token"))
-            return
-        }
+		if !token.Valid {
+			w.WriteHeader(http.StatusForbidden)
+			w.Write([]byte("Invalid token"))
+			return
+		}
 
-        next.ServeHTTP(w, r)
-    })
+		next.ServeHTTP(w, r)
+	})
 }
 
 func GenerateToken(username string, role string) string {
@@ -81,7 +82,7 @@ func GenerateToken(username string, role string) string {
 	return fmt.Sprintf("Bearer %s", t)
 }
 
-//private method here
+// private method here
 func createClaim(username string, role string) jwt.MapClaims {
 	claims := jwt.MapClaims{
 		"name": username,

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"golang_app/golangApp/config"
 	controller "golang_app/golangApp/controllers"
 	"golang_app/golangApp/middlewares"
@@ -25,10 +24,12 @@ func main() {
 	indexHandler := http.HandlerFunc(controller.Index)
 	r.Handle("GET /", middlewares.UserAuthenticate(indexHandler))
 
-	r.HandleFunc("POST /login", controller.Login)
+	r.HandleFunc("POST /api/sign-up", controller.Signup)
+	r.HandleFunc("POST /api/login", controller.Login)
 
-	r.HandleFunc("POST /upload-image", controller.UploadFile)
+	uploadImageHandler := http.HandlerFunc(controller.UploadFile)
+	r.Handle("POST /api/upload-image", middlewares.UserAuthenticate(uploadImageHandler))
 
 	http.ListenAndServe(":10000", r)
-	fmt.Println("Run Server on : localhost:10000")
+	log.Println("Run Server on : localhost:10000")
 }

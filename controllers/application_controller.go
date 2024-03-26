@@ -12,7 +12,7 @@ type successResponse struct {
 
 func SuccessResponse(data interface{}) []byte {
 	response := successResponse{
-		Status: "success",
+		Status: "Success",
 		Data:   data,
 	}
 
