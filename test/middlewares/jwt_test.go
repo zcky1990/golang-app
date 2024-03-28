@@ -1,46 +1,74 @@
 package middlewares
 
 import (
+	"encoding/json"
+	"io"
+	"net/http/httptest"
 	"testing"
 
 	"golang_app/golangApp/middlewares"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
-	"github.com/valyala/fasthttp"
 )
+
+func MockHandler(c *fiber.Ctx) error {
+	// Return a mock response
+	return c.SendString("This is a mock response")
+}
 
 func TestGenerateToken(t *testing.T) {
 	token, err := middlewares.GenerateToken("testuser", "testpassword")
 	// Check if the token is generated successfully
-	if err != nil {
-
-		assert.NotNil(t, err, "expected error not to be nil")
-	}
+	assert.NoError(t, err)
 
 	// Check if the generated token is in the expected format
 	expectedPrefix := "Bearer "
-	if !startsWith(token, expectedPrefix) {
-		t.Errorf("Expected token to start with '%s', got: %s", expectedPrefix, token)
-	}
+	assert.Contains(t, token, expectedPrefix)
 }
 
 func TestJWTMiddleware(t *testing.T) {
 	//see https://github.com/gofiber/fiber/blob/main/ctx_test.go to create mock context
+	var body map[string]string
 	app := fiber.New()
-	c := app.AcquireCtx(&fasthttp.RequestCtx{})
+	//create mock endpoint to test JWT middleware
+	app.Post("/", middlewares.JWTMiddleware(), MockHandler)
 
-	// Set up a mock request with a valid JWT token in the Authorization header
-	c.Request().Header.Set("Authorization", "Bearer valid_token")
+	// Set up a mock request with
+	req := httptest.NewRequest("POST", "/", nil)
+	req.Header.Set("Content-Type", "application/json")
+	//check if the response message is "Missing Auth Token
+	resp, _ := app.Test(req)
+	data, _ := io.ReadAll(resp.Body)
 
-	// Call the JWT middleware function
-	err := middlewares.JWTMiddleware()(c)
-	// Check if the middleware returns an error (it should not for a valid token)
-	if err != nil {
-		t.Errorf("Expected no error, got: %v", err)
-	}
-}
+	json.Unmarshal(data, &body)
+	assert.Equal(t, "Missing Auth Token", body["message"])
 
-func startsWith(s, prefix string) bool {
-	return len(s) >= len(prefix) && s[:len(prefix)] == prefix
+	//test if header not contain Bearer prefix in the request
+	req.Header.Set("Authorization", "invalid_token")
+	resp, _ = app.Test(req)
+	data, _ = io.ReadAll(resp.Body)
+	json.Unmarshal(data, &body)
+	assert.Equal(t, "Invalid/Malformed Auth Token", body["message"])
+
+	//test if header with invalid in the request when parse
+	req.Header.Set("Authorization", "Bearer invalid_token")
+	resp, _ = app.Test(req)
+	data, _ = io.ReadAll(resp.Body)
+	json.Unmarshal(data, &body)
+	assert.Equal(t, "token is malformed: token contains an invalid number of segments", body["message"])
+
+	//test if header with invalid token
+	req.Header.Set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmUiOjE3MTE5MDQ1OTcsInBhc3N3b3JkIjoiMTIzNDU2Njc3IiwidXNlcm5hbWUiOiJqb2huQGV4YW1wbGUuY29tIn0.qsApVZ4FNF4oQ_iVPywyBDcvfmEVFOuHB8wRW1n2IdM")
+	resp, _ = app.Test(req)
+	data, _ = io.ReadAll(resp.Body)
+	json.Unmarshal(data, &body)
+	assert.Equal(t, "token signature is invalid: signature is invalid", body["message"])
+
+	//test using valid token
+	//generate token to test and set to header
+	token, _ := middlewares.GenerateToken("testuser", "testpassword")
+	req.Header.Set("Authorization", token)
+	resp, _ = app.Test(req)
+	assert.Equal(t, 200, resp.StatusCode)
 }
