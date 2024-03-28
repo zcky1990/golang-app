@@ -26,15 +26,9 @@ func InitializeCloudinary(env string) {
 	var api string
 	var secret string
 
-	if env != "test" {
-		name = os.Getenv("CLOUD_NAME")
-		api = os.Getenv("CLOUD_API_KEY")
-		secret = os.Getenv("CLOUD_API_SECRET")
-	} else {
-		name = os.Getenv("CLOUD_NAME_TEST")
-		api = os.Getenv("CLOUD_API_KEY_TEST")
-		secret = os.Getenv("CLOUD_API_SECRET_TEST")
-	}
+	name = os.Getenv("CLOUD_NAME")
+	api = os.Getenv("CLOUD_API_KEY")
+	secret = os.Getenv("CLOUD_API_SECRET")
 
 	// log.Println("Initialize cloudinary")
 	cld, _ = cloudinary.NewFromParams(name, api, secret)

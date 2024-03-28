@@ -23,21 +23,13 @@ func InitializeRedis(env string) {
 	var address string
 	var redisUrl string
 
-	if env != "test" {
-		redisUrl = os.Getenv("REDIS_URL")
-		username = os.Getenv("REDIS_USERNAME")
-		password = os.Getenv("REDIS_PASSWORD")
-		host = os.Getenv("REDIS_HOST")
-		port = os.Getenv("REDIS_PORT")
-		db, _ = strconv.Atoi(os.Getenv("REDIS_DB"))
-	} else {
-		redisUrl = os.Getenv("REDIS_URL_TEST")
-		username = os.Getenv("REDIS_USERNAME_TEST")
-		password = os.Getenv("REDIS_PASSWORD_TEST")
-		host = os.Getenv("REDIS_HOST_TEST")
-		port = os.Getenv("REDIS_PORT_TEST")
-		db, _ = strconv.Atoi(os.Getenv("REDIS_DB_TEST"))
-	}
+	redisUrl = os.Getenv("REDIS_URL")
+	username = os.Getenv("REDIS_USERNAME")
+	password = os.Getenv("REDIS_PASSWORD")
+	host = os.Getenv("REDIS_HOST")
+	port = os.Getenv("REDIS_PORT")
+	db, _ = strconv.Atoi(os.Getenv("REDIS_DB"))
+
 	// log.Println("Initialize Redis")
 	if host != "" && port != "" {
 		address = s.Join([]string{host, port}, ":")

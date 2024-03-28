@@ -34,13 +34,14 @@ func TestJWTMiddleware(t *testing.T) {
 	//create mock endpoint to test JWT middleware
 	app.Post("/", middlewares.JWTMiddleware(), MockHandler)
 
-	// Set up a mock request with
+	// Set up a mock request
 	req := httptest.NewRequest("POST", "/", nil)
 	req.Header.Set("Content-Type", "application/json")
+
+	// Set up a mock response
 	//check if the response message is "Missing Auth Token
 	resp, _ := app.Test(req)
 	data, _ := io.ReadAll(resp.Body)
-
 	json.Unmarshal(data, &body)
 	assert.Equal(t, "Missing Auth Token", body["message"])
 

@@ -1,4 +1,7 @@
 #production/development envirotment
+SECRET=""
+
+#mongodb
 MONGO_HOST=""
 MONGO_TYPE=""
 MONGO_PORT=""
@@ -7,10 +10,12 @@ MONGO_USERNAME=""
 MONGO_PASSWORD=""
 MONGO_OPTION=""
 
+#cloudinary
 CLOUD_NAME=""
 CLOUD_API_KEY=""
 CLOUD_API_SECRET=""
 
+#redis
 REDIS_USERNAME=""
 REDIS_PASSWORD=""
 REDIS_HOST=""
