@@ -8,8 +8,11 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// this init method will called first when we import config package
+// it will load all the env variables from.env file
+// and set the env variable to global variables
+// we read different env file for test and production
 func init() {
-	log.Println("Initialize Environtment Variable")
 	var env string
 	currentDir, err := os.Getwd()
 	if err != nil {
@@ -28,6 +31,4 @@ func init() {
 	if err != nil {
 		log.Fatal("Error loading .env file", err)
 	}
-
-	log.Println(os.Getenv("ENV"))
 }

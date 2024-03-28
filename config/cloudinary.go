@@ -2,7 +2,6 @@ package config
 
 import (
 	"context"
-	"log"
 	"mime/multipart"
 	"os"
 
@@ -38,7 +37,7 @@ func InitializeCloudinary(env string) {
 func UploadImageToFolder(file multipart.File, filename string, folder string) (*UploadImageResponse, error) {
 	resp, err := cld.Upload.Upload(cloudinaryCtx, file, uploader.UploadParams{PublicID: s.Join([]string{folder, filename}, "/")})
 	if err != nil {
-		log.Printf("Error while Upload File, Reason: %v\n", err)
+		// log.Printf("Error while Upload File, Reason: %v\n", err)
 		return nil, err
 	} else {
 		responseUpload := &UploadImageResponse{
@@ -53,7 +52,7 @@ func UploadImageToFolder(file multipart.File, filename string, folder string) (*
 func UploadImage(file multipart.File, filename string) (*UploadImageResponse, error) {
 	resp, err := cld.Upload.Upload(cloudinaryCtx, file, uploader.UploadParams{PublicID: filename})
 	if err != nil {
-		log.Printf("Error while Upload File, Reason: %v\n", err)
+		// log.Printf("Error while Upload File, Reason: %v\n", err)
 		return nil, err
 	} else {
 		responseUpload := &UploadImageResponse{

@@ -64,7 +64,7 @@ func ConnectMongoDB(env string) error {
 	var err error
 	client, err = mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
-		log.Fatal("Error creating MongoDB client:", err)
+		// log.Fatal("Error creating MongoDB client:", err)
 		return err
 	}
 
@@ -98,7 +98,7 @@ func createUserIndex() error {
 	}
 	_, err := db.Collection("User").Indexes().CreateOne(context.Background(), indexModel)
 	if err != nil {
-		log.Printf("Error creating index: %v\n", err)
+		// log.Printf("Error creating index: %v\n", err)
 		return err
 	}
 	return nil
