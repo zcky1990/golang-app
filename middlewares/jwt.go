@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strings"
 	"time"
@@ -11,15 +10,15 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtSecret string
+var jwtSecret []byte
 
 func init() {
-	jwtSecret = os.Getenv("SECRET")
-	log.Println("secret : " + jwtSecret)
+	jwtSecret = []byte(os.Getenv("SECRET"))
 }
 
 func JWTMiddleware() func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
+		const BEARER_SCHEMA = "Bearer "
 		tokenString := c.Get("Authorization")
 		if tokenString == "" {
 			return c.JSON(fiber.Map{
@@ -27,33 +26,36 @@ func JWTMiddleware() func(c *fiber.Ctx) error {
 				"message": "Missing Auth Token",
 			})
 		}
-		tokenSlice := strings.Split(tokenString, " ")
-		if len(tokenSlice) != 2 {
+		if !strings.Contains(tokenString, BEARER_SCHEMA) {
 			return c.JSON(fiber.Map{
 				"status":  "Error",
 				"message": "Invalid/Malformed Auth Token",
 			})
-		}
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			return []byte(jwtSecret), nil
-		})
-
-		log.Println("tokenString : ", tokenString)
-		log.Println("token : ", token)
-		log.Println("valid : ", token.Valid)
-
-		if err != nil || !token.Valid {
-			return c.JSON(fiber.Map{
-				"status":  "Error",
-				"message": fiber.ErrUnauthorized,
+		} else {
+			tokenSlice := strings.Replace(tokenString, BEARER_SCHEMA, "", -1)
+			token, err := jwt.Parse(tokenSlice, func(token *jwt.Token) (interface{}, error) {
+				return jwtSecret, nil
 			})
+			if err != nil {
+				return c.JSON(fiber.Map{
+					"status":  "Error",
+					"message": err.Error(),
+				})
+			}
+			if !token.Valid {
+				return c.JSON(fiber.Map{
+					"status":  "Error",
+					"message": "Token Invalid",
+				})
+			}
+
 		}
+
 		return c.Next()
 	}
 }
 
 func GenerateToken(username string, password string) (string, error) {
-	log.Println("jwtSecret : " + jwtSecret)
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 	claims["username"] = username
