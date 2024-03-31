@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"io"
 
+	"golang_app/golangApp/config"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -27,4 +29,9 @@ func SetParams(body io.Reader, v interface{}) error {
 		return err
 	}
 	return nil
+}
+
+func Localization(message string) string {
+	locale, _ := config.GetInstance().GetMessage(message)
+	return locale
 }

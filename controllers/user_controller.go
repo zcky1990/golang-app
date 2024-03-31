@@ -15,7 +15,7 @@ func Signup() fiber.Handler {
 		}
 		user := models.GetUserByEmail(params.Email)
 		if user != nil {
-			return c.JSON(ErrorResponse("Email Has been taken"))
+			return c.JSON(ErrorResponse(Localization("EMAIL_TAKEN")))
 		}
 		data, err := models.CreateUser(params)
 		if err != nil {
@@ -45,7 +45,7 @@ func Login() fiber.Handler {
 					return c.JSON(ErrorResponse(err.Error()))
 				}
 			} else {
-				return c.JSON(ErrorResponse("User not found"))
+				return c.JSON(ErrorResponse(Localization("USER_NOT_FOUND")))
 			}
 		} else {
 			return c.JSON(ErrorResponse(err.Error()))
@@ -72,7 +72,7 @@ func UpdateUser() fiber.Handler {
 			}
 			return c.JSON(SuccessResponse(response))
 		} else {
-			return c.JSON(ErrorResponse("User not found"))
+			return c.JSON(ErrorResponse(Localization("USER_NOT_FOUND")))
 		}
 	}
 }

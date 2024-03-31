@@ -1,0 +1,10 @@
+en:
+  hello: "Hello world"
+  USER_NOT_FOUND: "User not Found"
+  EMAIL_TAKEN: "Email Has been taken"
+  FAILED_OPEN_FILE: "Failed to open file"
+ind:
+  hello: "Hallo"
+  USER_NOT_FOUND: "User tidak ditemukan"
+  EMAIL_TAKEN: "Email sudah digunakan"
+  FAILED_OPEN_FILE: "Gagal membaca file"

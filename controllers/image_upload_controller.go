@@ -22,7 +22,7 @@ func UploadFile() fiber.Handler {
 
 		file, err := files[0].Open()
 		if err != nil {
-			return c.JSON(ErrorResponse("Failed to open file"))
+			return c.JSON(ErrorResponse(Localization("FAILED_OPEN_FILE")))
 		}
 		defer file.Close()
 		fileName := files[0].Filename
