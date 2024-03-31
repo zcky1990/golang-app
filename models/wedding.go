@@ -105,7 +105,12 @@ func ConvertWeddingDataToBSON(data WeddingData) (bson.M, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	// remove empty value from bson
+	for key, value := range bsonMap {
+		if value == "" || value == nil {
+			delete(bsonMap, key)
+		}
+	}
 	return bsonMap, nil
 }
 
