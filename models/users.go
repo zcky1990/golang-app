@@ -15,6 +15,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+const USER_COLLECTION = "User"
+
 // use omitempty to automatically add id if we add empty id
 type User struct {
 	Id        primitive.ObjectID `bson:"_id,omitempty"`
@@ -48,7 +50,7 @@ func ConvertUserToBSON(data User) (bson.M, error) {
 }
 
 func CreateUser(user User) (string, error) {
-	result, err := config.GetDB().Collection("User").InsertOne(context.Background(), user)
+	result, err := config.GetDB().Collection(USER_COLLECTION).InsertOne(context.Background(), user)
 	if err != nil {
 		// log.Printf("Error while inserting user: %v\n", err)
 		return "", err
@@ -64,7 +66,7 @@ func CreateUser(user User) (string, error) {
 func UpdateUserById(id string, updates User) (string, error) {
 	objID, _ := primitive.ObjectIDFromHex(id)
 	data, _ := ConvertUserToBSON(updates)
-	result, err := config.GetDB().Collection("User").UpdateOne(
+	result, err := config.GetDB().Collection(USER_COLLECTION).UpdateOne(
 		context.TODO(),
 		bson.M{"_id": objID},
 		bson.M{"$set": data},
@@ -80,7 +82,7 @@ func UpdateUserById(id string, updates User) (string, error) {
 
 func GetUserByEmail(email string) *User {
 	result := User{}
-	err := config.GetDB().Collection("User").FindOne(context.TODO(), bson.M{"email": email}).Decode(&result)
+	err := config.GetDB().Collection(USER_COLLECTION).FindOne(context.TODO(), bson.M{"email": email}).Decode(&result)
 	if err != nil {
 		return nil
 	}
@@ -89,7 +91,7 @@ func GetUserByEmail(email string) *User {
 
 func DeleteUserById(id string) error {
 	objID, _ := primitive.ObjectIDFromHex(id)
-	_, err := config.GetDB().Collection("User").DeleteOne(context.TODO(), bson.M{"_id": objID})
+	_, err := config.GetDB().Collection(USER_COLLECTION).DeleteOne(context.TODO(), bson.M{"_id": objID})
 	if err != nil {
 		return err
 	}
@@ -98,7 +100,7 @@ func DeleteUserById(id string) error {
 
 func GetUserByEmailAndPassword(email string, password string) (*User, error) {
 	var result User
-	err := config.GetDB().Collection("User").FindOne(context.TODO(), bson.M{"email": email, "password": password}).Decode(&result)
+	err := config.GetDB().Collection(USER_COLLECTION).FindOne(context.TODO(), bson.M{"email": email, "password": password}).Decode(&result)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, nil
@@ -114,7 +116,7 @@ func GetAllUserList(page, pageSize int) ([]User, error) {
 	options := options.Find().
 		SetSkip(int64(offset)).
 		SetLimit(int64(pageSize))
-	cursor, err := config.GetDB().Collection("User").Find(context.TODO(), bson.M{}, options)
+	cursor, err := config.GetDB().Collection(USER_COLLECTION).Find(context.TODO(), bson.M{}, options)
 	if err != nil {
 		// log.Printf("Error while getting all users: %v\n", err)
 		return nil, err
@@ -146,7 +148,7 @@ func SearchUser(searchType string, query string) *[]User {
 	if searchType == "email" {
 		filter = bson.M{"email": query}
 	}
-	cursor, err := config.GetDB().Collection("User").Find(context.TODO(), filter)
+	cursor, err := config.GetDB().Collection(USER_COLLECTION).Find(context.TODO(), filter)
 	if err != nil {
 		// log.Printf("Error while searching for users: %v\n", err)
 		return nil

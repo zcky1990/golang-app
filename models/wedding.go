@@ -10,6 +10,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+const WEDDING_COLLECTION = "wedding_data"
+
 type SocialMedia struct {
 	Username string `json:"username"`
 	Link     string `json:"link"`
@@ -108,7 +110,7 @@ func ConvertWeddingDataToBSON(data WeddingData) (bson.M, error) {
 }
 
 func CreateWeddingData(data WeddingData) (string, error) {
-	result, err := config.GetDB().Collection("wedding_data").InsertOne(context.Background(), data)
+	result, err := config.GetDB().Collection(WEDDING_COLLECTION).InsertOne(context.Background(), data)
 	if err != nil {
 		return "", err
 	}
@@ -125,7 +127,7 @@ func CreateWeddingData(data WeddingData) (string, error) {
 func UpdateWeddingDataById(id string, updates WeddingData) (string, error) {
 	objID, _ := primitive.ObjectIDFromHex(id)
 	data, _ := ConvertWeddingDataToBSON(updates)
-	result, err := config.GetDB().Collection("wedding_data").UpdateOne(
+	result, err := config.GetDB().Collection(WEDDING_COLLECTION).UpdateOne(
 		context.TODO(),
 		bson.M{"_id": objID},
 		bson.M{"$set": data},
@@ -142,7 +144,7 @@ func UpdateWeddingDataById(id string, updates WeddingData) (string, error) {
 func GetWeddingDataById(id string) *WeddingData {
 	result := WeddingData{}
 	objID, _ := primitive.ObjectIDFromHex(id)
-	err := config.GetDB().Collection("wedding_data").FindOne(context.TODO(), bson.M{"_id": objID}).Decode(&result)
+	err := config.GetDB().Collection(WEDDING_COLLECTION).FindOne(context.TODO(), bson.M{"_id": objID}).Decode(&result)
 	if err != nil {
 		return nil
 	}
@@ -152,7 +154,7 @@ func GetWeddingDataById(id string) *WeddingData {
 func GetWeddingDataByUserId(userId string) *WeddingData {
 	result := WeddingData{}
 	objID, _ := primitive.ObjectIDFromHex(userId)
-	err := config.GetDB().Collection("wedding_data").FindOne(context.TODO(), bson.M{"user_id": objID}).Decode(&result)
+	err := config.GetDB().Collection(WEDDING_COLLECTION).FindOne(context.TODO(), bson.M{"user_id": objID}).Decode(&result)
 	if err != nil {
 		return nil
 	}
@@ -161,7 +163,7 @@ func GetWeddingDataByUserId(userId string) *WeddingData {
 
 func DeleteWeddingDataById(id string) error {
 	objID, _ := primitive.ObjectIDFromHex(id)
-	_, err := config.GetDB().Collection("wedding_data").DeleteOne(context.TODO(), bson.M{"_id": objID})
+	_, err := config.GetDB().Collection(WEDDING_COLLECTION).DeleteOne(context.TODO(), bson.M{"_id": objID})
 	if err != nil {
 		return err
 	}
