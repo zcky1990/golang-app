@@ -25,6 +25,7 @@ func main() {
 	v1 := api.Group("/v1")
 	v1.Post("/users/sign-up", controller.Signup())
 	v1.Post("/users/login", controller.Login())
+	v1.Post("/users/update-user", middlewares.JWTMiddleware(), controller.UpdateUser())
 
 	v1.Post("/upload/image", middlewares.JWTMiddleware(), controller.UploadFile())
 	app.Listen(":10000")

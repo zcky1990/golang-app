@@ -38,7 +38,12 @@ func ConvertUserToBSON(data User) (bson.M, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	//remove empty value from bson
+	for key, value := range bsonMap {
+		if value == "" || value == nil {
+			delete(bsonMap, key)
+		}
+	}
 	return bsonMap, nil
 }
 
@@ -68,9 +73,9 @@ func UpdateUserById(id string, updates User) (string, error) {
 		return "", err
 	}
 	if result.ModifiedCount == 0 {
-		return "", errors.New("no user updated")
+		return "", errors.New("No User Updated")
 	}
-	return "success update", nil
+	return "Success Update User", nil
 }
 
 func GetUserByEmail(email string) *User {
