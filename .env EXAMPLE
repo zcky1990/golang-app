@@ -1,4 +1,5 @@
 #production/development envirotment
+ENV=""
 SECRET=""
 
 #mongodb

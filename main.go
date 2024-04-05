@@ -9,16 +9,21 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func main() {
-	err := config.ConnectMongoDB("production")
+func init() {
+	err := config.ConnectMongoDB(config.GetEnv())
 	if err != nil {
 		log.Fatalf("Error connecting to MongoDB: %v", err)
 	}
-	defer config.DisconnectMongoDB()
+	config.InitializeCloudinary(config.GetEnv())
+	config.InitializeRedis(config.GetEnv())
+}
 
-	config.InitializeCloudinary("production")
-	config.InitializeRedis("production")
+func DisconnectDB() {
+	config.DisconnectMongoDB()
+}
 
+func main() {
+	defer DisconnectDB()
 	app := fiber.New()
 	api := app.Group("/api")
 
