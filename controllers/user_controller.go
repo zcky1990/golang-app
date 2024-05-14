@@ -7,17 +7,19 @@ import (
 	"golang_app/golangApp/models"
 	"golang_app/golangApp/services"
 	"golang_app/golangApp/utils/localize"
+	"golang_app/golangApp/utils/redis"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type UserController struct {
-	Service     *services.UserService
-	Translation *localize.Localization
+	service     *services.UserService
+	translation *localize.Localization
+	redis       *redis.RedisClient
 }
 
-func NewUserController(userService *services.UserService, localize *localize.Localization) *UserController {
-	return &UserController{Service: userService, Translation: localize}
+func NewUserController(userService *services.UserService, localize *localize.Localization, redis *redis.RedisClient) *UserController {
+	return &UserController{service: userService, translation: localize, redis: redis}
 }
 
 func (c *UserController) Signup() fiber.Handler {
@@ -26,11 +28,11 @@ func (c *UserController) Signup() fiber.Handler {
 		if err := ctx.BodyParser(&params); err != nil {
 			return ctx.JSON(ErrorResponse(err.Error()))
 		}
-		user := c.Service.GetUserByEmail(params.Email)
+		user := c.service.GetUserByEmail(params.Email)
 		if user != nil {
-			return ctx.JSON(ErrorResponse(c.Translation.Localization(constant.EMAIL_TAKEN)))
+			return ctx.JSON(ErrorResponse(c.translation.Localization(constant.EMAIL_TAKEN)))
 		}
-		data, err := c.Service.CreateUser(params)
+		data, err := c.service.CreateUser(params)
 		if err != nil {
 			return ctx.JSON(ErrorResponse(fmt.Sprintf("%s : %s", constant.MESSAGE_ERROR_FAILED_CREATE_USER, err.Error())))
 		}
@@ -55,7 +57,7 @@ func (c *UserController) Login() fiber.Handler {
 		if err := ctx.BodyParser(&params); err != nil {
 			return ctx.JSON(ErrorResponse(err.Error()))
 		}
-		responseUser, err := c.Service.GetUserByEmailAndPassword(params.Email, params.Password)
+		responseUser, err := c.service.GetUserByEmailAndPassword(params.Email, params.Password)
 		if err == nil {
 			if responseUser != nil {
 				token, err = middlewares.GenerateToken(params.Email, params.Password)
@@ -63,7 +65,7 @@ func (c *UserController) Login() fiber.Handler {
 					return ctx.JSON(ErrorResponse(err.Error()))
 				}
 			} else {
-				return ctx.JSON(ErrorResponse(c.Translation.Localization(constant.USER_NOT_FOUND)))
+				return ctx.JSON(ErrorResponse(c.translation.Localization(constant.USER_NOT_FOUND)))
 			}
 		} else {
 			return ctx.JSON(ErrorResponse(err.Error()))
@@ -85,15 +87,15 @@ func (c *UserController) UpdateUser() fiber.Handler {
 		if err := ctx.BodyParser(&params); err != nil {
 			return ctx.JSON(ErrorResponse(err.Error()))
 		}
-		user := c.Service.GetUserByEmail(params.Email)
+		user := c.service.GetUserByEmail(params.Email)
 		if user != nil {
-			response, err := c.Service.UpdateUserById(user.Id.Hex(), params)
+			response, err := c.service.UpdateUserById(user.Id.Hex(), params)
 			if err != nil {
 				return ctx.JSON(ErrorResponse(err.Error()))
 			}
 			return ctx.JSON(SuccessResponse(response))
 		} else {
-			return ctx.JSON(ErrorResponse(c.Translation.Localization(constant.USER_NOT_FOUND)))
+			return ctx.JSON(ErrorResponse(c.translation.Localization(constant.USER_NOT_FOUND)))
 		}
 	}
 }

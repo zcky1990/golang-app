@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 
@@ -12,85 +13,88 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// initializing the db object as a package-level variable
-var db *mongo.Database
-
-// initializing the client object as a package-level variable
-var client *mongo.Client
-
-func GetDB() *mongo.Database {
-	return db
+// MongoDB struct holds the client and database references
+type MongoDB struct {
+	client *mongo.Client
+	db     *mongo.Database
 }
 
-func GetClient() *mongo.Client {
-	return client
-}
+// NewMongoDB initializes a new MongoDB instance
+func NewMongoDB() (*MongoDB, error) {
+	mongoHost := os.Getenv(c.MONGO_HOST)
+	mongoPort := os.Getenv(c.MONGO_PORT)
+	mongoType := os.Getenv(c.MONGO_TYPE)
+	mongoOption := os.Getenv(c.MONGO_OPTION)
+	mongoUsername := os.Getenv(c.MONGO_USERNAME)
+	mongoPassword := os.Getenv(c.MONGO_PASSWORD)
+	databaseName := os.Getenv(c.MONGO_DATABASE_NAME)
 
-func ConnectMongoDB(env string) error {
-	var mongoHost string
-	var mongoPort string
-	var mongoType string
-	var mongoOption string
-	var mongoUsername string
-	var mongoPassword string
-	var databaseName string
-
-	mongoHost = os.Getenv(c.MONGO_HOST)
-	mongoPort = os.Getenv(c.MONGO_PORT)
-	mongoType = os.Getenv(c.MONGO_TYPE)
-	mongoOption = os.Getenv(c.MONGO_OPTION)
-	mongoUsername = os.Getenv(c.MONGO_USERNAME)
-	mongoPassword = os.Getenv(c.MONGO_PASSWORD)
-	databaseName = os.Getenv(c.MONGO_DATABASE_NAME)
-
-	var url string
-	if mongoPort != "" {
-		url = mongoHost + ":" + mongoPort
-	} else {
-		url = mongoHost
-	}
-
-	if mongoUsername != "" && mongoPassword != "" {
-		url = mongoUsername + ":" + mongoPassword + "@" + url
-	}
-
-	if mongoOption != "" {
-		url = url + "/" + mongoOption
-	}
-
-	mongoURL := mongoType + "://" + url
+	url := buildMongoURL(mongoHost, mongoPort, mongoType, mongoOption, mongoUsername, mongoPassword)
 
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-	clientOptions := options.Client().ApplyURI(mongoURL).SetServerAPIOptions(serverAPI)
+	clientOptions := options.Client().ApplyURI(url).SetServerAPIOptions(serverAPI)
 
-	var err error
-	client, err = mongo.Connect(context.TODO(), clientOptions)
+	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
-		// log.Fatal("Error creating MongoDB client:", err)
-		return err
+		return nil, fmt.Errorf("error creating MongoDB client: %w", err)
 	}
 
-	// log.Println("MongoDB connected successfully!")
+	db := client.Database(databaseName)
 
-	db = client.Database(databaseName)
-	// log.Println("Connected to MongoDB!")
-	createUserIndex()
-	return nil
+	mdb := &MongoDB{
+		client: client,
+		db:     db,
+	}
+
+	if err := mdb.createUserIndex(); err != nil {
+		return nil, err
+	}
+
+	log.Println("Connected to MongoDB!")
+	return mdb, nil
 }
 
-func DisconnectMongoDB() {
-	if client != nil {
-		err := client.Disconnect(context.Background())
+// buildMongoURL constructs the MongoDB connection URL
+func buildMongoURL(host, port, typ, option, username, password string) string {
+	url := fmt.Sprintf("%s://", typ)
+	if username != "" && password != "" {
+		url += fmt.Sprintf("%s:%s@", username, password)
+	}
+	if port != "" {
+		url += fmt.Sprintf("%s:%s", host, port)
+	} else {
+		url += host
+	}
+	if option != "" {
+		url += "/" + option
+	}
+	return url
+}
+
+// GetDB returns the MongoDB database instance
+func (mdb *MongoDB) GetDB() *mongo.Database {
+	return mdb.db
+}
+
+// GetClient returns the MongoDB client instance
+func (mdb *MongoDB) GetClient() *mongo.Client {
+	return mdb.client
+}
+
+// Disconnect disconnects the MongoDB client
+func (mdb *MongoDB) Disconnect() {
+	if mdb.client != nil {
+		err := mdb.client.Disconnect(context.Background())
 		if err != nil {
 			log.Printf("Error disconnecting from MongoDB: %v", err)
 		} else {
-			client = nil
 			log.Println("Disconnected from MongoDB")
 		}
 	}
 }
 
-func createUserIndex() error {
+// createUserIndex creates an index on the User collection
+func (mdb *MongoDB) createUserIndex() error {
 	indexOptions := options.Index().SetUnique(true)
 	indexModel := mongo.IndexModel{
 		Keys: bson.M{
@@ -98,10 +102,9 @@ func createUserIndex() error {
 		},
 		Options: indexOptions,
 	}
-	_, err := db.Collection("User").Indexes().CreateOne(context.Background(), indexModel)
+	_, err := mdb.db.Collection("User").Indexes().CreateOne(context.Background(), indexModel)
 	if err != nil {
-		// log.Printf("Error creating index: %v\n", err)
-		return err
+		return fmt.Errorf("error creating index: %w", err)
 	}
 	return nil
 }

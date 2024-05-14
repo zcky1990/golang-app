@@ -6,6 +6,7 @@ import (
 	"golang_app/golangApp/middlewares"
 	"golang_app/golangApp/services"
 	"golang_app/golangApp/utils/localize"
+	"golang_app/golangApp/utils/redis"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -15,31 +16,28 @@ var env string
 
 func init() {
 	env = config.GetEnv()
-	err := config.ConnectMongoDB(env)
-	if err != nil {
-		log.Fatalf("Error connecting to MongoDB: %v", err)
-	}
-	config.InitializeRedis(config.GetEnv())
-}
-
-func DisconnectDB() {
-	config.DisconnectMongoDB()
 }
 
 func main() {
-	defer DisconnectDB()
+	mongoDB, err := config.NewMongoDB()
+	if err != nil {
+		log.Fatalf("Failed to connect to MongoDB: %v", err)
+	}
+
+	defer mongoDB.Disconnect()
 	app := fiber.New()
 	api := app.Group("/api")
 
 	v1 := api.Group("/v1")
 
 	translation := localize.NewLocalization()
+	redisClient := redis.NewRedisClient()
 
-	userService := services.NewUserService(translation)
-	userController := controllers.NewUserController(userService, translation)
+	userService := services.NewUserService(mongoDB, translation, redisClient)
+	userController := controllers.NewUserController(userService, translation, redisClient)
 
-	cloudinaryService := services.NewUCloudinaryService(translation)
-	imageController := controllers.NewCloudinaryController(cloudinaryService, translation)
+	cloudinaryService := services.NewUCloudinaryService(translation, redisClient)
+	imageController := controllers.NewCloudinaryController(cloudinaryService, translation, redisClient)
 
 	v1.Post("/users/sign-up", userController.Signup())
 	v1.Post("/users/login", userController.Login())

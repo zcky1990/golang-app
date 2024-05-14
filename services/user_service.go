@@ -8,6 +8,7 @@ import (
 	"golang_app/golangApp/constant"
 	"golang_app/golangApp/models"
 	"golang_app/golangApp/utils/localize"
+	"golang_app/golangApp/utils/redis"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -18,13 +19,14 @@ import (
 const USER_COLLECTION = "User"
 
 type UserService struct {
-	Collection  *mongo.Collection
-	Translation *localize.Localization
+	collection  *mongo.Collection
+	translation *localize.Localization
+	redis       *redis.RedisClient
 }
 
-func NewUserService(locale *localize.Localization) *UserService {
-	collection := config.GetDB().Collection(USER_COLLECTION)
-	return &UserService{Collection: collection, Translation: locale}
+func NewUserService(mongodb *config.MongoDB, locale *localize.Localization, redis *redis.RedisClient) *UserService {
+	collection := mongodb.GetDB().Collection(USER_COLLECTION)
+	return &UserService{collection: collection, translation: locale, redis: redis}
 }
 
 func (s *UserService) ConvertUserToBSON(data models.User) (bson.M, error) {
@@ -46,7 +48,7 @@ func (s *UserService) ConvertUserToBSON(data models.User) (bson.M, error) {
 }
 
 func (s *UserService) CreateUser(user models.User) (string, error) {
-	result, err := s.Collection.InsertOne(context.Background(), user)
+	result, err := s.collection.InsertOne(context.Background(), user)
 	if err != nil {
 		// log.Printf("Error while inserting user: %v\n", err)
 		return "", err
@@ -62,7 +64,7 @@ func (s *UserService) CreateUser(user models.User) (string, error) {
 func (s *UserService) UpdateUserById(id string, updates models.User) (string, error) {
 	objID, _ := primitive.ObjectIDFromHex(id)
 	data, _ := s.ConvertUserToBSON(updates)
-	result, err := s.Collection.UpdateOne(
+	result, err := s.collection.UpdateOne(
 		context.TODO(),
 		bson.M{"_id": objID},
 		bson.M{"$set": data},
@@ -78,7 +80,7 @@ func (s *UserService) UpdateUserById(id string, updates models.User) (string, er
 
 func (s *UserService) GetUserByEmail(email string) *models.User {
 	result := models.User{}
-	err := s.Collection.FindOne(context.TODO(), bson.M{"email": email}).Decode(&result)
+	err := s.collection.FindOne(context.TODO(), bson.M{"email": email}).Decode(&result)
 	if err != nil {
 		return nil
 	}
@@ -87,7 +89,7 @@ func (s *UserService) GetUserByEmail(email string) *models.User {
 
 func (s *UserService) DeleteUserById(id string) error {
 	objID, _ := primitive.ObjectIDFromHex(id)
-	_, err := s.Collection.DeleteOne(context.TODO(), bson.M{"_id": objID})
+	_, err := s.collection.DeleteOne(context.TODO(), bson.M{"_id": objID})
 	if err != nil {
 		return err
 	}
@@ -96,7 +98,7 @@ func (s *UserService) DeleteUserById(id string) error {
 
 func (s *UserService) GetUserByEmailAndPassword(email string, password string) (*models.User, error) {
 	var result models.User
-	err := s.Collection.FindOne(context.TODO(), bson.M{"email": email, "password": password}).Decode(&result)
+	err := s.collection.FindOne(context.TODO(), bson.M{"email": email, "password": password}).Decode(&result)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, nil
@@ -112,7 +114,7 @@ func (s *UserService) GetAllUserList(page, pageSize int) ([]models.User, error) 
 	options := options.Find().
 		SetSkip(int64(offset)).
 		SetLimit(int64(pageSize))
-	cursor, err := s.Collection.Find(context.TODO(), bson.M{}, options)
+	cursor, err := s.collection.Find(context.TODO(), bson.M{}, options)
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +145,7 @@ func (s *UserService) SearchUser(searchType string, query string) *[]models.User
 	if searchType == "email" {
 		filter = bson.M{"email": query}
 	}
-	cursor, err := s.Collection.Find(context.TODO(), filter)
+	cursor, err := s.collection.Find(context.TODO(), filter)
 	if err != nil {
 		// log.Printf("Error while searching for users: %v\n", err)
 		return nil

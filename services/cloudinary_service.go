@@ -4,6 +4,7 @@ import (
 	"context"
 	"golang_app/golangApp/constant"
 	"golang_app/golangApp/utils/localize"
+	"golang_app/golangApp/utils/redis"
 	"mime/multipart"
 	"os"
 
@@ -19,12 +20,13 @@ type UploadImageResponse struct {
 }
 
 type CloudinaryService struct {
-	cld           *cloudinary.Cloudinary
-	cloudinaryCtx context.Context
-	Translation   *localize.Localization
+	cld         *cloudinary.Cloudinary
+	ctx         context.Context
+	translation *localize.Localization
+	redis       *redis.RedisClient
 }
 
-func NewUCloudinaryService(locale *localize.Localization) *CloudinaryService {
+func NewUCloudinaryService(locale *localize.Localization, redis *redis.RedisClient) *CloudinaryService {
 	var name string
 	var api string
 	var secret string
@@ -36,12 +38,12 @@ func NewUCloudinaryService(locale *localize.Localization) *CloudinaryService {
 	cloudConfig, _ := cloudinary.NewFromParams(name, api, secret)
 	contex := context.Background()
 
-	return &CloudinaryService{cld: cloudConfig, cloudinaryCtx: contex, Translation: locale}
+	return &CloudinaryService{cld: cloudConfig, ctx: contex, translation: locale, redis: redis}
 }
 
 // upload image to cloudinary to spesific folder
 func (service *CloudinaryService) UploadImageToFolder(file multipart.File, filename string, folder string) (*UploadImageResponse, error) {
-	resp, err := service.cld.Upload.Upload(service.cloudinaryCtx, file, uploader.UploadParams{PublicID: s.Join([]string{folder, filename}, "/")})
+	resp, err := service.cld.Upload.Upload(service.ctx, file, uploader.UploadParams{PublicID: s.Join([]string{folder, filename}, "/")})
 	if err != nil {
 		return nil, err
 	} else {
@@ -55,7 +57,7 @@ func (service *CloudinaryService) UploadImageToFolder(file multipart.File, filen
 
 // upload image to cloudinary
 func (service *CloudinaryService) UploadImage(file multipart.File, filename string) (*UploadImageResponse, error) {
-	resp, err := service.cld.Upload.Upload(service.cloudinaryCtx, file, uploader.UploadParams{PublicID: filename})
+	resp, err := service.cld.Upload.Upload(service.ctx, file, uploader.UploadParams{PublicID: filename})
 	if err != nil {
 		return nil, err
 	} else {
