@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"golang_app/golangApp/config"
-	"golang_app/golangApp/constant"
+	c "golang_app/golangApp/constant"
 	"golang_app/golangApp/models"
 	"golang_app/golangApp/utils/localize"
 	"golang_app/golangApp/utils/redis"
@@ -29,7 +29,7 @@ func NewUserService(mongodb *config.MongoDB, locale *localize.Localization, redi
 	return &UserService{collection: collection, translation: locale, redis: redis}
 }
 
-func (s *UserService) ConvertUserToBSON(data models.User) (bson.M, error) {
+func (s *UserService) convertUserToBSON(data models.User) (bson.M, error) {
 	bsonData, err := bson.Marshal(data)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func (s *UserService) CreateUser(user models.User) (string, error) {
 	}
 	insertedID, ok := result.InsertedID.(primitive.ObjectID)
 	if !ok {
-		return "", fmt.Errorf(constant.MESSAGE_ERROR_FAILED_EXTRACT_INSERTED_ID)
+		return "", fmt.Errorf(c.MESSAGE_ERROR_FAILED_EXTRACT_INSERTED_ID)
 	}
 	insertedIDString := insertedID.Hex()
 	return insertedIDString, nil
@@ -63,7 +63,7 @@ func (s *UserService) CreateUser(user models.User) (string, error) {
 
 func (s *UserService) UpdateUserById(id string, updates models.User) (string, error) {
 	objID, _ := primitive.ObjectIDFromHex(id)
-	data, _ := s.ConvertUserToBSON(updates)
+	data, _ := s.convertUserToBSON(updates)
 	result, err := s.collection.UpdateOne(
 		context.TODO(),
 		bson.M{"_id": objID},
@@ -73,9 +73,9 @@ func (s *UserService) UpdateUserById(id string, updates models.User) (string, er
 		return "", err
 	}
 	if result.ModifiedCount == 0 {
-		return "", errors.New(constant.MESSAGE_ERROR_FAILED_UPDATE_USER)
+		return "", errors.New(c.MESSAGE_ERROR_FAILED_UPDATE_DATA)
 	}
-	return "Success Update User", nil
+	return c.MESSAGE_SUCCESS_UPDATE_USER, nil
 }
 
 func (s *UserService) GetUserByEmail(email string) *models.User {

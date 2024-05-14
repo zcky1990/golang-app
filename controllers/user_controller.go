@@ -18,8 +18,8 @@ type UserController struct {
 	redis       *redis.RedisClient
 }
 
-func NewUserController(userService *services.UserService, localize *localize.Localization, redis *redis.RedisClient) *UserController {
-	return &UserController{service: userService, translation: localize, redis: redis}
+func NewUserController(service *services.UserService, localize *localize.Localization, redis *redis.RedisClient) *UserController {
+	return &UserController{service: service, translation: localize, redis: redis}
 }
 
 func (c *UserController) Signup() fiber.Handler {

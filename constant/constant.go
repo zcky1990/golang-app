@@ -33,8 +33,11 @@ const (
 
 	ERROR_MESSAGE = "error_message"
 
+	MESSAGE_SUCCESS_UPDATE_USER         = "Success Update User"
+	MESSAGE_SUCCESS_UPDATE_WEDDING_DATA = "Success Update Wedding Data"
+
 	MESSAGE_ERROR_FAILED_CREATE_USER         = "Failed to create User"
-	MESSAGE_ERROR_FAILED_UPDATE_USER         = "No User Updated"
+	MESSAGE_ERROR_FAILED_UPDATE_DATA         = "No Data Updated"
 	MESSAGE_ERROR_FAILED_EXTRACT_INSERTED_ID = "Failed to extract inserted ID"
 )
 

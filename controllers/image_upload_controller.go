@@ -20,8 +20,8 @@ type ImageController struct {
 	redis       *redis.RedisClient
 }
 
-func NewCloudinaryController(cloudinaryService *services.CloudinaryService, locale *localize.Localization, redis *redis.RedisClient) *ImageController {
-	return &ImageController{service: cloudinaryService, translation: locale, redis: redis}
+func NewCloudinaryController(service *services.CloudinaryService, locale *localize.Localization, redis *redis.RedisClient) *ImageController {
+	return &ImageController{service: service, translation: locale, redis: redis}
 }
 
 func (c *ImageController) UploadFile() fiber.Handler {

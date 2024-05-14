@@ -2,7 +2,7 @@ package services
 
 import (
 	"context"
-	"golang_app/golangApp/constant"
+	c "golang_app/golangApp/constant"
 	"golang_app/golangApp/utils/localize"
 	"golang_app/golangApp/utils/redis"
 	"mime/multipart"
@@ -31,9 +31,9 @@ func NewUCloudinaryService(locale *localize.Localization, redis *redis.RedisClie
 	var api string
 	var secret string
 
-	name = os.Getenv(constant.CLOUD_NAME)
-	api = os.Getenv(constant.CLOUD_API_KEY)
-	secret = os.Getenv(constant.CLOUD_API_SECRET)
+	name = os.Getenv(c.CLOUD_NAME)
+	api = os.Getenv(c.CLOUD_API_KEY)
+	secret = os.Getenv(c.CLOUD_API_SECRET)
 
 	cloudConfig, _ := cloudinary.NewFromParams(name, api, secret)
 	contex := context.Background()
