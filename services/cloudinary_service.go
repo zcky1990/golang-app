@@ -20,7 +20,7 @@ type UploadImageResponse struct {
 }
 
 type CloudinaryService struct {
-	cld         *cloudinary.Cloudinary
+	cloudinary  *cloudinary.Cloudinary
 	ctx         context.Context
 	translation *localize.Localization
 	redis       *redis.RedisClient
@@ -35,15 +35,15 @@ func NewUCloudinaryService(locale *localize.Localization, redis *redis.RedisClie
 	api = os.Getenv(c.CLOUD_API_KEY)
 	secret = os.Getenv(c.CLOUD_API_SECRET)
 
-	cloudConfig, _ := cloudinary.NewFromParams(name, api, secret)
+	cloudinary, _ := cloudinary.NewFromParams(name, api, secret)
 	contex := context.Background()
 
-	return &CloudinaryService{cld: cloudConfig, ctx: contex, translation: locale, redis: redis}
+	return &CloudinaryService{cloudinary: cloudinary, ctx: contex, translation: locale, redis: redis}
 }
 
 // upload image to cloudinary to spesific directory
 func (service *CloudinaryService) UploadImageToFolder(file multipart.File, filename string, directory string) (*UploadImageResponse, error) {
-	resp, err := service.cld.Upload.Upload(service.ctx, file, uploader.UploadParams{PublicID: s.Join([]string{directory, filename}, "/")})
+	resp, err := service.cloudinary.Upload.Upload(service.ctx, file, uploader.UploadParams{PublicID: s.Join([]string{directory, filename}, "/")})
 	if err != nil {
 		return nil, err
 	} else {
@@ -57,7 +57,7 @@ func (service *CloudinaryService) UploadImageToFolder(file multipart.File, filen
 
 // upload image to cloudinary
 func (service *CloudinaryService) UploadImage(file multipart.File, filename string) (*UploadImageResponse, error) {
-	resp, err := service.cld.Upload.Upload(service.ctx, file, uploader.UploadParams{PublicID: filename})
+	resp, err := service.cloudinary.Upload.Upload(service.ctx, file, uploader.UploadParams{PublicID: filename})
 	if err != nil {
 		return nil, err
 	} else {
