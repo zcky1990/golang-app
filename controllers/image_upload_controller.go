@@ -12,8 +12,6 @@ import (
 var ctx context.Context
 var cld *cloudinary.Cloudinary
 
-const FOLDER = "folder"
-
 type ImageController struct {
 	service *services.CloudinaryService
 }
@@ -22,31 +20,31 @@ func NewCloudinaryController(cloudinaryService *services.CloudinaryService) *Ima
 	return &ImageController{service: cloudinaryService}
 }
 
-func (ctrl *ImageController) UploadFile() fiber.Handler {
-	return func(c *fiber.Ctx) error {
+func (c *ImageController) UploadFile() fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
 		var uploadResp *services.UploadImageResponse
-		form, err := c.MultipartForm()
+		form, err := ctx.MultipartForm()
 		if err != nil {
-			return c.JSON(ErrorResponse(err.Error()))
+			return ctx.JSON(ErrorResponse(err.Error()))
 		}
 		files := form.File["file"]
 
 		file, err := files[0].Open()
 		if err != nil {
-			return c.JSON(ErrorResponse(ctrl.service.Locale.Localization(constant.FAILED_OPEN_FILE)))
+			return ctx.JSON(ErrorResponse(c.service.Locale.Localization(constant.FAILED_OPEN_FILE)))
 		}
 		defer file.Close()
 		fileName := files[0].Filename
-		folder := form.Value[FOLDER][0]
+		folder := form.Value[constant.FOLDER][0]
 
 		if folder != "" {
-			uploadResp, err = ctrl.service.UploadImageToFolder(file, fileName, folder)
+			uploadResp, err = c.service.UploadImageToFolder(file, fileName, folder)
 		} else {
-			uploadResp, err = ctrl.service.UploadImage(file, fileName)
+			uploadResp, err = c.service.UploadImage(file, fileName)
 		}
 		if err != nil {
-			return c.JSON(ErrorResponse(err.Error()))
+			return ctx.JSON(ErrorResponse(err.Error()))
 		}
-		return c.JSON(SuccessResponse(uploadResp))
+		return ctx.JSON(SuccessResponse(uploadResp))
 	}
 }

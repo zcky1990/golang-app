@@ -15,9 +15,10 @@ const (
 
 	STATUS = "status"
 	DATA   = "data"
+	ERROR  = "error"
 
-	SUCCESS = "success"
-	FAILED  = "failed"
+	SUCCESS = "Success"
+	FAILED  = "Failed"
 
 	FOLDER = "folder"
 
