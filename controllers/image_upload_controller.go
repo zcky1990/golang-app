@@ -31,12 +31,17 @@ func (c *ImageController) UploadFile() fiber.Handler {
 		if err != nil {
 			return ctx.JSON(ErrorResponse(err.Error()))
 		}
-		files := form.File["file"]
+
+		files, fileExists := form.File["file"]
+		if !fileExists || len(files) == 0 {
+			return ctx.Status(fiber.StatusBadRequest).JSON(ErrorResponse("File Params is required"))
+		}
 
 		file, err := files[0].Open()
 		if err != nil {
 			return ctx.JSON(ErrorResponse(c.translation.Localization(constant.FAILED_OPEN_FILE)))
 		}
+
 		defer file.Close()
 		fileName := files[0].Filename
 		directory := form.Value["directory"][0]
