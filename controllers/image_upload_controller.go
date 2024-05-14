@@ -39,10 +39,10 @@ func (c *ImageController) UploadFile() fiber.Handler {
 		}
 		defer file.Close()
 		fileName := files[0].Filename
-		folder := form.Value[constant.FOLDER][0]
+		directory := form.Value["directory"][0]
 
-		if folder != "" {
-			uploadResp, err = c.service.UploadImageToFolder(file, fileName, folder)
+		if directory != "" {
+			uploadResp, err = c.service.UploadImageToFolder(file, fileName, directory)
 		} else {
 			uploadResp, err = c.service.UploadImage(file, fileName)
 		}

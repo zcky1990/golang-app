@@ -41,9 +41,9 @@ func NewUCloudinaryService(locale *localize.Localization, redis *redis.RedisClie
 	return &CloudinaryService{cld: cloudConfig, ctx: contex, translation: locale, redis: redis}
 }
 
-// upload image to cloudinary to spesific folder
-func (service *CloudinaryService) UploadImageToFolder(file multipart.File, filename string, folder string) (*UploadImageResponse, error) {
-	resp, err := service.cld.Upload.Upload(service.ctx, file, uploader.UploadParams{PublicID: s.Join([]string{folder, filename}, "/")})
+// upload image to cloudinary to spesific directory
+func (service *CloudinaryService) UploadImageToFolder(file multipart.File, filename string, directory string) (*UploadImageResponse, error) {
+	resp, err := service.cld.Upload.Upload(service.ctx, file, uploader.UploadParams{PublicID: s.Join([]string{directory, filename}, "/")})
 	if err != nil {
 		return nil, err
 	} else {
