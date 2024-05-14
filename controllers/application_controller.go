@@ -1,25 +1,24 @@
-package controller
+package controllers
 
 import (
 	"encoding/json"
+	"golang_app/golangApp/constant"
 	"io"
-
-	"golang_app/golangApp/config"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func SuccessResponse(data interface{}) fiber.Map {
 	return fiber.Map{
-		"status": "Success",
-		"data":   data,
+		constant.STATUS: constant.SUCCESS,
+		constant.DATA:   data,
 	}
 }
 
 func ErrorResponse(message string) fiber.Map {
 	return fiber.Map{
-		"status": "Error",
-		"error":  message,
+		constant.STATUS:        constant.FAILED,
+		constant.ERROR_MESSAGE: message,
 	}
 }
 
@@ -29,9 +28,4 @@ func SetParams(body io.Reader, v interface{}) error {
 		return err
 	}
 	return nil
-}
-
-func Localization(message string) string {
-	locale, _ := config.GetInstance().GetMessage(message)
-	return locale
 }

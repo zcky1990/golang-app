@@ -1,25 +1,36 @@
-package controller
+package controllers
 
 import (
+	"fmt"
+	"golang_app/golangApp/constant"
 	"golang_app/golangApp/middlewares"
 	"golang_app/golangApp/models"
+	"golang_app/golangApp/services"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func Signup() fiber.Handler {
+type UserController struct {
+	service *services.UserService
+}
+
+func NewUserController(userService *services.UserService) *UserController {
+	return &UserController{service: userService}
+}
+
+func (controller *UserController) Signup() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var params models.User
 		if err := c.BodyParser(&params); err != nil {
 			return c.JSON(ErrorResponse(err.Error()))
 		}
-		user := models.GetUserByEmail(params.Email)
+		user := controller.service.GetUserByEmail(params.Email)
 		if user != nil {
-			return c.JSON(ErrorResponse(Localization("EMAIL_TAKEN")))
+			return c.JSON(ErrorResponse(controller.service.Locale.Localization(constant.EMAIL_TAKEN)))
 		}
-		data, err := models.CreateUser(params)
+		data, err := controller.service.CreateUser(params)
 		if err != nil {
-			return c.JSON(ErrorResponse("Failed to create User :" + err.Error()))
+			return c.JSON(ErrorResponse(fmt.Sprintf("%s : %s", constant.MESSAGE_ERROR_FAILED_CREATE_USER, err.Error())))
 		}
 		return c.JSON(SuccessResponse(data))
 	}
@@ -30,14 +41,14 @@ type LoginResponse struct {
 	Users         *models.User `json:"users,omitempty"`
 }
 
-func Login() fiber.Handler {
+func (controller *UserController) Login() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var params models.User
 		var token string
 		if err := c.BodyParser(&params); err != nil {
 			return c.JSON(ErrorResponse(err.Error()))
 		}
-		responseUser, err := models.GetUserByEmailAndPassword(params.Email, params.Password)
+		responseUser, err := controller.service.GetUserByEmailAndPassword(params.Email, params.Password)
 		if err == nil {
 			if responseUser != nil {
 				token, err = middlewares.GenerateToken(params.Email, params.Password)
@@ -45,7 +56,7 @@ func Login() fiber.Handler {
 					return c.JSON(ErrorResponse(err.Error()))
 				}
 			} else {
-				return c.JSON(ErrorResponse(Localization("USER_NOT_FOUND")))
+				return c.JSON(ErrorResponse(controller.service.Locale.Localization(constant.USER_NOT_FOUND)))
 			}
 		} else {
 			return c.JSON(ErrorResponse(err.Error()))
@@ -58,21 +69,21 @@ func Login() fiber.Handler {
 	}
 }
 
-func UpdateUser() fiber.Handler {
+func (controller *UserController) UpdateUser() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var params models.User
 		if err := c.BodyParser(&params); err != nil {
 			return c.JSON(ErrorResponse(err.Error()))
 		}
-		user := models.GetUserByEmail(params.Email)
+		user := controller.service.GetUserByEmail(params.Email)
 		if user != nil {
-			response, err := models.UpdateUserById(user.Id.Hex(), params)
+			response, err := controller.service.UpdateUserById(user.Id.Hex(), params)
 			if err != nil {
 				return c.JSON(ErrorResponse(err.Error()))
 			}
 			return c.JSON(SuccessResponse(response))
 		} else {
-			return c.JSON(ErrorResponse(Localization("USER_NOT_FOUND")))
+			return c.JSON(ErrorResponse(controller.service.Locale.Localization(constant.USER_NOT_FOUND)))
 		}
 	}
 }

@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 
+	c "golang_app/golangApp/constant"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -33,13 +35,13 @@ func ConnectMongoDB(env string) error {
 	var mongoPassword string
 	var databaseName string
 
-	mongoHost = os.Getenv("MONGO_HOST")
-	mongoPort = os.Getenv("MONGO_PORT")
-	mongoType = os.Getenv("MONGO_TYPE")
-	mongoOption = os.Getenv("MONGO_OPTION")
-	mongoUsername = os.Getenv("MONGO_USERNAME")
-	mongoPassword = os.Getenv("MONGO_PASSWORD")
-	databaseName = os.Getenv("MONGO_DATABASE_NAME")
+	mongoHost = os.Getenv(c.MONGO_HOST)
+	mongoPort = os.Getenv(c.MONGO_PORT)
+	mongoType = os.Getenv(c.MONGO_TYPE)
+	mongoOption = os.Getenv(c.MONGO_OPTION)
+	mongoUsername = os.Getenv(c.MONGO_USERNAME)
+	mongoPassword = os.Getenv(c.MONGO_PASSWORD)
+	databaseName = os.Getenv(c.MONGO_DATABASE_NAME)
 
 	var url string
 	if mongoPort != "" {

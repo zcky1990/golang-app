@@ -1,8 +1,9 @@
-package controller
+package controllers
 
 import (
 	"context"
-	"golang_app/golangApp/config"
+	"golang_app/golangApp/constant"
+	"golang_app/golangApp/services"
 
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/gofiber/fiber/v2"
@@ -11,9 +12,19 @@ import (
 var ctx context.Context
 var cld *cloudinary.Cloudinary
 
-func UploadFile() fiber.Handler {
+const FOLDER = "folder"
+
+type ImageController struct {
+	service *services.CloudinaryService
+}
+
+func NewCloudinaryController(cloudinaryService *services.CloudinaryService) *ImageController {
+	return &ImageController{service: cloudinaryService}
+}
+
+func (ctrl *ImageController) UploadFile() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var uploadResp *config.UploadImageResponse
+		var uploadResp *services.UploadImageResponse
 		form, err := c.MultipartForm()
 		if err != nil {
 			return c.JSON(ErrorResponse(err.Error()))
@@ -22,16 +33,16 @@ func UploadFile() fiber.Handler {
 
 		file, err := files[0].Open()
 		if err != nil {
-			return c.JSON(ErrorResponse(Localization("FAILED_OPEN_FILE")))
+			return c.JSON(ErrorResponse(ctrl.service.Locale.Localization(constant.FAILED_OPEN_FILE)))
 		}
 		defer file.Close()
 		fileName := files[0].Filename
-		folder := form.Value["folder"][0]
+		folder := form.Value[FOLDER][0]
 
 		if folder != "" {
-			uploadResp, err = config.UploadImageToFolder(file, fileName, folder)
+			uploadResp, err = ctrl.service.UploadImageToFolder(file, fileName, folder)
 		} else {
-			uploadResp, err = config.UploadImage(file, fileName)
+			uploadResp, err = ctrl.service.UploadImage(file, fileName)
 		}
 		if err != nil {
 			return c.JSON(ErrorResponse(err.Error()))
