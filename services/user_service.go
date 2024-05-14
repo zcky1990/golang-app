@@ -7,6 +7,7 @@ import (
 	"golang_app/golangApp/config"
 	"golang_app/golangApp/constant"
 	"golang_app/golangApp/models"
+	"golang_app/golangApp/utils/localize"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -17,14 +18,13 @@ import (
 const USER_COLLECTION = "User"
 
 type UserService struct {
-	Collection *mongo.Collection
-	Locale     *config.Localization
+	Collection  *mongo.Collection
+	Translation *localize.Localization
 }
 
-func NewUserService() *UserService {
+func NewUserService(locale *localize.Localization) *UserService {
 	collection := config.GetDB().Collection(USER_COLLECTION)
-	localize := config.NewLocalization()
-	return &UserService{Collection: collection, Locale: localize}
+	return &UserService{Collection: collection, Translation: locale}
 }
 
 func (s *UserService) ConvertUserToBSON(data models.User) (bson.M, error) {

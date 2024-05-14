@@ -2,8 +2,8 @@ package services
 
 import (
 	"context"
-	"golang_app/golangApp/config"
 	"golang_app/golangApp/constant"
+	"golang_app/golangApp/utils/localize"
 	"mime/multipart"
 	"os"
 
@@ -21,10 +21,10 @@ type UploadImageResponse struct {
 type CloudinaryService struct {
 	cld           *cloudinary.Cloudinary
 	cloudinaryCtx context.Context
-	Locale        *config.Localization
+	Translation   *localize.Localization
 }
 
-func NewUCloudinaryService() *CloudinaryService {
+func NewUCloudinaryService(locale *localize.Localization) *CloudinaryService {
 	var name string
 	var api string
 	var secret string
@@ -36,9 +36,7 @@ func NewUCloudinaryService() *CloudinaryService {
 	cloudConfig, _ := cloudinary.NewFromParams(name, api, secret)
 	contex := context.Background()
 
-	locale := config.NewLocalization()
-
-	return &CloudinaryService{cld: cloudConfig, cloudinaryCtx: contex, Locale: locale}
+	return &CloudinaryService{cld: cloudConfig, cloudinaryCtx: contex, Translation: locale}
 }
 
 // upload image to cloudinary to spesific folder

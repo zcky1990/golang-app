@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -66,8 +65,7 @@ func GenerateToken(username string, password string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	stringtoken := fmt.Sprintf("Bearer %s", tokenString)
-	return stringtoken, nil
+	return tokenString, nil
 }
 
 func getExpireDate() int64 {

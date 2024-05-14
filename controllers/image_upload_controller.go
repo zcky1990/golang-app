@@ -4,6 +4,7 @@ import (
 	"context"
 	"golang_app/golangApp/constant"
 	"golang_app/golangApp/services"
+	"golang_app/golangApp/utils/localize"
 
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/gofiber/fiber/v2"
@@ -13,11 +14,12 @@ var ctx context.Context
 var cld *cloudinary.Cloudinary
 
 type ImageController struct {
-	service *services.CloudinaryService
+	service     *services.CloudinaryService
+	Translation *localize.Localization
 }
 
-func NewCloudinaryController(cloudinaryService *services.CloudinaryService) *ImageController {
-	return &ImageController{service: cloudinaryService}
+func NewCloudinaryController(cloudinaryService *services.CloudinaryService, locale *localize.Localization) *ImageController {
+	return &ImageController{service: cloudinaryService, Translation: locale}
 }
 
 func (c *ImageController) UploadFile() fiber.Handler {
@@ -31,7 +33,7 @@ func (c *ImageController) UploadFile() fiber.Handler {
 
 		file, err := files[0].Open()
 		if err != nil {
-			return ctx.JSON(ErrorResponse(c.service.Locale.Localization(constant.FAILED_OPEN_FILE)))
+			return ctx.JSON(ErrorResponse(c.Translation.Localization(constant.FAILED_OPEN_FILE)))
 		}
 		defer file.Close()
 		fileName := files[0].Filename

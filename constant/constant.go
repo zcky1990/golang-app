@@ -13,6 +13,8 @@ const (
 	CLOUD_API_KEY    = "CLOUD_API_KEY"
 	CLOUD_API_SECRET = "CLOUD_API_SECRET"
 
+	SECRET = "SECRET"
+
 	STATUS = "status"
 	DATA   = "data"
 	ERROR  = "error"

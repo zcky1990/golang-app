@@ -5,6 +5,7 @@ import (
 	controllers "golang_app/golangApp/controllers"
 	"golang_app/golangApp/middlewares"
 	"golang_app/golangApp/services"
+	"golang_app/golangApp/utils/localize"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -32,11 +33,13 @@ func main() {
 
 	v1 := api.Group("/v1")
 
-	userService := services.NewUserService()
-	userController := controllers.NewUserController(userService)
+	translation := localize.NewLocalization()
 
-	cloudinaryService := services.NewUCloudinaryService()
-	imageController := controllers.NewCloudinaryController(cloudinaryService)
+	userService := services.NewUserService(translation)
+	userController := controllers.NewUserController(userService, translation)
+
+	cloudinaryService := services.NewUCloudinaryService(translation)
+	imageController := controllers.NewCloudinaryController(cloudinaryService, translation)
 
 	v1.Post("/users/sign-up", userController.Signup())
 	v1.Post("/users/login", userController.Login())

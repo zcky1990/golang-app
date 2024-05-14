@@ -1,4 +1,4 @@
-package i18n
+package localize
 
 import (
 	"fmt"
@@ -19,8 +19,8 @@ type I18n struct {
 	Locale       string
 }
 
-func NewI18n(filepath, locale string) *I18n {
-	trans, err := LoadTranslations(filepath)
+func newI18n(filepath, locale string) *I18n {
+	trans, err := loadTranslations(filepath)
 	if err != nil {
 		return nil
 	}
@@ -31,7 +31,7 @@ func NewI18n(filepath, locale string) *I18n {
 }
 
 // LoadTranslations loads translations from YAML files
-func LoadTranslations(filepath string) (*translations, error) {
+func loadTranslations(filepath string) (*translations, error) {
 	yamlFile, err := os.ReadFile(filepath)
 	if err != nil {
 		return nil, err
@@ -58,4 +58,18 @@ func (i18n *I18n) GetMessage(messageID string) (string, error) {
 		return "", fmt.Errorf("message not found with ID: %s", messageID)
 	}
 	return message, nil
+}
+
+type Localization struct {
+	I18n *I18n
+}
+
+func NewLocalization() *Localization {
+	locale := newI18n("i18n.yml", "ind")
+	return &Localization{I18n: locale}
+}
+
+func (c *Localization) Localization(messageKey string) string {
+	message, _ := c.I18n.GetMessage(messageKey)
+	return message
 }
