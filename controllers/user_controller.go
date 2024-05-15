@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"fmt"
-	"golang_app/golangApp/constant"
+	constant "golang_app/golangApp/constants"
 	"golang_app/golangApp/middlewares"
 	"golang_app/golangApp/models"
 	"golang_app/golangApp/services"

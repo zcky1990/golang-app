@@ -1,4 +1,4 @@
-package constant
+package constants
 
 const (
 	MONGO_HOST          = "MONGO_HOST"

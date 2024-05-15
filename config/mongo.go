@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	c "golang_app/golangApp/constant"
+	c "golang_app/golangApp/constants"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"

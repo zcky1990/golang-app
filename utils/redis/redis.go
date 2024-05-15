@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	c "golang_app/golangApp/constant"
+	c "golang_app/golangApp/constants"
 
 	s "strings"
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	c "golang_app/golangApp/constant"
+	c "golang_app/golangApp/constants"
 	"golang_app/golangApp/models"
 	"golang_app/golangApp/utils/localize"
 	"golang_app/golangApp/utils/redis"
