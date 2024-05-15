@@ -10,6 +10,7 @@ import (
 	"golang_app/golangApp/utils/redis"
 
 	"github.com/gofiber/fiber/v2"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type UserController struct {
@@ -18,25 +19,40 @@ type UserController struct {
 	redis       *redis.RedisClient
 }
 
-func NewUserController(service *services.UserService, localize *localize.Localization, redis *redis.RedisClient) *UserController {
+func NewUserController(database *mongo.Database, localize *localize.Localization, redis *redis.RedisClient) *UserController {
+	service := services.NewUserService(database, localize, redis)
 	return &UserController{service: service, translation: localize, redis: redis}
+}
+
+func (c *UserController) SuccessResponse(data interface{}) fiber.Map {
+	return fiber.Map{
+		constant.STATUS: constant.SUCCESS,
+		constant.DATA:   data,
+	}
+}
+
+func (c *UserController) ErrorResponse(message string) fiber.Map {
+	return fiber.Map{
+		constant.STATUS:        constant.FAILED,
+		constant.ERROR_MESSAGE: message,
+	}
 }
 
 func (c *UserController) Signup() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		var params models.User
 		if err := ctx.BodyParser(&params); err != nil {
-			return ctx.JSON(ErrorResponse(err.Error()))
+			return ctx.JSON(c.ErrorResponse(err.Error()))
 		}
 		user := c.service.GetUserByEmail(params.Email)
 		if user != nil {
-			return ctx.JSON(ErrorResponse(c.translation.Localization(constant.EMAIL_TAKEN)))
+			return ctx.JSON(c.ErrorResponse(c.translation.Localization(constant.EMAIL_TAKEN)))
 		}
 		data, err := c.service.CreateUser(params)
 		if err != nil {
-			return ctx.JSON(ErrorResponse(fmt.Sprintf("%s : %s", constant.MESSAGE_ERROR_FAILED_CREATE_USER, err.Error())))
+			return ctx.JSON(c.ErrorResponse(fmt.Sprintf("%s : %s", constant.MESSAGE_ERROR_FAILED_CREATE_USER, err.Error())))
 		}
-		return ctx.JSON(SuccessResponse(data))
+		return ctx.JSON(c.SuccessResponse(data))
 	}
 }
 
@@ -54,21 +70,22 @@ func (c *UserController) Login() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		var params models.User
 		var token string
+
 		if err := ctx.BodyParser(&params); err != nil {
-			return ctx.JSON(ErrorResponse(err.Error()))
+			return ctx.JSON(c.ErrorResponse(err.Error()))
 		}
 		responseUser, err := c.service.GetUserByEmailAndPassword(params.Email, params.Password)
 		if err == nil {
 			if responseUser != nil {
 				token, err = middlewares.GenerateToken(params.Email, params.Password)
 				if err != nil {
-					return ctx.JSON(ErrorResponse(err.Error()))
+					return ctx.JSON(c.ErrorResponse(err.Error()))
 				}
 			} else {
-				return ctx.JSON(ErrorResponse(c.translation.Localization(constant.USER_NOT_FOUND)))
+				return ctx.JSON(c.ErrorResponse(c.translation.Localization(constant.USER_NOT_FOUND)))
 			}
 		} else {
-			return ctx.JSON(ErrorResponse(err.Error()))
+			return ctx.JSON(c.ErrorResponse(err.Error()))
 		}
 		response := LoginResponse{
 			Authorization: Authorization{
@@ -77,7 +94,7 @@ func (c *UserController) Login() fiber.Handler {
 			},
 			Users: responseUser,
 		}
-		return ctx.JSON(SuccessResponse(response))
+		return ctx.JSON(c.SuccessResponse(response))
 	}
 }
 
@@ -85,17 +102,17 @@ func (c *UserController) UpdateUser() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		var params models.User
 		if err := ctx.BodyParser(&params); err != nil {
-			return ctx.JSON(ErrorResponse(err.Error()))
+			return ctx.JSON(c.ErrorResponse(err.Error()))
 		}
 		user := c.service.GetUserByEmail(params.Email)
 		if user != nil {
 			response, err := c.service.UpdateUserById(user.Id.Hex(), params)
 			if err != nil {
-				return ctx.JSON(ErrorResponse(err.Error()))
+				return ctx.JSON(c.ErrorResponse(err.Error()))
 			}
-			return ctx.JSON(SuccessResponse(response))
+			return ctx.JSON(c.SuccessResponse(response))
 		} else {
-			return ctx.JSON(ErrorResponse(c.translation.Localization(constant.USER_NOT_FOUND)))
+			return ctx.JSON(c.ErrorResponse(c.translation.Localization(constant.USER_NOT_FOUND)))
 		}
 	}
 }

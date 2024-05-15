@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"golang_app/golangApp/config"
 	c "golang_app/golangApp/constant"
 	"golang_app/golangApp/models"
 	"golang_app/golangApp/utils/localize"
@@ -17,15 +16,36 @@ import (
 
 const WEDDING_COLLECTION = "wedding_data"
 
+// Ensure WeddingService implements the BaseService interface
+var _ BaseService = (*WeddingService)(nil)
+
 type WeddingService struct {
 	collection  *mongo.Collection
 	translation *localize.Localization
 	redis       *redis.RedisClient
 }
 
-func NewWeddingService(mongodb *config.MongoDB, locale *localize.Localization, redis *redis.RedisClient) *WeddingService {
-	collection := mongodb.GetDB().Collection(WEDDING_COLLECTION)
+func NewWeddingService(mongodb *mongo.Database, locale *localize.Localization, redis *redis.RedisClient) *WeddingService {
+	collection := mongodb.Collection(WEDDING_COLLECTION)
 	return &WeddingService{collection: collection, translation: locale, redis: redis}
+}
+
+func (s *WeddingService) ConvertToBSON(data interface{}) (bson.M, error) {
+	bsonData, err := bson.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
+	var bsonMap bson.M
+	err = bson.Unmarshal(bsonData, &bsonMap)
+	if err != nil {
+		return nil, err
+	}
+	for key, value := range bsonMap {
+		if value == "" || value == nil {
+			delete(bsonMap, key)
+		}
+	}
+	return bsonMap, nil
 }
 
 func (c *WeddingService) convertWeddingDataToBSON(data models.WeddingData) (bson.M, error) {

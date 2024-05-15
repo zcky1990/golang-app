@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"golang_app/golangApp/config"
 	c "golang_app/golangApp/constant"
 	"golang_app/golangApp/models"
 	"golang_app/golangApp/utils/localize"
@@ -18,18 +17,21 @@ import (
 
 const USER_COLLECTION = "User"
 
+// Ensure UserService implements the BaseService interface
+var _ BaseService = (*UserService)(nil)
+
 type UserService struct {
 	collection  *mongo.Collection
 	translation *localize.Localization
 	redis       *redis.RedisClient
 }
 
-func NewUserService(mongodb *config.MongoDB, locale *localize.Localization, redis *redis.RedisClient) *UserService {
-	collection := mongodb.GetDB().Collection(USER_COLLECTION)
+func NewUserService(mongodb *mongo.Database, locale *localize.Localization, redis *redis.RedisClient) *UserService {
+	collection := mongodb.Collection(USER_COLLECTION)
 	return &UserService{collection: collection, translation: locale, redis: redis}
 }
 
-func (s *UserService) convertUserToBSON(data models.User) (bson.M, error) {
+func (s *UserService) ConvertToBSON(data interface{}) (bson.M, error) {
 	bsonData, err := bson.Marshal(data)
 	if err != nil {
 		return nil, err
@@ -63,7 +65,7 @@ func (s *UserService) CreateUser(user models.User) (string, error) {
 
 func (s *UserService) UpdateUserById(id string, updates models.User) (string, error) {
 	objID, _ := primitive.ObjectIDFromHex(id)
-	data, _ := s.convertUserToBSON(updates)
+	data, _ := s.ConvertToBSON(updates)
 	result, err := s.collection.UpdateOne(
 		context.TODO(),
 		bson.M{"_id": objID},

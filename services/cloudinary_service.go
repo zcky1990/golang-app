@@ -12,7 +12,11 @@ import (
 
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
+	"go.mongodb.org/mongo-driver/bson"
 )
+
+// Ensure CloudinaryService implements the BaseService interface
+var _ BaseService = (*CloudinaryService)(nil)
 
 type UploadImageResponse struct {
 	SecureUrl string `json:"secure_url"`
@@ -26,7 +30,7 @@ type CloudinaryService struct {
 	redis       *redis.RedisClient
 }
 
-func NewUCloudinaryService(locale *localize.Localization, redis *redis.RedisClient) *CloudinaryService {
+func NewCloudinaryService(locale *localize.Localization, redis *redis.RedisClient) *CloudinaryService {
 	var name string
 	var api string
 	var secret string
@@ -39,6 +43,24 @@ func NewUCloudinaryService(locale *localize.Localization, redis *redis.RedisClie
 	contex := context.Background()
 
 	return &CloudinaryService{cloudinary: cloudinary, ctx: contex, translation: locale, redis: redis}
+}
+
+func (s *CloudinaryService) ConvertToBSON(data interface{}) (bson.M, error) {
+	bsonData, err := bson.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
+	var bsonMap bson.M
+	err = bson.Unmarshal(bsonData, &bsonMap)
+	if err != nil {
+		return nil, err
+	}
+	for key, value := range bsonMap {
+		if value == "" || value == nil {
+			delete(bsonMap, key)
+		}
+	}
+	return bsonMap, nil
 }
 
 // upload image to cloudinary to spesific directory

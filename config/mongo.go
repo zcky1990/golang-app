@@ -15,8 +15,8 @@ import (
 
 // MongoDB struct holds the client and database references
 type MongoDB struct {
-	client *mongo.Client
-	db     *mongo.Database
+	Client *mongo.Client
+	Db     *mongo.Database
 }
 
 // NewMongoDB initializes a new MongoDB instance
@@ -42,8 +42,8 @@ func NewMongoDB() (*MongoDB, error) {
 	db := client.Database(databaseName)
 
 	mdb := &MongoDB{
-		client: client,
-		db:     db,
+		Client: client,
+		Db:     db,
 	}
 
 	if err := mdb.createUserIndex(); err != nil {
@@ -71,20 +71,10 @@ func buildMongoURL(host, port, typ, option, username, password string) string {
 	return url
 }
 
-// GetDB returns the MongoDB database instance
-func (mdb *MongoDB) GetDB() *mongo.Database {
-	return mdb.db
-}
-
-// GetClient returns the MongoDB client instance
-func (mdb *MongoDB) GetClient() *mongo.Client {
-	return mdb.client
-}
-
 // Disconnect disconnects the MongoDB client
 func (mdb *MongoDB) Disconnect() {
-	if mdb.client != nil {
-		err := mdb.client.Disconnect(context.Background())
+	if mdb.Client != nil {
+		err := mdb.Client.Disconnect(context.Background())
 		if err != nil {
 			log.Printf("Error disconnecting from MongoDB: %v", err)
 		} else {
@@ -102,7 +92,7 @@ func (mdb *MongoDB) createUserIndex() error {
 		},
 		Options: indexOptions,
 	}
-	_, err := mdb.db.Collection("User").Indexes().CreateOne(context.Background(), indexModel)
+	_, err := mdb.Db.Collection("User").Indexes().CreateOne(context.Background(), indexModel)
 	if err != nil {
 		return fmt.Errorf("error creating index: %w", err)
 	}

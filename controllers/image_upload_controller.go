@@ -20,8 +20,23 @@ type ImageController struct {
 	redis       *redis.RedisClient
 }
 
-func NewCloudinaryController(service *services.CloudinaryService, locale *localize.Localization, redis *redis.RedisClient) *ImageController {
-	return &ImageController{service: service, translation: locale, redis: redis}
+func NewCloudinaryController(localize *localize.Localization, redis *redis.RedisClient) *ImageController {
+	service := services.NewCloudinaryService(localize, redis)
+	return &ImageController{service: service, translation: localize, redis: redis}
+}
+
+func (c *ImageController) SuccessResponse(data interface{}) fiber.Map {
+	return fiber.Map{
+		constant.STATUS: constant.SUCCESS,
+		constant.DATA:   data,
+	}
+}
+
+func (c *ImageController) ErrorResponse(message string) fiber.Map {
+	return fiber.Map{
+		constant.STATUS:        constant.FAILED,
+		constant.ERROR_MESSAGE: message,
+	}
 }
 
 func (c *ImageController) UploadFile() fiber.Handler {
@@ -29,17 +44,17 @@ func (c *ImageController) UploadFile() fiber.Handler {
 		var uploadResp *services.UploadImageResponse
 		form, err := ctx.MultipartForm()
 		if err != nil {
-			return ctx.JSON(ErrorResponse(err.Error()))
+			return ctx.JSON(c.ErrorResponse(err.Error()))
 		}
 
 		files, fileExists := form.File["file"]
 		if !fileExists || len(files) == 0 {
-			return ctx.Status(fiber.StatusBadRequest).JSON(ErrorResponse("File Params is required"))
+			return ctx.Status(fiber.StatusBadRequest).JSON(c.ErrorResponse("File Params is required"))
 		}
 
 		file, err := files[0].Open()
 		if err != nil {
-			return ctx.JSON(ErrorResponse(c.translation.Localization(constant.FAILED_OPEN_FILE)))
+			return ctx.JSON(c.ErrorResponse(c.translation.Localization(constant.FAILED_OPEN_FILE)))
 		}
 
 		defer file.Close()
@@ -52,8 +67,8 @@ func (c *ImageController) UploadFile() fiber.Handler {
 			uploadResp, err = c.service.UploadImage(file, fileName)
 		}
 		if err != nil {
-			return ctx.JSON(ErrorResponse(err.Error()))
+			return ctx.JSON(c.ErrorResponse(err.Error()))
 		}
-		return ctx.JSON(SuccessResponse(uploadResp))
+		return ctx.JSON(c.SuccessResponse(uploadResp))
 	}
 }
