@@ -1,10 +1,13 @@
 package config
 
 import (
-	"golang_app/golangApp/app/controllers"
+	"fmt"
+	cntrl "golang_app/golangApp/app/controllers"
 	"golang_app/golangApp/app/middlewares"
 	"golang_app/golangApp/config/localize"
 	"golang_app/golangApp/config/redis"
+	c "golang_app/golangApp/constants"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -28,9 +31,9 @@ func RoutesNew(mongodb *mongo.Database, translation *localize.Localization, redi
 }
 
 func (r *Routes) SetUpRoutes() {
-	userController := controllers.NewUserController(r.Database, r.Translation, r.Redis)
-	imageController := controllers.NewCloudinaryController(r.Translation, r.Redis)
-	weddingController := controllers.NewWeddingController(r.Database, r.Translation, r.Redis)
+	userController := cntrl.NewUserController(r.Database, r.Translation, r.Redis)
+	imageController := cntrl.NewCloudinaryController(r.Translation, r.Redis)
+	weddingController := cntrl.NewWeddingController(r.Database, r.Translation, r.Redis)
 
 	api := r.App.Group("/api")
 
@@ -45,5 +48,5 @@ func (r *Routes) SetUpRoutes() {
 }
 
 func (r *Routes) StartServer() {
-	r.App.Listen(":10000")
+	r.App.Listen(fmt.Sprintf(":%s", os.Getenv(c.PORT)))
 }

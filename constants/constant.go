@@ -1,6 +1,7 @@
 package constants
 
 const (
+	PORT = "PORT"
 	// const localize
 	FAILED_OPEN_FILE = "FAILED_OPEN_FILE"
 	EMAIL_TAKEN      = "EMAIL_TAKEN"

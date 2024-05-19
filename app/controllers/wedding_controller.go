@@ -22,42 +22,42 @@ func NewWeddingController(database *mongo.Database, localize *localize.Localizat
 	return &WeddingController{service: service, translation: localize, redis: redis}
 }
 
-func (ctrl *WeddingController) SuccessResponse(data interface{}) fiber.Map {
+func (cntrl *WeddingController) SuccessResponse(data interface{}) fiber.Map {
 	return fiber.Map{
 		c.STATUS: c.SUCCESS,
 		c.DATA:   data,
 	}
 }
 
-func (ctrl *WeddingController) ErrorResponse(message string) fiber.Map {
+func (cntrl *WeddingController) ErrorResponse(message string) fiber.Map {
 	return fiber.Map{
 		c.STATUS:        c.FAILED,
 		c.ERROR_MESSAGE: message,
 	}
 }
 
-func (ctrl *WeddingController) CreateWeddingData() fiber.Handler {
+func (cntrl *WeddingController) CreateWeddingData() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		var params models.WeddingData
 		if err := ctx.BodyParser(&params); err != nil {
-			return ctx.JSON(ctrl.ErrorResponse(err.Error()))
+			return ctx.JSON(cntrl.ErrorResponse(err.Error()))
 		}
-		data, err := ctrl.service.CreateWeddingData(params)
+		data, err := cntrl.service.CreateWeddingData(params)
 		if err != nil {
-			return ctx.JSON(ctrl.ErrorResponse(ctrl.translation.Localization(c.EMAIL_TAKEN)))
+			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.Localization(c.EMAIL_TAKEN)))
 		}
-		return ctx.JSON(ctrl.SuccessResponse(data))
+		return ctx.JSON(cntrl.SuccessResponse(data))
 	}
 }
 
-func (ctrl *WeddingController) GetWeddingData() fiber.Handler {
+func (cntrl *WeddingController) GetWeddingData() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		weddingID := ctx.Params("id")
 
-		data, err := ctrl.service.GetWeddingDataById(weddingID)
+		data, err := cntrl.service.GetWeddingDataById(weddingID)
 		if err != nil {
-			return ctx.JSON(ctrl.ErrorResponse(ctrl.translation.Localization(c.EMAIL_TAKEN)))
+			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.Localization(c.EMAIL_TAKEN)))
 		}
-		return ctx.JSON(ctrl.SuccessResponse(data))
+		return ctx.JSON(cntrl.SuccessResponse(data))
 	}
 }
