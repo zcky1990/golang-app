@@ -35,7 +35,6 @@ func (r *Routes) SetUpRoutes() {
 	userController := cntrl.NewUserController(r.Database, r.Translation, r.Redis)
 	imageController := cntrl.NewCloudinaryController(r.Translation, r.Redis)
 	weddingController := cntrl.NewWeddingController(r.Database, r.Translation, r.Redis)
-
 	api := r.App.Group("/api")
 
 	v1 := api.Group("/v1")
