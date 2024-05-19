@@ -11,14 +11,14 @@ import (
 	"github.com/gofiber/storage/redis"
 )
 
-type sessionStore struct {
+type SessionStore struct {
 	Session *session.Store
 }
 
 var RedisStore *redis.Storage
 
-func SessionStoreNew() *sessionStore {
-	initRedisStore()
+func SessionStoreNew() *SessionStore {
+	redisStoreNew()
 	expiration, _ := time.ParseDuration(os.Getenv("SESSION_EXPIRATION"))
 	store := session.New(session.Config{
 		Expiration:     expiration,
@@ -26,12 +26,12 @@ func SessionStoreNew() *sessionStore {
 		CookieSameSite: "Lax",
 		Storage:        RedisStore,
 	})
-	return &sessionStore{
+	return &SessionStore{
 		Session: store,
 	}
 }
 
-func initRedisStore() {
+func redisStoreNew() {
 	portnum, _ := strconv.Atoi(os.Getenv(c.REDIS_PORT))
 	redisDB, _ := strconv.Atoi(os.Getenv(c.REDIS_DB))
 	RedisStore = redis.New(redis.Config{

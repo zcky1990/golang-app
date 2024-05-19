@@ -3,10 +3,10 @@ package config
 import (
 	"fmt"
 	cntrl "golang_app/golangApp/app/controllers"
-	"golang_app/golangApp/app/middlewares"
+	mid "golang_app/golangApp/app/middlewares"
 	"golang_app/golangApp/config/localize"
 	"golang_app/golangApp/config/redis"
-	"golang_app/golangApp/config/session"
+
 	c "golang_app/golangApp/constants"
 	"os"
 
@@ -23,15 +23,6 @@ type Routes struct {
 
 func RoutesNew(mongodb *mongo.Database, translation *localize.Localization, redis *redis.RedisClient) *Routes {
 	app := fiber.New()
-	ssn := session.SessionStoreNew()
-	app.Use(func(ctx *fiber.Ctx) error {
-		ses, err := ssn.Session.Get(ctx)
-		if err != nil {
-			return err
-		}
-		defer ses.Save()
-		return ctx.Next()
-	})
 	return &Routes{
 		App:         app,
 		Database:    mongodb,
@@ -50,10 +41,10 @@ func (r *Routes) SetUpRoutes() {
 	v1 := api.Group("/v1")
 	v1.Post("/users/sign-up", userController.Signup())
 	v1.Post("/users/login", userController.Login())
-	v1.Post("/users/update-user", middlewares.JWTMiddleware(), userController.UpdateUser())
-	v1.Post("/upload/image", middlewares.JWTMiddleware(), imageController.UploadFile())
-	v1.Post("/wedding/create", middlewares.JWTMiddleware(), weddingController.CreateWeddingData())
-	v1.Get("/wedding/:id", middlewares.JWTMiddleware(), weddingController.GetWeddingData())
+	v1.Post("/users/update-user", mid.JWTMiddleware(), userController.UpdateUser())
+	v1.Post("/upload/image", mid.JWTMiddleware(), imageController.UploadFile())
+	v1.Post("/wedding/create", mid.JWTMiddleware(), weddingController.CreateWeddingData())
+	v1.Get("/wedding/:id", mid.JWTMiddleware(), weddingController.GetWeddingData())
 }
 
 func (r *Routes) StartServer() {
