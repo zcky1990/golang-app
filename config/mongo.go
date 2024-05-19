@@ -83,7 +83,8 @@ func (mdb *MongoDB) Disconnect() {
 	}
 }
 
-// createUserIndex creates an index on the User collection
+// createUserIndex creates an index on the User collection and
+// make sure cannot be called outside mongo class
 func (mdb *MongoDB) createUserIndex() error {
 	indexOptions := options.Index().SetUnique(true)
 	indexModel := mongo.IndexModel{

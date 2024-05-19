@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"fmt"
-	"golang_app/golangApp/app/middlewares"
-	"golang_app/golangApp/app/models"
+	mdl "golang_app/golangApp/app/middlewares"
+	m "golang_app/golangApp/app/models"
 	"golang_app/golangApp/app/services"
 	c "golang_app/golangApp/constants"
 	"golang_app/golangApp/utils/localize"
@@ -40,7 +40,7 @@ func (ctrl *UserController) ErrorResponse(message string) fiber.Map {
 
 func (ctrl *UserController) Signup() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		var params models.User
+		var params m.User
 		if err := ctx.BodyParser(&params); err != nil {
 			return ctx.JSON(ctrl.ErrorResponse(err.Error()))
 		}
@@ -56,20 +56,15 @@ func (ctrl *UserController) Signup() fiber.Handler {
 	}
 }
 
-type Authorization struct {
-	Token    string `json:"auth_token,omitempty"`
-	AuthType string `json:"auth_type,omitempty"`
-}
-
 type LoginResponse struct {
-	Authorization Authorization `json:"authorization,omitempty"`
-	Users         *models.User  `json:"users,omitempty"`
+	Authorization mdl.Authorization `json:"authorization,omitempty"`
+	Users         *m.User           `json:"users,omitempty"`
 }
 
 func (ctrl *UserController) Login() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		var params models.User
-		var token string
+		var params m.User
+		var authorization *mdl.Authorization
 
 		if err := ctx.BodyParser(&params); err != nil {
 			return ctx.JSON(ctrl.ErrorResponse(err.Error()))
@@ -77,7 +72,7 @@ func (ctrl *UserController) Login() fiber.Handler {
 		responseUser, err := ctrl.service.GetUserByEmailAndPassword(params.Email, params.Password)
 		if err == nil {
 			if responseUser != nil {
-				token, err = middlewares.GenerateToken(params.Email, params.Password)
+				authorization, err = mdl.GenerateToken(params.Email, params.Password)
 				if err != nil {
 					return ctx.JSON(ctrl.ErrorResponse(err.Error()))
 				}
@@ -88,11 +83,8 @@ func (ctrl *UserController) Login() fiber.Handler {
 			return ctx.JSON(ctrl.ErrorResponse(err.Error()))
 		}
 		response := LoginResponse{
-			Authorization: Authorization{
-				Token:    token,
-				AuthType: "Bearer",
-			},
-			Users: responseUser,
+			Authorization: *authorization,
+			Users:         responseUser,
 		}
 		return ctx.JSON(ctrl.SuccessResponse(response))
 	}
@@ -100,7 +92,7 @@ func (ctrl *UserController) Login() fiber.Handler {
 
 func (ctrl *UserController) UpdateUser() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		var params models.User
+		var params m.User
 		if err := ctx.BodyParser(&params); err != nil {
 			return ctx.JSON(ctrl.ErrorResponse(err.Error()))
 		}

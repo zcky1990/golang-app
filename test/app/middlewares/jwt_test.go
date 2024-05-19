@@ -68,8 +68,8 @@ func TestJWTMiddleware(t *testing.T) {
 
 	//test using valid token
 	//generate token to test and set to header
-	token, _ := middlewares.GenerateToken("testuser", "testpassword")
-	req.Header.Set("Authorization", token)
+	auth, _ := middlewares.GenerateToken("testuser", "testpassword")
+	req.Header.Set("Authorization", auth.Token)
 	resp, _ = app.Test(req)
 	assert.Equal(t, 200, resp.StatusCode)
 }

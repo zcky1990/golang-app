@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	c "golang_app/golangApp/constants"
 	"os"
 	"strings"
 	"time"
@@ -11,61 +12,65 @@ import (
 
 var jwtSecret []byte
 
+type Authorization struct {
+	Token    string `json:"auth_token,omitempty"`
+	AuthType string `json:"auth_type,omitempty"`
+	ExpireAt int64  `json:"expire_at,omitempty"`
+}
+
 func init() {
 	jwtSecret = []byte(os.Getenv("SECRET"))
 }
 
-func JWTMiddleware() func(c *fiber.Ctx) error {
-	return func(c *fiber.Ctx) error {
+func JWTMiddleware() func(ctx *fiber.Ctx) error {
+	return func(ctx *fiber.Ctx) error {
 		const BEARER_SCHEMA = "Bearer "
-		tokenString := c.Get("Authorization")
+		tokenString := ctx.Get("Authorization")
 		if tokenString == "" {
-			return c.JSON(fiber.Map{
-				"status":  "Error",
-				"message": "Missing Auth Token",
-			})
+			return ctx.JSON(generateErrorMessage("Missing Auth Token"))
 		}
 		if !strings.Contains(tokenString, BEARER_SCHEMA) {
-			return c.JSON(fiber.Map{
-				"status":  "Error",
-				"message": "Invalid/Malformed Auth Token",
-			})
+			return ctx.JSON(generateErrorMessage("Invalid/Malformed Auth Token"))
 		} else {
 			tokenSlice := strings.Replace(tokenString, BEARER_SCHEMA, "", -1)
 			token, err := jwt.Parse(tokenSlice, func(token *jwt.Token) (interface{}, error) {
 				return jwtSecret, nil
 			})
 			if err != nil {
-				return c.JSON(fiber.Map{
-					"status":  "Error",
-					"message": err.Error(),
-				})
+				return ctx.JSON(generateErrorMessage(err.Error()))
 			}
 			if !token.Valid {
-				return c.JSON(fiber.Map{
-					"status":  "Error",
-					"message": "Token Invalid",
-				})
+				return ctx.JSON(generateErrorMessage("Token Invalid"))
 			}
-
 		}
-
-		return c.Next()
+		return ctx.Next()
 	}
 }
 
-func GenerateToken(username string, password string) (string, error) {
+func GenerateToken(username string, password string) (*Authorization, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
+	expire_at := getExpireDate()
 	claims["username"] = username
 	claims["password"] = password
-	claims["expire"] = getExpireDate()
+	claims["expire"] = expire_at
 
 	tokenString, err := token.SignedString(jwtSecret)
 	if err != nil {
-		return "", err
+		return &Authorization{}, err
 	}
-	return tokenString, nil
+	return &Authorization{
+		Token:    tokenString,
+		AuthType: "Bearer",
+		ExpireAt: expire_at,
+	}, nil
+}
+
+func generateErrorMessage(message string) fiber.Map {
+	return fiber.Map{
+		c.STATUS:        c.FAILED,
+		c.ERROR_MESSAGE: message,
+	}
 }
 
 func getExpireDate() int64 {
