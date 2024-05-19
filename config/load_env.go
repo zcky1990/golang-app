@@ -15,7 +15,7 @@ var env string
 // it will load all the env variables from.env file
 // and set the env variable to global variables
 // we read different env file for test and production
-func init() {
+func LoadEvirontment() {
 	var filePath string
 	currentDir, err := os.Getwd()
 	if err != nil {

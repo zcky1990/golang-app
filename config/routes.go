@@ -3,8 +3,8 @@ package config
 import (
 	"golang_app/golangApp/app/controllers"
 	"golang_app/golangApp/app/middlewares"
-	"golang_app/golangApp/utils/localize"
-	"golang_app/golangApp/utils/redis"
+	"golang_app/golangApp/config/localize"
+	"golang_app/golangApp/config/redis"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"

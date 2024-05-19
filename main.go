@@ -1,20 +1,22 @@
 package main
 
 import (
-	"golang_app/golangApp/config"
-	"golang_app/golangApp/utils/localize"
-	"golang_app/golangApp/utils/redis"
+	cfg "golang_app/golangApp/config"
+	"golang_app/golangApp/config/localize"
+	"golang_app/golangApp/config/mongo"
+	"golang_app/golangApp/config/redis"
 	"log"
 )
 
 var env string
 
 func init() {
-	env = config.GetEnv()
+	cfg.LoadEvirontment()
+	env = cfg.GetEnv()
 }
 
 func main() {
-	mongoDB, err := config.NewMongoDB()
+	mongoDB, err := mongo.NewMongoDB()
 	if err != nil {
 		log.Fatalf("Failed to connect to MongoDB: %v", err)
 	}
@@ -24,8 +26,7 @@ func main() {
 	redisClient := redis.NewRedisClient()
 	defer redisClient.Close()
 
-	app := config.RoutesNew(mongoDB.Db, translation, redisClient)
+	app := cfg.RoutesNew(mongoDB.Db, translation, redisClient)
 	app.SetUpRoutes()
 	app.StartServer()
-
 }

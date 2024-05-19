@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 	m "golang_app/golangApp/app/models"
+	"golang_app/golangApp/config/localize"
+	"golang_app/golangApp/config/redis"
 	c "golang_app/golangApp/constants"
-	"golang_app/golangApp/utils/localize"
-	"golang_app/golangApp/utils/redis"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

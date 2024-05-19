@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"golang_app/golangApp/app/services"
+	"golang_app/golangApp/config/localize"
+	"golang_app/golangApp/config/redis"
 	c "golang_app/golangApp/constants"
-	"golang_app/golangApp/utils/localize"
-	"golang_app/golangApp/utils/redis"
 
 	"github.com/gofiber/fiber/v2"
 )
