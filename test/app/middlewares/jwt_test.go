@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"golang_app/golangApp/middlewares"
+	"golang_app/golangApp/app/middlewares"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"

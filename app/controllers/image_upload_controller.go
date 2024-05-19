@@ -1,18 +1,13 @@
 package controllers
 
 import (
-	"context"
-	constant "golang_app/golangApp/constants"
-	"golang_app/golangApp/services"
+	"golang_app/golangApp/app/services"
+	c "golang_app/golangApp/constants"
 	"golang_app/golangApp/utils/localize"
 	"golang_app/golangApp/utils/redis"
 
-	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/gofiber/fiber/v2"
 )
-
-var ctx context.Context
-var cld *cloudinary.Cloudinary
 
 type ImageController struct {
 	service     *services.CloudinaryService
@@ -25,36 +20,36 @@ func NewCloudinaryController(localize *localize.Localization, redis *redis.Redis
 	return &ImageController{service: service, translation: localize, redis: redis}
 }
 
-func (c *ImageController) SuccessResponse(data interface{}) fiber.Map {
+func (ctrl *ImageController) SuccessResponse(data interface{}) fiber.Map {
 	return fiber.Map{
-		constant.STATUS: constant.SUCCESS,
-		constant.DATA:   data,
+		c.STATUS: c.SUCCESS,
+		c.DATA:   data,
 	}
 }
 
-func (c *ImageController) ErrorResponse(message string) fiber.Map {
+func (ctrl *ImageController) ErrorResponse(message string) fiber.Map {
 	return fiber.Map{
-		constant.STATUS:        constant.FAILED,
-		constant.ERROR_MESSAGE: message,
+		c.STATUS:        c.FAILED,
+		c.ERROR_MESSAGE: message,
 	}
 }
 
-func (c *ImageController) UploadFile() fiber.Handler {
+func (ctrl *ImageController) UploadFile() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		var uploadResp *services.UploadImageResponse
 		form, err := ctx.MultipartForm()
 		if err != nil {
-			return ctx.JSON(c.ErrorResponse(err.Error()))
+			return ctx.JSON(ctrl.ErrorResponse(err.Error()))
 		}
 
 		files, fileExists := form.File["file"]
 		if !fileExists || len(files) == 0 {
-			return ctx.Status(fiber.StatusBadRequest).JSON(c.ErrorResponse("File Params is required"))
+			return ctx.Status(fiber.StatusBadRequest).JSON(ctrl.ErrorResponse(c.MESSAGE_ERROR_FILE_PARAMS_REQUIRED))
 		}
 
 		file, err := files[0].Open()
 		if err != nil {
-			return ctx.JSON(c.ErrorResponse(c.translation.Localization(constant.FAILED_OPEN_FILE)))
+			return ctx.JSON(ctrl.ErrorResponse(ctrl.translation.Localization(c.FAILED_OPEN_FILE)))
 		}
 
 		defer file.Close()
@@ -62,13 +57,13 @@ func (c *ImageController) UploadFile() fiber.Handler {
 		directory := form.Value["directory"][0]
 
 		if directory != "" {
-			uploadResp, err = c.service.UploadImageToFolder(file, fileName, directory)
+			uploadResp, err = ctrl.service.UploadImageToFolder(file, fileName, directory)
 		} else {
-			uploadResp, err = c.service.UploadImage(file, fileName)
+			uploadResp, err = ctrl.service.UploadImage(file, fileName)
 		}
 		if err != nil {
-			return ctx.JSON(c.ErrorResponse(err.Error()))
+			return ctx.JSON(ctrl.ErrorResponse(err.Error()))
 		}
-		return ctx.JSON(c.SuccessResponse(uploadResp))
+		return ctx.JSON(ctrl.SuccessResponse(uploadResp))
 	}
 }

@@ -4,6 +4,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+const USER_COLLECTION = "User"
+
 // use omitempty to automatically add id if we add empty id
 type User struct {
 	Id        primitive.ObjectID `bson:"_id,omitempty"`

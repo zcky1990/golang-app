@@ -1,9 +1,9 @@
 package controllers
 
 import (
+	"golang_app/golangApp/app/models"
+	"golang_app/golangApp/app/services"
 	constant "golang_app/golangApp/constants"
-	"golang_app/golangApp/models"
-	"golang_app/golangApp/services"
 	"golang_app/golangApp/utils/localize"
 	"golang_app/golangApp/utils/redis"
 

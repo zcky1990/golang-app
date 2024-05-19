@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	m "golang_app/golangApp/app/models"
 	c "golang_app/golangApp/constants"
-	"golang_app/golangApp/models"
 	"golang_app/golangApp/utils/localize"
 	"golang_app/golangApp/utils/redis"
 
@@ -14,8 +14,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
-
-const USER_COLLECTION = "User"
 
 // Ensure UserService implements the BaseService interface
 var _ BaseService = (*UserService)(nil)
@@ -27,7 +25,7 @@ type UserService struct {
 }
 
 func NewUserService(mongodb *mongo.Database, locale *localize.Localization, redis *redis.RedisClient) *UserService {
-	collection := mongodb.Collection(USER_COLLECTION)
+	collection := mongodb.Collection(m.USER_COLLECTION)
 	return &UserService{collection: collection, translation: locale, redis: redis}
 }
 
@@ -49,7 +47,7 @@ func (s *UserService) ConvertToBSON(data interface{}) (bson.M, error) {
 	return bsonMap, nil
 }
 
-func (s *UserService) CreateUser(user models.User) (string, error) {
+func (s *UserService) CreateUser(user m.User) (string, error) {
 	result, err := s.collection.InsertOne(context.Background(), user)
 	if err != nil {
 		// log.Printf("Error while inserting user: %v\n", err)
@@ -63,7 +61,7 @@ func (s *UserService) CreateUser(user models.User) (string, error) {
 	return insertedIDString, nil
 }
 
-func (s *UserService) UpdateUserById(id string, updates models.User) (string, error) {
+func (s *UserService) UpdateUserById(id string, updates m.User) (string, error) {
 	objID, _ := primitive.ObjectIDFromHex(id)
 	data, _ := s.ConvertToBSON(updates)
 	result, err := s.collection.UpdateOne(
@@ -80,8 +78,8 @@ func (s *UserService) UpdateUserById(id string, updates models.User) (string, er
 	return c.MESSAGE_SUCCESS_UPDATE_USER, nil
 }
 
-func (s *UserService) GetUserByEmail(email string) *models.User {
-	result := models.User{}
+func (s *UserService) GetUserByEmail(email string) *m.User {
+	result := m.User{}
 	err := s.collection.FindOne(context.TODO(), bson.M{"email": email}).Decode(&result)
 	if err != nil {
 		return nil
@@ -98,8 +96,8 @@ func (s *UserService) DeleteUserById(id string) error {
 	return nil
 }
 
-func (s *UserService) GetUserByEmailAndPassword(email string, password string) (*models.User, error) {
-	var result models.User
+func (s *UserService) GetUserByEmailAndPassword(email string, password string) (*m.User, error) {
+	var result m.User
 	err := s.collection.FindOne(context.TODO(), bson.M{"email": email, "password": password}).Decode(&result)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -110,8 +108,8 @@ func (s *UserService) GetUserByEmailAndPassword(email string, password string) (
 	return &result, nil
 }
 
-func (s *UserService) GetAllUserList(page, pageSize int) ([]models.User, error) {
-	var results []models.User
+func (s *UserService) GetAllUserList(page, pageSize int) ([]m.User, error) {
+	var results []m.User
 	offset := (page - 1) * pageSize
 	options := options.Find().
 		SetSkip(int64(offset)).
@@ -122,7 +120,7 @@ func (s *UserService) GetAllUserList(page, pageSize int) ([]models.User, error) 
 	}
 	defer cursor.Close(context.TODO())
 	for cursor.Next(context.TODO()) {
-		var user models.User
+		var user m.User
 		if err := cursor.Decode(&user); err != nil {
 			// log.Printf("Error decoding user: %v\n", err)
 			continue
@@ -135,8 +133,8 @@ func (s *UserService) GetAllUserList(page, pageSize int) ([]models.User, error) 
 	return results, nil
 }
 
-func (s *UserService) SearchUser(searchType string, query string) *[]models.User {
-	results := []models.User{}
+func (s *UserService) SearchUser(searchType string, query string) *[]m.User {
+	results := []m.User{}
 	filter := bson.M{}
 	if searchType == "name" {
 		filter = bson.M{"$or": []interface{}{
@@ -154,7 +152,7 @@ func (s *UserService) SearchUser(searchType string, query string) *[]models.User
 	}
 	defer cursor.Close(context.TODO())
 	for cursor.Next(context.TODO()) {
-		var user models.User
+		var user m.User
 		if err := cursor.Decode(&user); err != nil {
 			// log.Printf("Error decoding user: %v\n", err)
 			continue

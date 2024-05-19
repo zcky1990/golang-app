@@ -1,8 +1,8 @@
 package config
 
 import (
-	"golang_app/golangApp/controllers"
-	"golang_app/golangApp/middlewares"
+	"golang_app/golangApp/app/controllers"
+	"golang_app/golangApp/app/middlewares"
 	"golang_app/golangApp/utils/localize"
 	"golang_app/golangApp/utils/redis"
 

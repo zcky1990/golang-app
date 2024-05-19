@@ -1,6 +1,11 @@
 package constants
 
 const (
+	// const localize
+	FAILED_OPEN_FILE = "FAILED_OPEN_FILE"
+	EMAIL_TAKEN      = "EMAIL_TAKEN"
+	USER_NOT_FOUND   = "USER_NOT_FOUND"
+
 	MONGO_HOST          = "MONGO_HOST"
 	MONGO_PORT          = "MONGO_PORT"
 	MONGO_TYPE          = "MONGO_TYPE"
@@ -20,7 +25,8 @@ const (
 	REDIS_PORT     = "REDIS_PORT"
 	REDIS_DB       = "REDIS_DB"
 
-	SECRET = "SECRET"
+	MESSAGE_ERROR_FILE_PARAMS_REQUIRED = "File params required"
+	SECRET                             = "SECRET"
 
 	STATUS = "status"
 	DATA   = "data"
@@ -39,11 +45,4 @@ const (
 	MESSAGE_ERROR_FAILED_CREATE_USER         = "Failed to create User"
 	MESSAGE_ERROR_FAILED_UPDATE_DATA         = "No Data Updated"
 	MESSAGE_ERROR_FAILED_EXTRACT_INSERTED_ID = "Failed to extract inserted ID"
-)
-
-// const localize
-const (
-	FAILED_OPEN_FILE = "FAILED_OPEN_FILE"
-	EMAIL_TAKEN      = "EMAIL_TAKEN"
-	USER_NOT_FOUND   = "USER_NOT_FOUND"
 )

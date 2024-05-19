@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	m "golang_app/golangApp/app/models"
 	c "golang_app/golangApp/constants"
-	"golang_app/golangApp/models"
 	"golang_app/golangApp/utils/localize"
 	"golang_app/golangApp/utils/redis"
 
@@ -13,8 +13,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
-
-const WEDDING_COLLECTION = "wedding_data"
 
 // Ensure WeddingService implements the BaseService interface
 var _ BaseService = (*WeddingService)(nil)
@@ -26,7 +24,7 @@ type WeddingService struct {
 }
 
 func NewWeddingService(mongodb *mongo.Database, locale *localize.Localization, redis *redis.RedisClient) *WeddingService {
-	collection := mongodb.Collection(WEDDING_COLLECTION)
+	collection := mongodb.Collection(m.WEDDING_COLLECTION)
 	return &WeddingService{collection: collection, translation: locale, redis: redis}
 }
 
@@ -48,7 +46,7 @@ func (s *WeddingService) ConvertToBSON(data interface{}) (bson.M, error) {
 	return bsonMap, nil
 }
 
-func (c *WeddingService) convertWeddingDataToBSON(data models.WeddingData) (bson.M, error) {
+func (c *WeddingService) convertWeddingDataToBSON(data m.WeddingData) (bson.M, error) {
 	// Marshal the struct to BSON
 	bsonData, err := bson.Marshal(data)
 	if err != nil {
@@ -69,7 +67,7 @@ func (c *WeddingService) convertWeddingDataToBSON(data models.WeddingData) (bson
 	return bsonMap, nil
 }
 
-func (service *WeddingService) CreateWeddingData(data models.WeddingData) (string, error) {
+func (service *WeddingService) CreateWeddingData(data m.WeddingData) (string, error) {
 	result, err := service.collection.InsertOne(context.Background(), data)
 	if err != nil {
 		return "", err
@@ -84,7 +82,7 @@ func (service *WeddingService) CreateWeddingData(data models.WeddingData) (strin
 	return insertedIDString, nil
 }
 
-func (service *WeddingService) UpdateWeddingDataById(id string, updates models.WeddingData) (string, error) {
+func (service *WeddingService) UpdateWeddingDataById(id string, updates m.WeddingData) (string, error) {
 	objID, _ := primitive.ObjectIDFromHex(id)
 	data, _ := service.convertWeddingDataToBSON(updates)
 	result, err := service.collection.UpdateOne(
@@ -101,8 +99,8 @@ func (service *WeddingService) UpdateWeddingDataById(id string, updates models.W
 	return c.MESSAGE_SUCCESS_UPDATE_WEDDING_DATA, nil
 }
 
-func (service *WeddingService) GetWeddingDataById(id string) (*models.WeddingData, error) {
-	result := models.WeddingData{}
+func (service *WeddingService) GetWeddingDataById(id string) (*m.WeddingData, error) {
+	result := m.WeddingData{}
 	objID, _ := primitive.ObjectIDFromHex(id)
 	err := service.collection.FindOne(context.TODO(), bson.M{"_id": objID}).Decode(&result)
 	if err != nil {
@@ -111,8 +109,8 @@ func (service *WeddingService) GetWeddingDataById(id string) (*models.WeddingDat
 	return &result, nil
 }
 
-func (service *WeddingService) GetWeddingDataByUserId(userId string) (*models.WeddingData, error) {
-	result := models.WeddingData{}
+func (service *WeddingService) GetWeddingDataByUserId(userId string) (*m.WeddingData, error) {
+	result := m.WeddingData{}
 	objID, _ := primitive.ObjectIDFromHex(userId)
 	err := service.collection.FindOne(context.TODO(), bson.M{"user_id": objID}).Decode(&result)
 	if err != nil {
