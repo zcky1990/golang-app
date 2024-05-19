@@ -6,6 +6,7 @@ import (
 	"golang_app/golangApp/app/middlewares"
 	"golang_app/golangApp/config/localize"
 	"golang_app/golangApp/config/redis"
+	"golang_app/golangApp/config/session"
 	c "golang_app/golangApp/constants"
 	"os"
 
@@ -22,6 +23,15 @@ type Routes struct {
 
 func RoutesNew(mongodb *mongo.Database, translation *localize.Localization, redis *redis.RedisClient) *Routes {
 	app := fiber.New()
+	ssn := session.SessionStoreNew()
+	app.Use(func(ctx *fiber.Ctx) error {
+		ses, err := ssn.Session.Get(ctx)
+		if err != nil {
+			return err
+		}
+		defer ses.Save()
+		return ctx.Next()
+	})
 	return &Routes{
 		App:         app,
 		Database:    mongodb,
@@ -44,7 +54,6 @@ func (r *Routes) SetUpRoutes() {
 	v1.Post("/upload/image", middlewares.JWTMiddleware(), imageController.UploadFile())
 	v1.Post("/wedding/create", middlewares.JWTMiddleware(), weddingController.CreateWeddingData())
 	v1.Get("/wedding/:id", middlewares.JWTMiddleware(), weddingController.GetWeddingData())
-
 }
 
 func (r *Routes) StartServer() {
