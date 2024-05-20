@@ -42,7 +42,6 @@ func RoutesNew(mongodb *mongo.Database, translation *localize.Localization, redi
 }
 
 func (r *Routes) AddViewRoutes() {
-	// Serve static files from the "public" directory
 	r.App.Static("/public", "./static")
 
 	homeController := cntrl.NewHomeController(r.Translation, r.Redis)

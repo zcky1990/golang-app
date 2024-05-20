@@ -19,6 +19,7 @@
 .env
 
 node_modules
+static/dist
 
 # Go workspace file
 go.work
