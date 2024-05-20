@@ -2,6 +2,11 @@
 This is Golang repository project, this repository used to practice and learning how to create REST API Application using GO.
 In this repository, we are following Ruby On Rails(ROR) stucture folder as base.
 
+Build Tailwindcss
+```
+npm run build:css
+```
+
 To running application: 
 ```
 go run .

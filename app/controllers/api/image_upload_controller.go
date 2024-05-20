@@ -1,4 +1,4 @@
-package controllers
+package api
 
 import (
 	"golang_app/golangApp/app/services"
