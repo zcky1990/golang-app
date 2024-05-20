@@ -7,7 +7,7 @@
 export default {
     data() {
         return {
-            message: 'Hello, Vue! JS AJA'
+            message: 'Hello, Vue! JS AJA 123589'
         }
     }
 }

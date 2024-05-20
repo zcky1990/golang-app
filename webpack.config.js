@@ -32,11 +32,20 @@ plugins: [
     // }),
     new VueLoaderPlugin()
 ],
-devServer: {
-    static: {
-        directory: path.resolve(__dirname, 'static/dist/javascript'),
-    },
-    compress: false,
-    port: 9000
-    }
+
+//we are using watch option instead dev server, so we only need to tun our go app, then whenever any changes happen in our js it automaticaly build file
+//see build:dev and build:prod on package.json
+//to run npm run build:dev or npm run build:prod
+watch: true,
+watchOptions: {
+    ignored: /node_modules/,
+},
+//we didn use devServer to hotreload
+// devServer: {
+//     static: {
+//         directory: path.resolve(__dirname, 'dist'),
+//     },
+//     compress: false,
+//     port: 9000
+//     }
 };

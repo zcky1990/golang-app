@@ -7,6 +7,11 @@ Build Tailwindcss
 npm run build:css
 ```
 
+Start webpack
+```
+npm run build:dev or npm run build:prod
+```
+
 To running application: 
 ```
 go run .
