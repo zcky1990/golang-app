@@ -1,6 +1,8 @@
 <template>
-    <contents />
-      <router-view />
+    <div class="container">
+        <contents />
+        <router-view />
+    </div>
 </template>
 <script>
 import contents from "./../components/HelloWorld.vue"
