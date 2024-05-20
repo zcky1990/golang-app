@@ -7,9 +7,14 @@ Build Tailwindcss
 npm run build:css
 ```
 
-Start webpack
+Start webpack to hot reload JS
 ```
 npm run build:dev or npm run build:prod
+```
+
+Running Go with hot Reload
+```
+fresh
 ```
 
 To running application: 
