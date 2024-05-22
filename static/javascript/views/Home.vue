@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="container mx-auto">
         <contents :dataProperty="data"/>
         <router-view />
     </div>

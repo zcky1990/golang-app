@@ -57,8 +57,7 @@ ENV=development go run .
 ENV=production go run .
 ````
 # Development
-When you develop using this, you need to run go and webpack at the same time,
-it's better to use fresh, so you dont have to kill golang app every time you changes someting in your golang app but the choice is yours
+You need to run go and webpack at the same time, when you add new components with new tailwindcss class, don't forget to run css build again so new tailwindcss will create new css output.
 
 # Running Tests
 Run all unit tests:

@@ -1,7 +1,7 @@
 <template>
-    <div>
+    <div class="container mx-auto">
         <h1 class="text-3xl font-bold underline">{{ message }}</h1>
-        <h1 class="text-3xl font-bold underline">{{ dataProperty }}</h1>
+        <h1 class="text-3xl underline">{{ dataProperty }}</h1>
     </div>
 </template>
 <script>

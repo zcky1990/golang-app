@@ -1,6 +1,5 @@
 const path = require('path');
 // const HtmlWebpackPlugin = require('html-webpack-plugin');
-
 const ENV = process.env.NODE_ENV || 'development';
 
 // Set the output directory based on the environment
