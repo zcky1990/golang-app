@@ -9,7 +9,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var _ EnvirontmentConfiguration = (*DevelopmentEnvirontment)(nil)
+var _ EnvironmentConfiguration = (*DevelopmentEnvirontment)(nil)
 
 type DevelopmentEnvirontment struct {
 	Config *Config

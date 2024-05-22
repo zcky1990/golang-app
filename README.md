@@ -35,10 +35,10 @@ npm run build:dev
 For Production:
 ````
 npm run build:prod
+````
 
 see webpack.config.js to learn more  
 
-````
 # Running the Go Application
 
 Run the Go application with hot reload:

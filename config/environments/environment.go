@@ -11,7 +11,7 @@ type Config struct {
 	JavaScriptOutputPath  string
 }
 
-type EnvirontmentConfiguration interface {
+type EnvironmentConfiguration interface {
 	GetConfiguration() *Config
 	LoadEvirontmentFile()
 	GetJSFilePath() string

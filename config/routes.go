@@ -30,7 +30,7 @@ type Routes struct {
 
 var viewsfs embed.FS
 
-func RoutesNew(env env.EnvirontmentConfiguration, mongodb *mongo.Database, translation *localize.Localization, redis *redis.RedisClient) *Routes {
+func RoutesNew(env env.EnvironmentConfiguration, mongodb *mongo.Database, translation *localize.Localization, redis *redis.RedisClient) *Routes {
 	config := env.GetConfiguration()
 	engine := html.New(config.EngineHtmlPath, config.EnginePageType)
 

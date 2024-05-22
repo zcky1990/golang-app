@@ -10,8 +10,8 @@ import (
 	"os"
 )
 
-func initializeEnvirotmentConfigurationAndEnvirotment(env string) e.EnvirontmentConfiguration {
-	var config e.EnvirontmentConfiguration
+func initializeEnvirotmentConfigurationAndEnvirotment(env string) e.EnvironmentConfiguration {
+	var config e.EnvironmentConfiguration
 	if env == "development" {
 		config = e.NewDevEnvConfiguration(env)
 	}
