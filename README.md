@@ -1,45 +1,72 @@
-# golang-app
-This is Golang repository project, this repository used to practice and learning how to create REST API Application using GO.
-In this repository, we are following Ruby On Rails(ROR) stucture folder as base.
+# Golang App
+This repository is a Go project designed for practicing and learning how to create a REST API application using Go. We follow the Ruby on Rails (ROR) folder structure as a base.
 
-Build Tailwindcss
-```
+# Folder Structure
+The folder structure is separated based on the environment you set:
+
+Development: All JS and CSS files will be built in the static/dev folder.
+Production: All JS and CSS files will be built in the static/dist folder.
+
+# Build Tailwind CSS
+To build Tailwind CSS, use the following commands:
+
+Build Tailwind CSS:
+````
 npm run build:css
-```
+````
+Build Tailwind CSS for Development/Test (not minified):
+````
+npm run build:css:dev
+````
+Build Tailwind CSS for Production (minified):
+````
+npm run build:css:prod
+````
+# Webpack
+Start Webpack for hot reloading JS:
 
-Start webpack to hot reload JS
-```
-npm run build:dev or npm run build:prod
-```
+For Development:
+````
+npm run build:dev
+````
+For Production:
+````
+npm run build:prod
+````
+# Running the Go Application
 
-Running Go with hot Reload
-```
+Run the Go application with hot reload:
+````
 fresh
-```
+````
 
-To running application: 
-```
+Run the Go application:
+````
 go run .
-```
+````
+Run the Go application with a specific environment:
+````
+ENV=development go run .
+ENV=production go run .
+````
 
-To running all unit test :
-```
+# Running Tests
+Run all unit tests:
+````
 go test ./test/*
-```
-
-To running spesific unit test :
-```
+````
+Run specific unit tests:
+````
 go test ./test/models
-```
+````
+If you want to separate environment variables for production and test environments, create a new file named .env.test.
 
-If you want to split environment variable to seperate file between production and test create new file with name `.env.test`
-
-To running all unit test with .env.test:
-```
+Run all unit tests with .env.test:
+````
 ENV=test go test ./test/*
-```
+````
 
-To running spesific unit test with .env.test:
-```
+Run specific unit tests with .env.test:
+````
 ENV=test go test ./test/models
-```
+````

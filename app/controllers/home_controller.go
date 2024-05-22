@@ -8,18 +8,23 @@ import (
 )
 
 type HomeController struct {
-	translation *localize.Localization
-	redis       *redis.RedisClient
+	jsImportPath  string
+	cssImportPath string
+	translation   *localize.Localization
+	redis         *redis.RedisClient
 }
 
-func NewHomeController(localize *localize.Localization, redis *redis.RedisClient) *HomeController {
-	return &HomeController{translation: localize, redis: redis}
+func NewHomeController(JsPath string, CssPath string, localize *localize.Localization, redis *redis.RedisClient) *HomeController {
+	return &HomeController{jsImportPath: JsPath, cssImportPath: CssPath, translation: localize, redis: redis}
 }
 
-func (cntrl *HomeController) IndexPage() fiber.Handler {
+func (c *HomeController) IndexPage() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		return ctx.Render("index", fiber.Map{
-			"Title": "Hello, World!",
+			"JSPath":     c.jsImportPath,
+			"CSSPath":    c.cssImportPath,
+			"JSFileName": "home.js",
+			"Title":      "Hello, World!",
 		}, "layouts/application")
 	}
 }

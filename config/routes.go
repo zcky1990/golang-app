@@ -6,6 +6,7 @@ import (
 	cntrl "golang_app/golangApp/app/controllers"
 	api "golang_app/golangApp/app/controllers/api"
 	mid "golang_app/golangApp/app/middlewares"
+	env "golang_app/golangApp/config/environments"
 	"golang_app/golangApp/config/localize"
 	"golang_app/golangApp/config/redis"
 
@@ -18,33 +19,41 @@ import (
 )
 
 type Routes struct {
-	App         *fiber.App
-	Database    *mongo.Database
-	Translation *localize.Localization
-	Redis       *redis.RedisClient
+	App           *fiber.App
+	Database      *mongo.Database
+	Translation   *localize.Localization
+	Redis         *redis.RedisClient
+	Config        *env.Config
+	ImportJSPath  string
+	ImportCssPath string
 }
 
 var viewsfs embed.FS
 
-func RoutesNew(mongodb *mongo.Database, translation *localize.Localization, redis *redis.RedisClient) *Routes {
-	engine := html.New("./app/views", ".html")
+func RoutesNew(env env.EnvirontmentConfiguration, mongodb *mongo.Database, translation *localize.Localization, redis *redis.RedisClient) *Routes {
+	config := env.GetConfiguration()
+	engine := html.New(config.EngineHtmlPath, config.EnginePageType)
 
 	app := fiber.New(fiber.Config{
 		Views:       engine,
-		ViewsLayout: "layouts/application",
+		ViewsLayout: config.EngineViewsLayout,
 	})
+
 	return &Routes{
-		App:         app,
-		Database:    mongodb,
-		Translation: translation,
-		Redis:       redis,
+		App:           app,
+		Database:      mongodb,
+		Translation:   translation,
+		Redis:         redis,
+		Config:        config,
+		ImportJSPath:  env.GetJSFilePath(),
+		ImportCssPath: env.GetCSSFilePath(),
 	}
 }
 
 func (r *Routes) AddViewRoutes() {
-	r.App.Static("/public", "./static")
+	r.App.Static(r.Config.StaticAssetPublicPath, r.Config.StaticAssetPath)
 
-	homeController := cntrl.NewHomeController(r.Translation, r.Redis)
+	homeController := cntrl.NewHomeController(r.ImportJSPath, r.ImportCssPath, r.Translation, r.Redis)
 	r.App.Get("/", homeController.IndexPage())
 }
 

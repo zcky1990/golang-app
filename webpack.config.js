@@ -1,5 +1,11 @@
 const path = require('path');
 // const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+const ENV = process.env.NODE_ENV || 'development';
+
+// Set the output directory based on the environment
+const outputDirectory = ENV === 'production' ? 'static/dist/javascript' : 'static/dev/javascript';
+
 const { VueLoaderPlugin } = require('vue-loader');
 
 module.exports = {
@@ -8,7 +14,7 @@ module.exports = {
         home: './static/javascript/home.js',
     },
     output: {
-        path: path.resolve(__dirname, 'static/dist/javascript'),
+        path: path.resolve(__dirname, outputDirectory),
         filename: '[name].js'
     },
     module: {
@@ -27,6 +33,7 @@ module.exports = {
     ]
 },
 plugins: [
+    //use this plugin if you want to generate html file
     // new HtmlWebpackPlugin({
     //     template: path.resolve(__dirname, 'app/views/home/index.html')
     // }),
@@ -40,7 +47,7 @@ watch: true,
 watchOptions: {
     ignored: /node_modules/,
 },
-//we didn use devServer to hotreload
+//we didnt use devServer to hotreload
 // devServer: {
 //     static: {
 //         directory: path.resolve(__dirname, 'dist'),
