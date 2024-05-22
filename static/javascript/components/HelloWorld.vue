@@ -1,13 +1,15 @@
 <template>
     <div>
         <h1 class="text-3xl font-bold underline">{{ message }}</h1>
+        <h1 class="text-3xl font-bold underline">{{ dataProperty }}</h1>
     </div>
 </template>
 <script>
 export default {
+    props: ['dataProperty'],
     data() {
         return {
-            message: 'Hello, Vue! JS AJA 12358910'
+            message: 'Hello, Vue! JS AJA 12358910',
         }
     }
 }

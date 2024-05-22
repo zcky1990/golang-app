@@ -1,4 +1,10 @@
-import { createApp } from 'vue';
+import {createApp} from 'vue';
 import App from './views/Home.vue'
 
-createApp(App).mount('#app');
+document.addEventListener('DOMContentLoaded', () => {
+    const initialData = window.__INITIAL_DATA__;
+
+    createApp(App, {
+        data: initialData
+    }).mount('#app');
+});

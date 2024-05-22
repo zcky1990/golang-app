@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <contents />
+        <contents :dataProperty="data"/>
         <router-view />
     </div>
 </template>
@@ -8,7 +8,8 @@
 import contents from "./../components/HelloWorld.vue"
 
 export default {
-    name: 'App',
+    name: 'Home',
+    props: ['data'],
     components: {
         contents,
     }
