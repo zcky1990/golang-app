@@ -59,6 +59,10 @@ ENV=production go run .
 # Development
 You need to run go and webpack at the same time, when you add new components with new tailwindcss class, don't forget to run css build again so new tailwindcss will create new css output.
 
+
+if you want go to hot realoding when you change something in the html template, on .fresh.yml, delete '.html' from no_rebuild_ext
+so when you save, it will kill go and start go again automatically
+
 # Running Tests
 Run all unit tests:
 ````
