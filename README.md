@@ -4,7 +4,7 @@ This repository is a Go project designed for practicing and learning how to crea
 # Folder Structure
 The folder structure is separated based on the environment you set:
 
-Development: All JS and CSS files will be built in the static/dev folder.
+Development: All JS and CSS files will be built in the static/dev folder.  
 Production: All JS and CSS files will be built in the static/dist folder.
 
 # Build Tailwind CSS
