@@ -37,7 +37,7 @@ func initializeEnvirotmentConfigurationAndEnvirotment() e.EnvironmentConfigurati
 func GetApplicationInstance() *Application {
 	once.Do(func() {
 		config := initializeEnvirotmentConfigurationAndEnvirotment()
-		config.LoadEvirontmentFile()
+		config.LoadEnvironmentFile()
 		instance = &Application{EnvConfig: config}
 	})
 	return instance

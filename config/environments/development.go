@@ -34,7 +34,7 @@ func (c *DevelopmentEnvirontment) GetConfiguration() *Config {
 	return c.Config
 }
 
-func (c *DevelopmentEnvirontment) LoadEvirontmentFile() {
+func (c *DevelopmentEnvirontment) LoadEnvironmentFile() {
 	currentDir, err := os.Getwd()
 	if err != nil {
 		log.Fatal("Error get current directory", err)
