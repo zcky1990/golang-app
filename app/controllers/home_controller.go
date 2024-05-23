@@ -66,3 +66,20 @@ func (c *HomeController) IndexPage() fiber.Handler {
 		}, "layouts/application")
 	}
 }
+
+func (c *HomeController) HomePage() fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+
+		response := &response{
+			JsImportPath:  c.envConf.GetJSFilePath(),
+			CssImportPath: c.envConf.GetCSSFilePath(),
+		}
+		return ctx.Render("index", fiber.Map{
+			"JSPath":     c.envConf.GetJSFilePath(),
+			"CSSPath":    c.envConf.GetCSSFilePath(),
+			"JSFileName": "home.js",
+			"Title":      "Hello, World!",
+			"Data":       c.structToMap(response),
+		}, "layouts/application")
+	}
+}

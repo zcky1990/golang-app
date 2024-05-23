@@ -12,7 +12,8 @@ import (
 )
 
 type SessionStore struct {
-	Session *session.Store
+	Store      *session.Store
+	RedisStore *redis.Storage
 }
 
 var RedisStore *redis.Storage
@@ -27,7 +28,8 @@ func SessionStoreNew() *SessionStore {
 		Storage:        RedisStore,
 	})
 	return &SessionStore{
-		Session: store,
+		Store:      store,
+		RedisStore: RedisStore,
 	}
 }
 

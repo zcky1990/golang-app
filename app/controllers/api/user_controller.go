@@ -7,6 +7,7 @@ import (
 	"golang_app/golangApp/app/services"
 	"golang_app/golangApp/config/localize"
 	"golang_app/golangApp/config/redis"
+	"golang_app/golangApp/config/session"
 	c "golang_app/golangApp/constants"
 
 	"github.com/gofiber/fiber/v2"
@@ -65,6 +66,10 @@ func (cntrl *UserController) Login() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		var params m.User
 		var authorization *mdl.Authorization
+		// Retrieve session
+		sesStore := ctx.Locals("session").(*session.SessionStore)
+		// Set a session value
+		sec, _ := sesStore.Store.Get(ctx)
 
 		if err := ctx.BodyParser(&params); err != nil {
 			return ctx.JSON(cntrl.ErrorResponse(err.Error()))
@@ -73,6 +78,10 @@ func (cntrl *UserController) Login() fiber.Handler {
 		if err == nil {
 			if responseUser != nil {
 				authorization, err = mdl.GenerateToken(params.Email, params.Password)
+				//create session in redis
+				sec.Set(responseUser.Email, responseUser.Email)
+				sec.Save()
+
 				if err != nil {
 					return ctx.JSON(cntrl.ErrorResponse(err.Error()))
 				}

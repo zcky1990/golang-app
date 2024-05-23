@@ -8,9 +8,7 @@ import (
 	env "golang_app/golangApp/config/environments"
 	"golang_app/golangApp/config/localize"
 	"golang_app/golangApp/config/redis"
-
-	db "golang_app/golangApp/config/mongo"
-	"log"
+	"golang_app/golangApp/config/session"
 
 	c "golang_app/golangApp/constants"
 	"os"
@@ -29,26 +27,8 @@ type Routes struct {
 	EnvCnfg     env.EnvironmentConfiguration
 }
 
-func RoutesNew() *Routes {
-	// we initiate app environment, and load env from env file
-	appCnf := GetApplicationInstance()
-
-	// initiate database
-	mongoDB, err := db.NewMongoDB()
-	if err != nil {
-		log.Fatalf("Failed to connect to MongoDB: %v", err)
-	}
-	defer mongoDB.Disconnect()
-
-	// initiate localization
-	translation := localize.NewLocalization()
-
-	// initiate redis
-	redisClient := redis.NewRedisClient()
-	defer redisClient.Close()
-
-	// get our configuration and setup fibers engine
-	// so our application can use fibers template
+func RoutesNew(appCnf *Application, mongo *mongo.Database, translation *localize.Localization, redis *redis.RedisClient) *Routes {
+	// get our configuration and setup fibers engine so our application can use fibers template
 	config := appCnf.EnvConfig.GetConfiguration()
 	engine := html.New(config.EngineHtmlPath, config.EnginePageType)
 
@@ -58,11 +38,19 @@ func RoutesNew() *Routes {
 		ViewsLayout: config.EngineViewsLayout,
 	})
 
+	// Middleware to manage sessions
+	sess := session.SessionStoreNew()
+	app.Use(func(c *fiber.Ctx) error {
+		// Save session for future middleware in local context
+		c.Locals("session", sess)
+		return c.Next()
+	})
+
 	return &Routes{
 		App:         app,
-		Database:    mongoDB.Db,
+		Database:    mongo,
 		Translation: translation,
-		Redis:       redisClient,
+		Redis:       redis,
 		Config:      config,
 		EnvCnfg:     appCnf.EnvConfig,
 	}
@@ -73,6 +61,7 @@ func (r *Routes) AddViewRoutes() {
 
 	homeController := cntrl.NewHomeController(r.EnvCnfg, r.Translation, r.Redis)
 	r.App.Get("/", homeController.IndexPage())
+	r.App.Get("/home", mid.SessionMiddleware(), homeController.HomePage())
 }
 
 func (r *Routes) AddAPIRoutes() {
