@@ -30,21 +30,29 @@ type Routes struct {
 }
 
 func RoutesNew() *Routes {
+	// we initiate app environment, and load env from env file
 	appCnf := GetApplicationInstance()
 
+	// initiate database
 	mongoDB, err := db.NewMongoDB()
 	if err != nil {
 		log.Fatalf("Failed to connect to MongoDB: %v", err)
 	}
 	defer mongoDB.Disconnect()
 
+	// initiate localization
 	translation := localize.NewLocalization()
+
+	// initiate redis
 	redisClient := redis.NewRedisClient()
 	defer redisClient.Close()
 
+	// get our configuration and setup fibers engine
+	// so our application can use fibers template
 	config := appCnf.EnvConfig.GetConfiguration()
 	engine := html.New(config.EngineHtmlPath, config.EnginePageType)
 
+	// initiate fibers with option enable fibers template
 	app := fiber.New(fiber.Config{
 		Views:       engine,
 		ViewsLayout: config.EngineViewsLayout,
