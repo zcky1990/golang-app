@@ -1,7 +1,6 @@
 package config
 
 import (
-	"embed"
 	"fmt"
 	cntrl "golang_app/golangApp/app/controllers"
 	api "golang_app/golangApp/app/controllers/api"
@@ -9,6 +8,9 @@ import (
 	env "golang_app/golangApp/config/environments"
 	"golang_app/golangApp/config/localize"
 	"golang_app/golangApp/config/redis"
+
+	db "golang_app/golangApp/config/mongo"
+	"log"
 
 	c "golang_app/golangApp/constants"
 	"os"
@@ -19,19 +21,28 @@ import (
 )
 
 type Routes struct {
-	App           *fiber.App
-	Database      *mongo.Database
-	Translation   *localize.Localization
-	Redis         *redis.RedisClient
-	Config        *env.Config
-	ImportJSPath  string
-	ImportCssPath string
+	App         *fiber.App
+	Database    *mongo.Database
+	Translation *localize.Localization
+	Redis       *redis.RedisClient
+	Config      *env.Config
+	EnvCnfg     env.EnvironmentConfiguration
 }
 
-var viewsfs embed.FS
+func RoutesNew() *Routes {
+	appCnf := GetApplicationInstance()
 
-func RoutesNew(env env.EnvironmentConfiguration, mongodb *mongo.Database, translation *localize.Localization, redis *redis.RedisClient) *Routes {
-	config := env.GetConfiguration()
+	mongoDB, err := db.NewMongoDB()
+	if err != nil {
+		log.Fatalf("Failed to connect to MongoDB: %v", err)
+	}
+	defer mongoDB.Disconnect()
+
+	translation := localize.NewLocalization()
+	redisClient := redis.NewRedisClient()
+	defer redisClient.Close()
+
+	config := appCnf.EnvConfig.GetConfiguration()
 	engine := html.New(config.EngineHtmlPath, config.EnginePageType)
 
 	app := fiber.New(fiber.Config{
@@ -40,20 +51,19 @@ func RoutesNew(env env.EnvironmentConfiguration, mongodb *mongo.Database, transl
 	})
 
 	return &Routes{
-		App:           app,
-		Database:      mongodb,
-		Translation:   translation,
-		Redis:         redis,
-		Config:        config,
-		ImportJSPath:  env.GetJSFilePath(),
-		ImportCssPath: env.GetCSSFilePath(),
+		App:         app,
+		Database:    mongoDB.Db,
+		Translation: translation,
+		Redis:       redisClient,
+		Config:      config,
+		EnvCnfg:     appCnf.EnvConfig,
 	}
 }
 
 func (r *Routes) AddViewRoutes() {
 	r.App.Static(r.Config.StaticAssetPublicPath, r.Config.StaticAssetPath)
 
-	homeController := cntrl.NewHomeController(r.ImportJSPath, r.ImportCssPath, r.Translation, r.Redis)
+	homeController := cntrl.NewHomeController(r.EnvCnfg, r.Translation, r.Redis)
 	r.App.Get("/", homeController.IndexPage())
 }
 
@@ -72,11 +82,8 @@ func (r *Routes) AddAPIRoutes() {
 	v1.Get("/wedding/:id", mid.JWTMiddleware(), weddingController.GetWeddingData())
 }
 
-func (r *Routes) SetUpRoutes() {
+func (r *Routes) StartServer() {
 	r.AddViewRoutes()
 	r.AddAPIRoutes()
-}
-
-func (r *Routes) StartServer() {
 	r.App.Listen(fmt.Sprintf(":%s", os.Getenv(c.PORT)))
 }
