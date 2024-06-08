@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"errors"
 	"golang_app/golangApp/config/session"
 	c "golang_app/golangApp/constants"
 	"os"
@@ -28,63 +29,79 @@ func init() {
 
 func JWTMiddleware() func(ctx *fiber.Ctx) error {
 	return func(ctx *fiber.Ctx) error {
-		//check bearer and validate token
-		const BEARER_SCHEMA = "Bearer "
 		tokenString := ctx.Get("Authorization")
-		var token *jwt.Token
-		var err error
-		if tokenString == "" {
-			return ctx.JSON(generateErrorMessage("Missing Auth Token"))
-		}
-		if !strings.Contains(tokenString, BEARER_SCHEMA) {
-			return ctx.JSON(generateErrorMessage("Invalid/Malformed Auth Token"))
-		} else {
-			tokenSlice := strings.Replace(tokenString, BEARER_SCHEMA, "", -1)
-			token, err = jwt.Parse(tokenSlice, func(token *jwt.Token) (interface{}, error) {
-				return jwtSecret, nil
-			})
-			if err != nil {
-				return ctx.JSON(generateErrorMessage(err.Error()))
-			}
-			if !token.Valid {
-				return ctx.JSON(generateErrorMessage("Token Invalid"))
-			}
+		token, err := validateToken(tokenString)
+		if err != nil {
+			return ctx.JSON(generateErrorMessage(err.Error()))
 		}
 
-		//to make it more save, we also check if stil have session login in redis
-		// Extract claims from the token
-		claims, ok := token.Claims.(jwt.MapClaims)
-		if !ok {
-			return ctx.JSON(generateErrorMessage("Failed to extract claims from token"))
+		claims, err := extractClaims(token)
+		if err != nil {
+			return ctx.JSON(generateErrorMessage(err.Error()))
 		}
 
-		// Access specific claims
-		name, nameOk := claims["user_email"].(string)
-		if !nameOk {
-			return ctx.JSON(generateErrorMessage("Invalid claims in token"))
+		if err := checkSession(ctx, claims); err != nil {
+			return ctx.JSON(generateErrorMessage(err.Error()))
 		}
 
-		// Retrieve session
-		sesStore := ctx.Locals("session").(*session.SessionStore)
-		// GET a session value
-		sec, _ := sesStore.Store.Get(ctx)
-		stringSession := sec.Get(name)
-
-		// if session not present we make jwt token invalid
-		if stringSession == nil {
-			return ctx.JSON(generateErrorMessage("Invalid Session, Please login again"))
-		}
 		return ctx.Next()
 	}
+}
+
+func validateToken(tokenString string) (*jwt.Token, error) {
+	const bearerSchema = "Bearer "
+	if tokenString == "" {
+		return nil, errors.New("Missing Auth Token")
+	}
+	if !strings.HasPrefix(tokenString, bearerSchema) {
+		return nil, errors.New("Invalid/Malformed Auth Token")
+	}
+
+	tokenSlice := strings.TrimPrefix(tokenString, bearerSchema)
+	token, err := jwt.Parse(tokenSlice, func(token *jwt.Token) (interface{}, error) {
+		return jwtSecret, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if !token.Valid {
+		return nil, errors.New("Token Invalid")
+	}
+	return token, nil
+}
+
+func extractClaims(token *jwt.Token) (jwt.MapClaims, error) {
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return nil, errors.New("Failed to extract claims from token")
+	}
+
+	if _, ok := claims["user_email"].(string); !ok {
+		return nil, errors.New("Invalid claims in token")
+	}
+
+	return claims, nil
+}
+
+func checkSession(ctx *fiber.Ctx, claims jwt.MapClaims) error {
+	email := claims["user_email"].(string)
+	sesStore := ctx.Locals("session").(*session.SessionStore)
+	sec, _ := sesStore.Store.Get(ctx)
+	stringSession := sec.Get(email)
+
+	if stringSession == nil {
+		return errors.New("Invalid Session, Please login again")
+	}
+	return nil
 }
 
 func GenerateToken(email string, password string) (*Authorization, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
-	expire_at := getExpireDate()
+	expireAt := getExpireDate()
 	claims["user_email"] = email
 	claims["password"] = password
-	claims["expire"] = expire_at
+	claims["expire"] = expireAt
 
 	tokenString, err := token.SignedString(jwtSecret)
 	if err != nil {
@@ -93,7 +110,7 @@ func GenerateToken(email string, password string) (*Authorization, error) {
 	return &Authorization{
 		Token:    tokenString,
 		AuthType: "Bearer",
-		ExpireAt: expire_at,
+		ExpireAt: expireAt,
 	}, nil
 }
 

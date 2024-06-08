@@ -32,12 +32,12 @@ module.exports = {
     ]
 },
 plugins: [
-    //use this plugin if you want to generate html file
+    new VueLoaderPlugin()
+],
+//use this plugin if you want to generate html file
     // new HtmlWebpackPlugin({
     //     template: path.resolve(__dirname, 'app/views/home/index.html')
     // }),
-    new VueLoaderPlugin()
-],
 
 //we are using watch option instead dev server, so we only need to tun our go app, then whenever any changes happen in our js it automaticaly build file
 //see build:dev and build:prod on package.json
