@@ -4,11 +4,24 @@ import { createStore } from 'vuex'
 export default createStore({
   state () {
     return {
+      snackbar:{
+        show: false,
+        message: '',
+      },
       count: 0,
       data : ''
     }
   },
   mutations: {
+    setSnackbarMessage(state, message) {
+      state.snackbar.message = message
+    },
+    showMessage(state) {
+      state.snackbar.show = true
+    },
+    hideMessage(state) {
+      state.snackbar.show = false
+    },
     increment (state) {
       state.count++
     },

@@ -19,9 +19,10 @@ export default {
     },
     methods: {
         increase: function (event) {
-            console.log("fire")
             this.$store.commit('increment')
-            this.$store.commit("addMessage", this.$store.state.count)
+            // this.$store.commit("addMessage", this.$store.state.count)
+            this.$store.commit('setSnackbarMessage', "test ting" );
+            this.$store.commit('showMessage');
         }
     }
 }

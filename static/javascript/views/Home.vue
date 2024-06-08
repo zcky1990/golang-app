@@ -1,11 +1,15 @@
 <template>
     <div class="container mx-auto">
+        <snackBar :show="showSnackbar" :message="snackbarMessage" position="top" color="green" @close="closeSnackbar" />
         <contents :dataProperty="data"/>
         <showCount/>
     </div>
 </template>
 <script>
-import contents from "./../components/HelloWorld.vue"
+import { inject } from 'vue';
+
+import snackBar from "./../components/shared/Snackbar.vue";
+import contents from "./../components/HelloWorld.vue";
 import showCount from "../components/ShowCount.vue";
 
 export default {
@@ -13,7 +17,27 @@ export default {
     props: ['data'],
     components: {
         contents,
-        showCount
-    }
+        showCount,
+        snackBar
+    },
+    created() {
+        this.$store = inject('store');
+    },
+    computed: {
+        showSnackbar() {
+            return this.$store.state.snackbar.show;
+        },
+        snackbarMessage() {
+            return this.$store.state.snackbar.message;
+        }
+    },
+    methods: {
+        showMessage() {
+            this.$store.dispatch('snackbar/showSnackbar', 'Hello, Snackbar!');
+        },
+        closeSnackbar() {
+            this.$store.commit('snackbar/hideMessage');
+        }
+  }
 }
 </script>
