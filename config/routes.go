@@ -61,7 +61,7 @@ func (r *Routes) AddViewRoutes() {
 
 	homeController := cntrl.NewHomeController(r.EnvCnfg, r.Translation, r.Redis)
 	r.App.Get("/", homeController.IndexPage())
-	r.App.Get("/home", mid.SessionMiddleware(), homeController.HomePage())
+	r.App.Get("/home", homeController.HomePage())
 }
 
 func (r *Routes) AddAPIRoutes() {

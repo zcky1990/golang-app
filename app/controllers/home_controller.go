@@ -22,12 +22,34 @@ type response struct {
 	CssImportPath string
 }
 
+type ImportPath struct {
+	JSPath  string
+	CSSPath string
+}
+
+type metaData struct {
+	Title      string
+	Filename   string
+	ImportPath ImportPath
+}
+
 func NewHomeController(env env.EnvironmentConfiguration, localize *localize.Localization, redis *redis.RedisClient) *HomeController {
 	return &HomeController{
 		envConf:     env,
 		translation: localize,
 		redis:       redis,
 	}
+}
+func (c *HomeController) getMetaData(file string) *metaData {
+	path := &ImportPath{
+		JSPath:  c.envConf.GetJSFilePath(),
+		CSSPath: c.envConf.GetCSSFilePath(),
+	}
+	meta := &metaData{
+		Filename:   file,
+		ImportPath: *path,
+	}
+	return meta
 }
 
 func (c *HomeController) structToMap(v interface{}) map[string]interface{} {
@@ -58,11 +80,9 @@ func (c *HomeController) IndexPage() fiber.Handler {
 			CssImportPath: c.envConf.GetCSSFilePath(),
 		}
 		return ctx.Render("index", fiber.Map{
-			"JSPath":     c.envConf.GetJSFilePath(),
-			"CSSPath":    c.envConf.GetCSSFilePath(),
-			"JSFileName": "home.js",
-			"Title":      "Hello, World!",
-			"Data":       c.structToMap(response),
+			"Title": "Hello world",
+			"Meta":  c.getMetaData("home.js"),
+			"Data":  c.structToMap(response),
 		}, "layouts/application")
 	}
 }
@@ -75,11 +95,9 @@ func (c *HomeController) HomePage() fiber.Handler {
 			CssImportPath: c.envConf.GetCSSFilePath(),
 		}
 		return ctx.Render("index", fiber.Map{
-			"JSPath":     c.envConf.GetJSFilePath(),
-			"CSSPath":    c.envConf.GetCSSFilePath(),
-			"JSFileName": "home.js",
-			"Title":      "Hello, World!",
-			"Data":       c.structToMap(response),
+			"Title": "Hello world",
+			"Meta":  c.getMetaData("home.js"),
+			"Data":  c.structToMap(response),
 		}, "layouts/application")
 	}
 }

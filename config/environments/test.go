@@ -18,7 +18,7 @@ type TestEnvirontment struct {
 func NewTestEnvConfiguration(env string) *TestEnvirontment {
 	config := &Config{
 		Env:                   env,
-		EnvFilename:           ".env",
+		EnvFilename:           ".env.test",
 		EngineHtmlPath:        "./app/views",
 		EnginePageType:        ".html",
 		EngineViewsLayout:     "layouts/application",
