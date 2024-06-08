@@ -1,7 +1,7 @@
 <template>
     <div class="container mx-auto">
         <h1 class="text-3xl font-bold underline">{{ this.$store.state.count }}</h1>
-        <div class="p-2 text-3xl" @click="increase">click</div>
+        <h1 class="text-3xl font-bold underline">{{ this.$store.state.data }}</h1>
     </div>
 </template>
 <script>
@@ -16,13 +16,6 @@ export default {
     },
     created() {
         this.$store = inject('store');
-    },
-    methods: {
-        increase: function (event) {
-            console.log("fire")
-            this.$store.commit('increment')
-            this.$store.commit("addMessage", this.$store.state.count)
-        }
     }
 }
 </script>
