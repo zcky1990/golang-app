@@ -53,12 +53,13 @@ func (cntrl *WeddingController) getLanguange(ctx *fiber.Ctx) string {
 func (cntrl *WeddingController) CreateWeddingData() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		var params models.WeddingData
+		lang := cntrl.getLanguange(ctx)
 		if err := ctx.BodyParser(&params); err != nil {
 			return ctx.JSON(cntrl.ErrorResponse(err.Error()))
 		}
 		data, err := cntrl.service.CreateWeddingData(params)
 		if err != nil {
-			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.GetLocalizationMessageWithLocale("EMAIL_TAKEN", cntrl.getLanguange(ctx))))
+			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.GetLocalizationMessageWithLocale("EMAIL_TAKEN", lang)))
 		}
 		return ctx.JSON(cntrl.SuccessResponse(data))
 	}
@@ -67,10 +68,11 @@ func (cntrl *WeddingController) CreateWeddingData() fiber.Handler {
 func (cntrl *WeddingController) GetWeddingData() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		weddingID := ctx.Params("id")
+		lang := cntrl.getLanguange(ctx)
 
 		data, err := cntrl.service.GetWeddingDataById(weddingID)
 		if err != nil {
-			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.GetLocalizationMessageWithLocale("EMAIL_TAKEN", cntrl.getLanguange(ctx))))
+			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.GetLocalizationMessageWithLocale("EMAIL_TAKEN", lang)))
 		}
 		return ctx.JSON(cntrl.SuccessResponse(data))
 	}

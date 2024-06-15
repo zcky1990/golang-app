@@ -50,18 +50,19 @@ func (cntrl *ImageController) UploadFile() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		var uploadResp *services.UploadImageResponse
 		form, err := ctx.MultipartForm()
+		lang := cntrl.getLanguange(ctx)
 		if err != nil {
 			return ctx.JSON(cntrl.ErrorResponse(err.Error()))
 		}
 
 		files, fileExists := form.File["file"]
 		if !fileExists || len(files) == 0 {
-			return ctx.Status(fiber.StatusBadRequest).JSON(cntrl.ErrorResponse(cntrl.translation.GetLocalizationMessageWithLocale("FILE_PARAMS_REQUIRED", cntrl.getLanguange(ctx))))
+			return ctx.Status(fiber.StatusBadRequest).JSON(cntrl.ErrorResponse(cntrl.translation.GetLocalizationMessageWithLocale("FILE_PARAMS_REQUIRED", lang)))
 		}
 
 		file, err := files[0].Open()
 		if err != nil {
-			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.GetLocalizationMessageWithLocale("FAILED_OPEN_FILE", cntrl.getLanguange(ctx))))
+			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.GetLocalizationMessageWithLocale("FAILED_OPEN_FILE", lang)))
 		}
 
 		defer file.Close()
