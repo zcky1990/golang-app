@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	cntrl "golang_app/golangApp/app/controllers"
+	ctrl "golang_app/golangApp/app/controllers"
 	api "golang_app/golangApp/app/controllers/api"
 	mid "golang_app/golangApp/app/middlewares"
 	env "golang_app/golangApp/config/environments"
@@ -59,7 +59,7 @@ func RoutesNew(appCnf *Application, mongo *mongo.Database, translation *localize
 func (r *Routes) AddViewRoutes() {
 	r.App.Static(r.Config.StaticAssetPublicPath, r.Config.StaticAssetPath)
 
-	homeController := cntrl.NewHomeController(r.EnvCnfg, r.Translation, r.Redis)
+	homeController := ctrl.NewHomeController(r.EnvCnfg, r.Translation, r.Redis)
 	r.App.Get("/", homeController.IndexPage())
 	r.App.Get("/home", homeController.HomePage())
 }

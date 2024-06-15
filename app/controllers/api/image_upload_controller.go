@@ -20,21 +20,21 @@ func NewCloudinaryController(localize *localize.Localization, redis *redis.Redis
 	return &ImageController{service: service, translation: localize, redis: redis}
 }
 
-func (cntrl *ImageController) SuccessResponse(data interface{}) fiber.Map {
+func (ctrl *ImageController) SuccessResponse(data interface{}) fiber.Map {
 	return fiber.Map{
 		c.STATUS: c.SUCCESS,
 		c.DATA:   data,
 	}
 }
 
-func (cntrl *ImageController) ErrorResponse(message string) fiber.Map {
+func (ctrl *ImageController) ErrorResponse(message string) fiber.Map {
 	return fiber.Map{
 		c.STATUS:        c.FAILED,
 		c.ERROR_MESSAGE: message,
 	}
 }
 
-func (cntrl *ImageController) getLanguange(ctx *fiber.Ctx) string {
+func (ctrl *ImageController) getLanguange(ctx *fiber.Ctx) string {
 	locale := ctx.Get("Accept-Language")
 	if locale == "" {
 		return c.LOCALE_ENGLISH
@@ -46,23 +46,23 @@ func (cntrl *ImageController) getLanguange(ctx *fiber.Ctx) string {
 	}
 }
 
-func (cntrl *ImageController) UploadFile() fiber.Handler {
+func (ctrl *ImageController) UploadFile() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		var uploadResp *services.UploadImageResponse
 		form, err := ctx.MultipartForm()
-		locale := cntrl.getLanguange(ctx)
+		locale := ctrl.getLanguange(ctx)
 		if err != nil {
-			return ctx.JSON(cntrl.ErrorResponse(err.Error()))
+			return ctx.JSON(ctrl.ErrorResponse(err.Error()))
 		}
 
 		files, fileExists := form.File["file"]
 		if !fileExists || len(files) == 0 {
-			return ctx.Status(fiber.StatusBadRequest).JSON(cntrl.ErrorResponse(cntrl.translation.GetMessage("FILE_PARAMS_REQUIRED", locale)))
+			return ctx.Status(fiber.StatusBadRequest).JSON(ctrl.ErrorResponse(ctrl.translation.GetMessage("FILE_PARAMS_REQUIRED", locale)))
 		}
 
 		file, err := files[0].Open()
 		if err != nil {
-			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.GetMessage("FAILED_OPEN_FILE", locale)))
+			return ctx.JSON(ctrl.ErrorResponse(ctrl.translation.GetMessage("FAILED_OPEN_FILE", locale)))
 		}
 
 		defer file.Close()
@@ -70,13 +70,13 @@ func (cntrl *ImageController) UploadFile() fiber.Handler {
 		directory := form.Value["directory"][0]
 
 		if directory != "" {
-			uploadResp, err = cntrl.service.UploadImageToFolder(file, fileName, directory)
+			uploadResp, err = ctrl.service.UploadImageToFolder(file, fileName, directory)
 		} else {
-			uploadResp, err = cntrl.service.UploadImage(file, fileName)
+			uploadResp, err = ctrl.service.UploadImage(file, fileName)
 		}
 		if err != nil {
-			return ctx.JSON(cntrl.ErrorResponse(err.Error()))
+			return ctx.JSON(ctrl.ErrorResponse(err.Error()))
 		}
-		return ctx.JSON(cntrl.SuccessResponse(uploadResp))
+		return ctx.JSON(ctrl.SuccessResponse(uploadResp))
 	}
 }
