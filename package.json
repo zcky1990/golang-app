@@ -2,9 +2,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build:css": "npx tailwindcss -i ./static/css/tailwind.css -o ./static/css/tailwind-out.css",
-    "build:css:dev": "npx tailwindcss -i ./static/css/tailwind.css -o ./static/dev/css/tailwind-out.css",
-    "build:css:prod": "npx tailwindcss -i ./static/css/tailwind.css -o ./static/dist/css/tailwind-out.css --minify",
+    "build:css": "npx tailwindcss -i ./static/css/tailwind.css -o ./static/css/tailwind-out.css --watch",
+    "build:css:dev": "npx tailwindcss -c ./tailwind.config.dev.js -i ./static/css/tailwind.css -o ./static/dev/css/tailwind-out.css",
+    "build:css:prod": "npx tailwindcss -c ./tailwind.config.prod.js -i ./static/css/tailwind.css -o ./static/dist/css/tailwind-out.css --minify",
     "start": "webpack serve --mode development --live-reload",
     "build:prod": "NODE_ENV=production webpack --mode production",
     "build:dev": "NODE_ENV=development webpack --mode development"

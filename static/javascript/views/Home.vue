@@ -34,8 +34,8 @@ export default {
     data(){
         return {
             snackBar:{
-                snackbarMessage: '',
-                show: false
+                snackbarMessage: 'test',
+                show: true
             }
         }
     },

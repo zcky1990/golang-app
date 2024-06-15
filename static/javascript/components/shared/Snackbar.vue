@@ -1,5 +1,5 @@
 <template>
-    <div v-if="show" :class="['fixed', positionClasses, 'p-4', bgColor, 'text-white']">
+    <div v-if="show" :class="['fixed', positionClasses, 'p-4', bgColor, 'text-white', 'text-center']">
       {{ message }}
       <button @click="closeSnackbar" class="ml-4 text-blue-300 hover:text-white focus:outline-none focus:text-white">
         &#10005;
