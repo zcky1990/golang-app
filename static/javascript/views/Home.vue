@@ -5,6 +5,7 @@
             :message="snackBar.snackbarMessage" 
             position="top" 
             color="green" 
+            timeout="10000"
             @showSnakeBar="showSnackbar"
             @closeSnakeBar="closeSnackbar" 
         />
@@ -34,7 +35,7 @@ export default {
         return {
             snackBar:{
                 snackbarMessage: '',
-                show: true
+                show: false
             }
         }
     },
@@ -46,16 +47,11 @@ export default {
     },
     methods: {
         showSnackbar(message) {
-            console.log("emitted Show")
             let snackBar = this.snackBar;
             snackBar.snackbarMessage = message;
             snackBar.show = true;
-            setTimeout(function () {
-                snackBar.show = false
-            }, 1000);
         },
         closeSnackbar() {
-            console.log("emitted Hide")
             this.snackBar.show = false;
         }
     }

@@ -13,7 +13,18 @@
       show: Boolean,
       message: String,
       position: String,
-      color: String
+      color: String,
+      timeout: Number,
+    },
+    watch: { 
+      show: function(newVal, oldVal) { // watch it
+        let self = this;
+        if (newVal === true) {
+          setTimeout(function () {
+            self.closeSnackbar() ;
+          }, self.timeout!== undefined ? self.timeout : 1000);
+        }
+        }
     },
     computed: {
       positionClasses() {
