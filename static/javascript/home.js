@@ -3,7 +3,6 @@ import App from './views/Home.vue'
 import counterStore from './vuex/counter-vuex-example'
 
 document.addEventListener('DOMContentLoaded', () => {
-    const initialData = window.__INITIAL_DATA__;
     // Create the Vue app
     const app = createApp(App);
     // Provide the Vuex store to all components

@@ -5,6 +5,7 @@ import (
 )
 
 type BaseApiController interface {
+	getLanguange(ctx *fiber.Ctx) string
 	SuccessResponse(data interface{}) fiber.Map
 	ErrorResponse(message string) fiber.Map
 }

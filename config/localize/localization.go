@@ -2,6 +2,7 @@ package localize
 
 import (
 	"fmt"
+	c "golang_app/golangApp/constants"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -47,15 +48,30 @@ func loadTranslations(filepath string) (*translations, error) {
 // GetMessage retrieves translated message for a given message ID
 func (i18n *I18n) GetMessage(messageID string) (string, error) {
 	if i18n.Translations == nil {
-		return "", fmt.Errorf("translations not loaded")
+		return "", fmt.Errorf("Translations not loaded")
 	}
 	translation, ok := (*i18n.Translations)[i18n.Locale]
 	if !ok {
-		return "", fmt.Errorf("translation not found for locale: %s", i18n.Locale)
+		return "", fmt.Errorf("Translation not found for locale: %s", i18n.Locale)
 	}
 	message, ok := translation[messageID]
 	if !ok {
-		return "", fmt.Errorf("message not found with ID: %s", messageID)
+		return "", fmt.Errorf("Message not found with ID: %s", messageID)
+	}
+	return message, nil
+}
+
+func (i18n *I18n) GetMessageWithLocale(messageID string, locale string) (string, error) {
+	if i18n.Translations == nil {
+		return "", fmt.Errorf("Translations not loaded")
+	}
+	translation, ok := (*i18n.Translations)[locale]
+	if !ok {
+		return "", fmt.Errorf("Translation not found for locale: %s", locale)
+	}
+	message, ok := translation[messageID]
+	if !ok {
+		return "", fmt.Errorf("Message not found with ID: %s", messageID)
 	}
 	return message, nil
 }
@@ -65,11 +81,16 @@ type Localization struct {
 }
 
 func NewLocalization() *Localization {
-	locale := newI18n("i18n.yml", "ind")
+	locale := newI18n("i18n.yml", c.LOCALE_INDONESIA)
 	return &Localization{I18n: locale}
 }
 
-func (c *Localization) Localization(messageKey string) string {
+func (c *Localization) GetLocalizationMessage(messageKey string) string {
 	message, _ := c.I18n.GetMessage(messageKey)
+	return message
+}
+
+func (c *Localization) GetLocalizationMessageWithLocale(messageKey string, locale string) string {
+	message, _ := c.I18n.GetMessageWithLocale(messageKey, locale)
 	return message
 }

@@ -11,6 +11,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+var _ BaseApiController = (*WeddingController)(nil)
+
 type WeddingController struct {
 	service     *services.WeddingService
 	translation *localize.Localization
@@ -36,6 +38,18 @@ func (cntrl *WeddingController) ErrorResponse(message string) fiber.Map {
 	}
 }
 
+func (cntrl *WeddingController) getLanguange(ctx *fiber.Ctx) string {
+	lang := ctx.Get("Accept-Language")
+	if lang == "" {
+		return c.LOCALE_ENGLISH
+	}
+	if lang == c.LOCALE_ENGLISH {
+		return c.LOCALE_ENGLISH
+	} else {
+		return c.LOCALE_INDONESIA
+	}
+}
+
 func (cntrl *WeddingController) CreateWeddingData() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		var params models.WeddingData
@@ -44,7 +58,7 @@ func (cntrl *WeddingController) CreateWeddingData() fiber.Handler {
 		}
 		data, err := cntrl.service.CreateWeddingData(params)
 		if err != nil {
-			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.Localization(c.EMAIL_TAKEN)))
+			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.GetLocalizationMessageWithLocale("EMAIL_TAKEN", cntrl.getLanguange(ctx))))
 		}
 		return ctx.JSON(cntrl.SuccessResponse(data))
 	}
@@ -56,7 +70,7 @@ func (cntrl *WeddingController) GetWeddingData() fiber.Handler {
 
 		data, err := cntrl.service.GetWeddingDataById(weddingID)
 		if err != nil {
-			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.Localization(c.EMAIL_TAKEN)))
+			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.GetLocalizationMessageWithLocale("EMAIL_TAKEN", cntrl.getLanguange(ctx))))
 		}
 		return ctx.JSON(cntrl.SuccessResponse(data))
 	}

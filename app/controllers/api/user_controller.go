@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	mdl "golang_app/golangApp/app/middlewares"
 	m "golang_app/golangApp/app/models"
 	"golang_app/golangApp/app/services"
@@ -38,6 +37,17 @@ func (cntrl *UserController) ErrorResponse(message string) fiber.Map {
 		c.ERROR_MESSAGE: message,
 	}
 }
+func (cntrl *UserController) getLanguange(ctx *fiber.Ctx) string {
+	lang := ctx.Get("Accept-Language")
+	if lang == "" {
+		return c.LOCALE_ENGLISH
+	}
+	if lang == c.LOCALE_ENGLISH {
+		return c.LOCALE_ENGLISH
+	} else {
+		return c.LOCALE_INDONESIA
+	}
+}
 
 func (cntrl *UserController) Signup() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
@@ -47,11 +57,11 @@ func (cntrl *UserController) Signup() fiber.Handler {
 		}
 		user := cntrl.service.GetUserByEmail(params.Email)
 		if user != nil {
-			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.Localization(c.EMAIL_TAKEN)))
+			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.GetLocalizationMessageWithLocale("EMAIL_TAKEN", cntrl.getLanguange(ctx))))
 		}
 		data, err := cntrl.service.CreateUser(params)
 		if err != nil {
-			return ctx.JSON(cntrl.ErrorResponse(fmt.Sprintf("%s : %s", c.MESSAGE_ERROR_FAILED_CREATE_USER, err.Error())))
+			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.GetLocalizationMessageWithLocale("FAILED_CREATE_USER", cntrl.getLanguange(ctx))))
 		}
 		return ctx.JSON(cntrl.SuccessResponse(data))
 	}
@@ -86,7 +96,7 @@ func (cntrl *UserController) Login() fiber.Handler {
 					return ctx.JSON(cntrl.ErrorResponse(err.Error()))
 				}
 			} else {
-				return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.Localization(c.USER_NOT_FOUND)))
+				return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.GetLocalizationMessageWithLocale("USER_NOT_FOUND", cntrl.getLanguange(ctx))))
 			}
 		} else {
 			return ctx.JSON(cntrl.ErrorResponse(err.Error()))
@@ -113,7 +123,7 @@ func (cntrl *UserController) UpdateUser() fiber.Handler {
 			}
 			return ctx.JSON(cntrl.SuccessResponse(response))
 		} else {
-			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.Localization(c.USER_NOT_FOUND)))
+			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.GetLocalizationMessageWithLocale("USER_NOT_FOUND", cntrl.getLanguange(ctx))))
 		}
 	}
 }

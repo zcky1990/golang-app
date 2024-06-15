@@ -2,7 +2,13 @@ en:
   USER_NOT_FOUND: "User not Found"
   EMAIL_TAKEN: "Email Has been taken"
   FAILED_OPEN_FILE: "Failed to open file"
-ind:
+  FILE_PARAMS_REQUIRED: "File params required"
+  FAILED_CREATE_USER:  "Failed to create User"
+  FAILED_UPDATE_DATA: "No Data Updated"
+id:
   USER_NOT_FOUND: "User tidak ditemukan"
   EMAIL_TAKEN: "Email sudah digunakan"
   FAILED_OPEN_FILE: "Gagal membaca file"
+  FILE_PARAMS_REQUIRED: "File parameter dibutuhkan"
+  FAILED_CREATE_USER:  "Gagal membuat User"
+  FAILED_UPDATE_DATA: "Gagal Update Data"

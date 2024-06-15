@@ -2,10 +2,6 @@ package constants
 
 const (
 	PORT = "PORT"
-	// const localize
-	FAILED_OPEN_FILE = "FAILED_OPEN_FILE"
-	EMAIL_TAKEN      = "EMAIL_TAKEN"
-	USER_NOT_FOUND   = "USER_NOT_FOUND"
 
 	MONGO_HOST          = "MONGO_HOST"
 	MONGO_PORT          = "MONGO_PORT"
@@ -46,4 +42,7 @@ const (
 	MESSAGE_ERROR_FAILED_CREATE_USER         = "Failed to create User"
 	MESSAGE_ERROR_FAILED_UPDATE_DATA         = "No Data Updated"
 	MESSAGE_ERROR_FAILED_EXTRACT_INSERTED_ID = "Failed to extract inserted ID"
+
+	LOCALE_ENGLISH   = "en"
+	LOCALE_INDONESIA = "id"
 )

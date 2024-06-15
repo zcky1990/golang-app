@@ -38,6 +38,6 @@ export default {
         closeSnackbar() {
             this.$store.commit('snackbar/hideMessage');
         }
-  }
+    }
 }
 </script>

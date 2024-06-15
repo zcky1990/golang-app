@@ -34,6 +34,18 @@ func (cntrl *ImageController) ErrorResponse(message string) fiber.Map {
 	}
 }
 
+func (cntrl *ImageController) getLanguange(ctx *fiber.Ctx) string {
+	lang := ctx.Get("Accept-Language")
+	if lang == "" {
+		return c.LOCALE_ENGLISH
+	}
+	if lang == c.LOCALE_ENGLISH {
+		return c.LOCALE_ENGLISH
+	} else {
+		return c.LOCALE_INDONESIA
+	}
+}
+
 func (cntrl *ImageController) UploadFile() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		var uploadResp *services.UploadImageResponse
@@ -44,12 +56,12 @@ func (cntrl *ImageController) UploadFile() fiber.Handler {
 
 		files, fileExists := form.File["file"]
 		if !fileExists || len(files) == 0 {
-			return ctx.Status(fiber.StatusBadRequest).JSON(cntrl.ErrorResponse(c.MESSAGE_ERROR_FILE_PARAMS_REQUIRED))
+			return ctx.Status(fiber.StatusBadRequest).JSON(cntrl.ErrorResponse(cntrl.translation.GetLocalizationMessageWithLocale("FILE_PARAMS_REQUIRED", cntrl.getLanguange(ctx))))
 		}
 
 		file, err := files[0].Open()
 		if err != nil {
-			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.Localization(c.FAILED_OPEN_FILE)))
+			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.GetLocalizationMessageWithLocale("FAILED_OPEN_FILE", cntrl.getLanguange(ctx))))
 		}
 
 		defer file.Close()
