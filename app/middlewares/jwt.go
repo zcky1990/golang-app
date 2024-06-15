@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"errors"
-	"golang_app/golangApp/config/session"
 	c "golang_app/golangApp/constants"
 	"os"
 	"strconv"
@@ -40,7 +39,11 @@ func JWTMiddleware() func(ctx *fiber.Ctx) error {
 			return ctx.JSON(generateErrorMessage(err.Error()))
 		}
 
-		if err := checkSession(ctx, claims); err != nil {
+		email := claims["user_email"].(string)
+		if email == "" {
+			return ctx.JSON(generateErrorMessage("Invalid session"))
+		}
+		if err := checkSessionClaim(ctx, email); err != nil {
 			return ctx.JSON(generateErrorMessage(err.Error()))
 		}
 
@@ -81,18 +84,6 @@ func extractClaims(token *jwt.Token) (jwt.MapClaims, error) {
 	}
 
 	return claims, nil
-}
-
-func checkSession(ctx *fiber.Ctx, claims jwt.MapClaims) error {
-	email := claims["user_email"].(string)
-	sesStore := ctx.Locals("session").(*session.SessionStore)
-	sec, _ := sesStore.Store.Get(ctx)
-	stringSession := sec.Get(email)
-
-	if stringSession == nil {
-		return errors.New("Invalid Session, Please login again")
-	}
-	return nil
 }
 
 func GenerateToken(email string, password string) (*Authorization, error) {
