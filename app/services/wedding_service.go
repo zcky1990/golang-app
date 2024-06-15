@@ -46,27 +46,6 @@ func (s *WeddingService) ConvertToBSON(data interface{}) (bson.M, error) {
 	return bsonMap, nil
 }
 
-func (c *WeddingService) convertWeddingDataToBSON(data m.WeddingData) (bson.M, error) {
-	// Marshal the struct to BSON
-	bsonData, err := bson.Marshal(data)
-	if err != nil {
-		return nil, err
-	}
-	// Unmarshal the BSON to bson.M
-	var bsonMap bson.M
-	err = bson.Unmarshal(bsonData, &bsonMap)
-	if err != nil {
-		return nil, err
-	}
-	// remove empty value from bson
-	for key, value := range bsonMap {
-		if value == "" || value == nil {
-			delete(bsonMap, key)
-		}
-	}
-	return bsonMap, nil
-}
-
 func (service *WeddingService) CreateWeddingData(data m.WeddingData) (string, error) {
 	result, err := service.collection.InsertOne(context.Background(), data)
 	if err != nil {
@@ -84,7 +63,7 @@ func (service *WeddingService) CreateWeddingData(data m.WeddingData) (string, er
 
 func (service *WeddingService) UpdateWeddingDataById(id string, updates m.WeddingData) (string, error) {
 	objID, _ := primitive.ObjectIDFromHex(id)
-	data, _ := service.convertWeddingDataToBSON(updates)
+	data, _ := service.ConvertToBSON(updates)
 	result, err := service.collection.UpdateOne(
 		context.TODO(),
 		bson.M{"_id": objID},
