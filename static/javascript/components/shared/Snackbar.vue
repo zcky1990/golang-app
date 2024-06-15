@@ -1,7 +1,7 @@
 <template>
     <div v-if="show" :class="['fixed', positionClasses, 'p-4', bgColor, 'text-white']">
       {{ message }}
-      <button @click="close" class="ml-4 text-blue-300 hover:text-white focus:outline-none focus:text-white">
+      <button @click="closeSnackbar" class="ml-4 text-blue-300 hover:text-white focus:outline-none focus:text-white">
         &#10005;
       </button>
     </div>
@@ -24,8 +24,8 @@
       }
     },
     methods: {
-      close() {
-        this.$emit("close") ;
+      closeSnackbar() {
+        this.$emit("closeSnakeBar") ;
       }
     }
   };

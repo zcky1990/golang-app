@@ -57,7 +57,7 @@ func (c *HomeController) IndexPage() fiber.Handler {
 			JsImportPath:  c.envConf.GetJSFilePath(),
 			CssImportPath: c.envConf.GetCSSFilePath(),
 		}
-		return ctx.Render("index", fiber.Map{
+		return ctx.Render("home_index", fiber.Map{
 			"Title": "Hello world",
 			"Meta":  c.getMetaData("home.js"),
 			"Data":  response,
@@ -72,7 +72,7 @@ func (c *HomeController) HomePage() fiber.Handler {
 			JsImportPath:  c.envConf.GetJSFilePath(),
 			CssImportPath: c.envConf.GetCSSFilePath(),
 		}
-		return ctx.Render("index", fiber.Map{
+		return ctx.Render("home_index", fiber.Map{
 			"Title": "Hello world",
 			"Meta":  c.getMetaData("home.js"),
 			"Data":  response,

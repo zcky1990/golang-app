@@ -70,7 +70,7 @@ type Localization struct {
 }
 
 func NewLocalization() *Localization {
-	locale := newI18n("i18n.yml", c.LOCALE_INDONESIA)
+	locale := newI18n("i18n.yml", c.LOCALE_ENGLISH)
 	return &Localization{
 		i18n: locale,
 	}

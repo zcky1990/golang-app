@@ -8,21 +8,14 @@
 import { inject } from 'vue';
 
 export default {
-    props: ['dataProperty'],
-    data() {
-        return {
-            message: 'Hello, Vue! JS AJA 12358910',
-        }
-    },
     created() {
         this.$store = inject('store');
     },
     methods: {
         increase: function (event) {
             this.$store.commit('increment')
-            // this.$store.commit("addMessage", this.$store.state.count)
-            this.$store.commit('setSnackbarMessage', "test ting" );
-            this.$store.commit('showMessage');
+            console.log("clicced")
+            this.$emit("showSnakeBar", "test ting");
         }
     }
 }

@@ -1,7 +1,18 @@
 <template>
     <div class="container mx-auto">
-        <snackBar :show="showSnackbar" :message="snackbarMessage" position="top" color="green" @close="closeSnackbar" />
-        <contents :dataProperty="data"/>
+        <snackBar 
+            :show="snackBar.show" 
+            :message="snackBar.snackbarMessage" 
+            position="top" 
+            color="green" 
+            @showSnakeBar="showSnackbar"
+            @closeSnakeBar="closeSnackbar" 
+        />
+        <contents 
+            :dataProperty="data" 
+            @closeSnakeBar="closeSnackbar" 
+            @showSnakeBar="showSnackbar"
+        />
         <showCount/>
     </div>
 </template>
@@ -14,29 +25,38 @@ import showCount from "../components/ShowCount.vue";
 
 export default {
     name: 'Home',
-    props: ['data'],
     components: {
         contents,
         showCount,
         snackBar
     },
+    data(){
+        return {
+            snackBar:{
+                snackbarMessage: '',
+                show: true
+            }
+        }
+    },
     created() {
         this.$store = inject('store');
     },
     computed: {
-        showSnackbar() {
-            return this.$store.state.snackbar.show;
-        },
-        snackbarMessage() {
-            return this.$store.state.snackbar.message;
-        }
+
     },
     methods: {
-        showMessage() {
-            this.$store.dispatch('snackbar/showSnackbar', 'Hello, Snackbar!');
+        showSnackbar(message) {
+            console.log("emitted Show")
+            let snackBar = this.snackBar;
+            snackBar.snackbarMessage = message;
+            snackBar.show = true;
+            setTimeout(function () {
+                snackBar.show = false
+            }, 1000);
         },
         closeSnackbar() {
-            this.$store.commit('snackbar/hideMessage');
+            console.log("emitted Hide")
+            this.snackBar.show = false;
         }
     }
 }
