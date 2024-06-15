@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"errors"
-	c "golang_app/golangApp/constants"
 	"os"
 	"strconv"
 	"strings"
@@ -26,32 +25,76 @@ func init() {
 	expiration, _ = strconv.ParseInt(os.Getenv("SESSION_EXPIRATION"), 10, 64)
 }
 
-func JWTMiddleware() func(ctx *fiber.Ctx) error {
-	return func(ctx *fiber.Ctx) error {
-		tokenString := ctx.Get("Authorization")
-		token, err := validateToken(tokenString)
-		if err != nil {
-			return ctx.JSON(generateErrorMessage(err.Error()))
-		}
+func GenerateToken(email string, password string) (*Authorization, error) {
+	token := jwt.New(jwt.SigningMethodHS256)
+	claims := token.Claims.(jwt.MapClaims)
+	expireAt := getExpireDate()
+	claims["user_email"] = email
+	claims["password"] = password
+	claims["expire"] = expireAt
 
-		claims, err := extractClaims(token)
-		if err != nil {
-			return ctx.JSON(generateErrorMessage(err.Error()))
-		}
-
-		email := claims["user_email"].(string)
-		if email == "" {
-			return ctx.JSON(generateErrorMessage("Invalid session"))
-		}
-		if err := checkSessionClaim(ctx, email); err != nil {
-			return ctx.JSON(generateErrorMessage(err.Error()))
-		}
-
-		return ctx.Next()
+	tokenString, err := token.SignedString(jwtSecret)
+	if err != nil {
+		return &Authorization{}, err
 	}
+	return &Authorization{
+		Token:    tokenString,
+		AuthType: "Bearer",
+		ExpireAt: expireAt,
+	}, nil
 }
 
-func validateToken(tokenString string) (*jwt.Token, error) {
+func ValidateJWTToken(ctx *fiber.Ctx) error {
+	err := validateToken(ctx)
+	if err != nil {
+		return ctx.JSON(generateErrorMessage(err.Error()))
+	}
+	return nil
+}
+
+func GetEmailFromToken(ctx *fiber.Ctx) (string, error) {
+	token, err := getToken(ctx)
+	if err != nil {
+		return "", ctx.JSON(generateErrorMessage(err.Error()))
+	}
+	claims, err := extractClaims(token)
+	if err != nil {
+		return "", ctx.JSON(generateErrorMessage(err.Error()))
+	}
+
+	email := claims["user_email"].(string)
+	if email == "" {
+		return "", ctx.JSON(generateErrorMessage("Invalid session"))
+	}
+	return email, nil
+}
+
+// private method here
+func validateToken(ctx *fiber.Ctx) error {
+	tokenString := ctx.Get("Authorization")
+	const bearerSchema = "Bearer "
+	if tokenString == "" {
+		return errors.New("Missing Auth Token")
+	}
+	if !strings.HasPrefix(tokenString, bearerSchema) {
+		return errors.New("Invalid/Malformed Auth Token")
+	}
+
+	tokenSlice := strings.TrimPrefix(tokenString, bearerSchema)
+	token, err := jwt.Parse(tokenSlice, func(token *jwt.Token) (interface{}, error) {
+		return jwtSecret, nil
+	})
+	if err != nil {
+		return err
+	}
+	if !token.Valid {
+		return errors.New("Token Invalid")
+	}
+	return nil
+}
+
+func getToken(ctx *fiber.Ctx) (*jwt.Token, error) {
+	tokenString := ctx.Get("Authorization")
 	const bearerSchema = "Bearer "
 	if tokenString == "" {
 		return nil, errors.New("Missing Auth Token")
@@ -84,32 +127,6 @@ func extractClaims(token *jwt.Token) (jwt.MapClaims, error) {
 	}
 
 	return claims, nil
-}
-
-func GenerateToken(email string, password string) (*Authorization, error) {
-	token := jwt.New(jwt.SigningMethodHS256)
-	claims := token.Claims.(jwt.MapClaims)
-	expireAt := getExpireDate()
-	claims["user_email"] = email
-	claims["password"] = password
-	claims["expire"] = expireAt
-
-	tokenString, err := token.SignedString(jwtSecret)
-	if err != nil {
-		return &Authorization{}, err
-	}
-	return &Authorization{
-		Token:    tokenString,
-		AuthType: "Bearer",
-		ExpireAt: expireAt,
-	}, nil
-}
-
-func generateErrorMessage(message string) fiber.Map {
-	return fiber.Map{
-		c.STATUS:        c.FAILED,
-		c.ERROR_MESSAGE: message,
-	}
 }
 
 func getExpireDate() int64 {

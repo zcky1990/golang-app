@@ -37,7 +37,8 @@ func CheckSession(ctx *fiber.Ctx) error {
 	return nil
 }
 
-func checkSessionClaim(ctx *fiber.Ctx, email string) error {
+// becasue we are using api, we are gonna check session value base on email
+func CheckSessionClaim(ctx *fiber.Ctx, email string) error {
 	sesStore := ctx.Locals("session").(*session.SessionStore)
 	sec, _ := sesStore.Store.Get(ctx)
 	stringSession := sec.Get(email)

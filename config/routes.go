@@ -73,10 +73,10 @@ func (r *Routes) AddAPIRoutes() {
 	v1 := api.Group("/v1")
 	v1.Post("/users/sign-up", userController.Signup())
 	v1.Post("/users/login", userController.Login())
-	v1.Post("/users/update-user", mid.JWTMiddleware(), userController.UpdateUser())
-	v1.Post("/upload/image", mid.JWTMiddleware(), imageController.UploadFile())
-	v1.Post("/wedding/create", mid.JWTMiddleware(), weddingController.CreateWeddingData())
-	v1.Get("/wedding/:id", mid.JWTMiddleware(), weddingController.GetWeddingData())
+	v1.Post("/users/update-user", mid.CheckJWTandSessionMiddleware(), userController.UpdateUser())
+	v1.Post("/upload/image", mid.CheckJWTandSessionMiddleware(), imageController.UploadFile())
+	v1.Post("/wedding/create", mid.CheckJWTandSessionMiddleware(), weddingController.CreateWeddingData())
+	v1.Get("/wedding/:id", mid.CheckJWTandSessionMiddleware(), weddingController.GetWeddingData())
 }
 
 func (r *Routes) StartServer() {
