@@ -3,11 +3,9 @@ package services
 import (
 	"context"
 	"errors"
-	"fmt"
 	m "golang_app/golangApp/app/models"
 	"golang_app/golangApp/config/localize"
 	"golang_app/golangApp/config/redis"
-	c "golang_app/golangApp/constants"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -47,7 +45,7 @@ func (s *UserService) ConvertToBSON(data interface{}) (bson.M, error) {
 	return bsonMap, nil
 }
 
-func (s *UserService) CreateUser(user m.User) (string, error) {
+func (s *UserService) CreateUser(user m.User, locale string) (string, error) {
 	result, err := s.collection.InsertOne(context.Background(), user)
 	if err != nil {
 		// log.Printf("Error while inserting user: %v\n", err)
@@ -55,13 +53,13 @@ func (s *UserService) CreateUser(user m.User) (string, error) {
 	}
 	insertedID, ok := result.InsertedID.(primitive.ObjectID)
 	if !ok {
-		return "", fmt.Errorf(c.MESSAGE_ERROR_FAILED_EXTRACT_INSERTED_ID)
+		return "", errors.New(s.translation.GetMessage("FAILED_CREATE_USER", locale))
 	}
 	insertedIDString := insertedID.Hex()
 	return insertedIDString, nil
 }
 
-func (s *UserService) UpdateUserById(id string, updates m.User) (string, error) {
+func (s *UserService) UpdateUserById(id string, updates m.User, locale string) (string, error) {
 	objID, _ := primitive.ObjectIDFromHex(id)
 	data, _ := s.ConvertToBSON(updates)
 	result, err := s.collection.UpdateOne(
@@ -70,12 +68,12 @@ func (s *UserService) UpdateUserById(id string, updates m.User) (string, error) 
 		bson.M{"$set": data},
 	)
 	if err != nil {
-		return "", err
+		return "", errors.New(s.translation.GetMessage("FAILED_UPDATE_USER", locale))
 	}
 	if result.ModifiedCount == 0 {
-		return "", errors.New(c.MESSAGE_ERROR_FAILED_UPDATE_DATA)
+		return "", errors.New(s.translation.GetMessage("NO_DATA_USER_UPDATED", locale))
 	}
-	return c.MESSAGE_SUCCESS_UPDATE_USER, nil
+	return s.translation.GetMessage("SUCCESS_UPDATE_USER", locale), nil
 }
 
 func (s *UserService) GetUserByEmail(email string) *m.User {

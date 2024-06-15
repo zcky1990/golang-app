@@ -22,8 +22,7 @@ const (
 	REDIS_PORT     = "REDIS_PORT"
 	REDIS_DB       = "REDIS_DB"
 
-	MESSAGE_ERROR_FILE_PARAMS_REQUIRED = "File params required"
-	SECRET                             = "SECRET"
+	SECRET = "SECRET"
 
 	STATUS = "status"
 	DATA   = "data"
@@ -35,13 +34,6 @@ const (
 	FOLDER = "folder"
 
 	ERROR_MESSAGE = "error_message"
-
-	MESSAGE_SUCCESS_UPDATE_USER         = "Success Update User"
-	MESSAGE_SUCCESS_UPDATE_WEDDING_DATA = "Success Update Wedding Data"
-
-	MESSAGE_ERROR_FAILED_CREATE_USER         = "Failed to create User"
-	MESSAGE_ERROR_FAILED_UPDATE_DATA         = "No Data Updated"
-	MESSAGE_ERROR_FAILED_EXTRACT_INSERTED_ID = "Failed to extract inserted ID"
 
 	LOCALE_ENGLISH   = "en"
 	LOCALE_INDONESIA = "id"

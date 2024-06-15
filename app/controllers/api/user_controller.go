@@ -60,7 +60,7 @@ func (ctrl *UserController) Signup() fiber.Handler {
 		if user != nil {
 			return ctx.JSON(ctrl.ErrorResponse(ctrl.translation.GetMessage("EMAIL_TAKEN", locale)))
 		}
-		data, err := ctrl.service.CreateUser(params)
+		data, err := ctrl.service.CreateUser(params, locale)
 		if err != nil {
 			return ctx.JSON(ctrl.ErrorResponse(ctrl.translation.GetMessage("FAILED_CREATE_USER", locale)))
 		}
@@ -120,7 +120,7 @@ func (ctrl *UserController) UpdateUser() fiber.Handler {
 		}
 		user := ctrl.service.GetUserByEmail(params.Email)
 		if user != nil {
-			response, err := ctrl.service.UpdateUserById(user.Id.Hex(), params)
+			response, err := ctrl.service.UpdateUserById(user.Id.Hex(), params, locale)
 			if err != nil {
 				return ctx.JSON(ctrl.ErrorResponse(err.Error()))
 			}

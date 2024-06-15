@@ -57,7 +57,7 @@ func (ctrl *WeddingController) CreateWeddingData() fiber.Handler {
 		if err := ctx.BodyParser(&params); err != nil {
 			return ctx.JSON(ctrl.ErrorResponse(err.Error()))
 		}
-		data, err := ctrl.service.CreateWeddingData(params)
+		data, err := ctrl.service.CreateWeddingData(params, locale)
 		if err != nil {
 			return ctx.JSON(ctrl.ErrorResponse(ctrl.translation.GetMessage("EMAIL_TAKEN", locale)))
 		}
