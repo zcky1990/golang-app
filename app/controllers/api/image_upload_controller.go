@@ -35,11 +35,11 @@ func (cntrl *ImageController) ErrorResponse(message string) fiber.Map {
 }
 
 func (cntrl *ImageController) getLanguange(ctx *fiber.Ctx) string {
-	lang := ctx.Get("Accept-Language")
-	if lang == "" {
+	locale := ctx.Get("Accept-Language")
+	if locale == "" {
 		return c.LOCALE_ENGLISH
 	}
-	if lang == c.LOCALE_ENGLISH {
+	if locale == c.LOCALE_ENGLISH {
 		return c.LOCALE_ENGLISH
 	} else {
 		return c.LOCALE_INDONESIA
@@ -50,19 +50,19 @@ func (cntrl *ImageController) UploadFile() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		var uploadResp *services.UploadImageResponse
 		form, err := ctx.MultipartForm()
-		lang := cntrl.getLanguange(ctx)
+		locale := cntrl.getLanguange(ctx)
 		if err != nil {
 			return ctx.JSON(cntrl.ErrorResponse(err.Error()))
 		}
 
 		files, fileExists := form.File["file"]
 		if !fileExists || len(files) == 0 {
-			return ctx.Status(fiber.StatusBadRequest).JSON(cntrl.ErrorResponse(cntrl.translation.GetLocalizationMessageWithLocale("FILE_PARAMS_REQUIRED", lang)))
+			return ctx.Status(fiber.StatusBadRequest).JSON(cntrl.ErrorResponse(cntrl.translation.GetMessage("FILE_PARAMS_REQUIRED", locale)))
 		}
 
 		file, err := files[0].Open()
 		if err != nil {
-			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.GetLocalizationMessageWithLocale("FAILED_OPEN_FILE", lang)))
+			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.GetMessage("FAILED_OPEN_FILE", locale)))
 		}
 
 		defer file.Close()

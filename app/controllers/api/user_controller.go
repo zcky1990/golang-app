@@ -38,11 +38,11 @@ func (cntrl *UserController) ErrorResponse(message string) fiber.Map {
 	}
 }
 func (cntrl *UserController) getLanguange(ctx *fiber.Ctx) string {
-	lang := ctx.Get("Accept-Language")
-	if lang == "" {
+	locale := ctx.Get("Accept-Language")
+	if locale == "" {
 		return c.LOCALE_ENGLISH
 	}
-	if lang == c.LOCALE_ENGLISH {
+	if locale == c.LOCALE_ENGLISH {
 		return c.LOCALE_ENGLISH
 	} else {
 		return c.LOCALE_INDONESIA
@@ -52,17 +52,17 @@ func (cntrl *UserController) getLanguange(ctx *fiber.Ctx) string {
 func (cntrl *UserController) Signup() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		var params m.User
-		lang := cntrl.getLanguange(ctx)
+		locale := cntrl.getLanguange(ctx)
 		if err := ctx.BodyParser(&params); err != nil {
 			return ctx.JSON(cntrl.ErrorResponse(err.Error()))
 		}
 		user := cntrl.service.GetUserByEmail(params.Email)
 		if user != nil {
-			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.GetLocalizationMessageWithLocale("EMAIL_TAKEN", lang)))
+			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.GetMessage("EMAIL_TAKEN", locale)))
 		}
 		data, err := cntrl.service.CreateUser(params)
 		if err != nil {
-			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.GetLocalizationMessageWithLocale("FAILED_CREATE_USER", lang)))
+			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.GetMessage("FAILED_CREATE_USER", locale)))
 		}
 		return ctx.JSON(cntrl.SuccessResponse(data))
 	}
@@ -77,7 +77,7 @@ func (cntrl *UserController) Login() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		var params m.User
 		var authorization *mdl.Authorization
-		lang := cntrl.getLanguange(ctx)
+		locale := cntrl.getLanguange(ctx)
 		// Retrieve session
 		sesStore := ctx.Locals("session").(*session.SessionStore)
 		// Set a session value
@@ -98,7 +98,7 @@ func (cntrl *UserController) Login() fiber.Handler {
 					return ctx.JSON(cntrl.ErrorResponse(err.Error()))
 				}
 			} else {
-				return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.GetLocalizationMessageWithLocale("USER_NOT_FOUND", lang)))
+				return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.GetMessage("USER_NOT_FOUND", locale)))
 			}
 		} else {
 			return ctx.JSON(cntrl.ErrorResponse(err.Error()))
@@ -114,7 +114,7 @@ func (cntrl *UserController) Login() fiber.Handler {
 func (cntrl *UserController) UpdateUser() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		var params m.User
-		lang := cntrl.getLanguange(ctx)
+		locale := cntrl.getLanguange(ctx)
 		if err := ctx.BodyParser(&params); err != nil {
 			return ctx.JSON(cntrl.ErrorResponse(err.Error()))
 		}
@@ -126,7 +126,7 @@ func (cntrl *UserController) UpdateUser() fiber.Handler {
 			}
 			return ctx.JSON(cntrl.SuccessResponse(response))
 		} else {
-			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.GetLocalizationMessageWithLocale("USER_NOT_FOUND", lang)))
+			return ctx.JSON(cntrl.ErrorResponse(cntrl.translation.GetMessage("USER_NOT_FOUND", locale)))
 		}
 	}
 }
