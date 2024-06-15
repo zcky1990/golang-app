@@ -37,7 +37,7 @@ func (ctrl *ImageController) ErrorResponse(message string) fiber.Map {
 func (ctrl *ImageController) getLanguange(ctx *fiber.Ctx) string {
 	locale := ctx.Get("Accept-Language")
 	if locale == "" {
-		return c.LOCALE_ENGLISH
+		return ""
 	}
 	if locale == c.LOCALE_ENGLISH {
 		return c.LOCALE_ENGLISH

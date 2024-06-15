@@ -47,10 +47,8 @@ func loadTranslations(filepath string) (*translations, error) {
 
 // GetMessage retrieves translated message for a given message ID
 func (i18n *I18n) getMessage(messageID string, lang string) (string, error) {
-	var locale string
-	if lang == "" {
-		locale = i18n.Locale
-	} else {
+	locale := i18n.Locale
+	if lang != "" {
 		locale = lang
 	}
 	if i18n.Translations == nil {
@@ -58,7 +56,7 @@ func (i18n *I18n) getMessage(messageID string, lang string) (string, error) {
 	}
 	translation, ok := (*i18n.Translations)[locale]
 	if !ok {
-		return "", fmt.Errorf("Translation not found for locale: %s", i18n.Locale)
+		return "", fmt.Errorf("Translation not found for locale: %s", locale)
 	}
 	message, ok := translation[messageID]
 	if !ok {

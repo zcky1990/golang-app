@@ -40,7 +40,7 @@ func (ctrl *UserController) ErrorResponse(message string) fiber.Map {
 func (ctrl *UserController) getLanguange(ctx *fiber.Ctx) string {
 	locale := ctx.Get("Accept-Language")
 	if locale == "" {
-		return c.LOCALE_ENGLISH
+		return ""
 	}
 	if locale == c.LOCALE_ENGLISH {
 		return c.LOCALE_ENGLISH
