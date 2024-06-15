@@ -1,7 +1,7 @@
 import { createStore } from 'vuex'
 
 // Create a new store instance.
-export default createStore({
+const snackBarStore = createStore({
   state () {
     return {
       snackbar:{
@@ -9,7 +9,7 @@ export default createStore({
         message: '',
       },
       count: 0,
-      data : ''
+      data : {}
     }
   },
   mutations: {
@@ -27,6 +27,11 @@ export default createStore({
     },
     addMessage (state, message){
       state.data = `${state.data} ${message}`
+    },
+    setState(state, payload) {
+      state.data = payload
     }
   }
 })
+
+export default snackBarStore;
