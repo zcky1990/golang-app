@@ -2,6 +2,8 @@
     <div>
         <snackBar :show="snackBar.show" :message="snackBar.snackbarMessage" position="top" color="green" timeout=10000
             :type="snackBar.type" :title="snackBar.title" @showSnakeBar="showSnackbar" @closeSnakeBar="closeSnackbar" />
+        <envelope/>
+        <forbidden />
         <contents :dataProperty="data" @closeSnakeBar="closeSnackbar" @showSnakeBar="showSnackbar" />
         <showCount />
         <login />
@@ -12,6 +14,8 @@
 import { inject } from 'vue';
 
 import snackBar from "./../components/shared/Snackbar.vue";
+import envelope from "./../components/Envelope.vue";
+import forbidden from "./../components/Forbidden.vue";
 import contents from "./../components/HelloWorld.vue";
 import showCount from "../components/ShowCount.vue";
 import login from "../components/Login.vue"
@@ -25,7 +29,9 @@ export default {
         showCount,
         snackBar,
         login,
-        signUp
+        signUp,
+        forbidden,
+        envelope
     },
     data() {
         return {
