@@ -1,7 +1,6 @@
 <template>
     <div class="container mx-auto">
         <h1 class="text-3xl font-bold underline">{{ this.$store.state.count }}</h1>
-        <h1 class="text-3xl font-bold underline">{{ this.$store.state.data }}</h1>
     </div>
 </template>
 <script>

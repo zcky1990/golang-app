@@ -14,7 +14,7 @@ export default {
     methods: {
         increase: function (event) {
             this.$store.commit('increment')
-            this.$emit("showSnakeBar", "test ting");
+            this.$emit("showSnakeBar","Error", "test ting", "error");
         }
     }
 }
