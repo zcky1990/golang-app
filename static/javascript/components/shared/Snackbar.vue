@@ -19,8 +19,8 @@
           </span>
 
           <div class="flex-1">
-            <strong :class="['block', 'font-medium', textColor]"> {{ title }} </strong>
-            <strong class="block font-medium"> {{ message }} </strong>
+            <p :class="['block', 'font-medium', textColor]"> {{ title }} </p>
+            <p class="block text-sm font-light"> {{ message }} </p>
           </div>
 
           <button @click="closeSnackbar" class="text-gray-500 transition hover:text-gray-600">
@@ -43,7 +43,6 @@ export default {
     title: String,
     message: String,
     type: String,
-    color: String,
     timeout: Number,
   },
   watch: {
