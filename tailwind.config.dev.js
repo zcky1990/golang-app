@@ -11,7 +11,13 @@ module.exports = {
     },
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        marsha: ['marsha', 'Arial', 'sans-serif'],
+        dosis: ['Dosis', 'Arial', 'sans-serif'],
+        'playfair-display': ['"Playfair Display"', 'Arial', 'sans-serif'],
+      },
+    }
   },
   plugins: [],
 }
