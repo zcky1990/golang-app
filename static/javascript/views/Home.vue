@@ -1,10 +1,19 @@
 <template>
     <div>
-        <snackBar :show="snackBar.show" :message="snackBar.snackbarMessage" position="top" color="green" timeout=10000
+        <snackBar :show="snackBar.show" :message="snackBar.snackbarMessage" position="top" color="green" :timeout=1000
             :type="snackBar.type" :title="snackBar.title" @showSnakeBar="showSnackbar" @closeSnakeBar="closeSnackbar" />
         <countDown position="center" targetDate="2025-03-25"/>
         <arrumCard />
-        <envelope/>
+        <prokes />
+        <notificationWithAction 
+            :show="dialogPopUp.showNotification" 
+            :titleDialog="dialogPopUp.title"
+            :messageDialog="dialogPopUp.message" 
+            :typeDialog="dialogPopUp.type"
+            :button="dialogPopUp.button"
+            @submitCallback="closeDialog"
+            @cancelCallback="closeDialog"
+        />
         <forbidden />
         <contents :dataProperty="data" @closeSnakeBar="closeSnackbar" @showSnakeBar="showSnackbar" />
         <showCount />
@@ -22,6 +31,8 @@ import arrumCard from "./../components/ArrumCard.vue"
 import forbidden from "./../components/Forbidden.vue";
 import contents from "./../components/HelloWorld.vue";
 import showCount from "../components/ShowCount.vue";
+import notificationWithAction from "../components/NitificationWithAction.vue"
+import prokes from "../components/Prokes.vue";
 import login from "../components/Login.vue"
 import signUp from "../components/SignUp.vue"
 import { info } from 'autoprefixer';
@@ -34,6 +45,8 @@ export default {
         countDown,
         arrumCard,
         snackBar,
+        notificationWithAction,
+        prokes,
         login,
         signUp,
         forbidden,
@@ -46,6 +59,16 @@ export default {
                 show: true,
                 type: 'info',
                 title: ''
+            },
+            dialogPopUp: {
+                showNotification: false,
+                title: 'notification',
+                message: 'message',
+                type: 'error',
+                button: {
+                    submit: 'Submit',
+                    cancel: 'Cancel'
+                }
             }
         }
     },
@@ -66,10 +89,18 @@ export default {
             }
             snackBar.snackbarMessage = message;
             snackBar.show = true;
+            this.dialogPopUp.showNotification = true
         },
         closeSnackbar() {
             this.snackBar.show = false;
+        },
+        showDialog() {
+            this.dialogPopUp.showNotification = true
+        },
+        closeDialog() {
+            this.dialogPopUp.showNotification = false
         }
+
     }
 }
 </script>

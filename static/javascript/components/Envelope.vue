@@ -6,8 +6,8 @@
                 <img decoding="async"
                     :src="imageUrl ? imageUrl : 'https://haribahagiaku.id/wp-content/uploads/2022/06/Tema-1-animasi-55-cosa.png'"
                     title="Tema-1-animasi-55-cosa" alt="Tema-1-animasi-55-cosa" />
-                <h1 class="text-3xl font-bold text-white font-marsha lg:text-4xl">{{ brideAndGroom }}</h1>
-                <p class="mt-4 font-playfair-display text-gray">Kepada Bapak/Ibu/Saudara/i</p>
+                <h1 class="text-3xl font-bold text-white lg:text-4xl">{{ brideAndGroom }}</h1>
+                <p class="mt-4 text-gray">Kepada Bapak/Ibu/Saudara/i</p>
                 <h1 class="mt-4 text-3xl font-bold text-white lg:text-4xl">{{ invite }}</h1>
                 <p class="mt-4 text-gray">Kami Mengundang Anda Untuk Hadir Di Acara Pernikahan Kami.</p>
                 <div class="flex justify-center mt-2 space-x-2">

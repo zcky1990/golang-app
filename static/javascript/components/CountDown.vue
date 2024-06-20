@@ -3,25 +3,25 @@
         <div class="container mx-auto w-full-h-full">
             <div :class="positionClass">
                 <div class="flex flex-col justify-center text-center">
-                    <span class="font-mono text-2xl countdown">
+                    <span class="text-2xl countdown">
                         <span>{{ days }}</span>
                     </span>
                     days
                 </div>
                 <div class="flex flex-col justify-center text-center">
-                    <span class="font-mono text-2xl countdown">
+                    <span class="text-2xl countdown">
                         <span>{{ hours }}</span>
                     </span>
                     hours
                 </div>
                 <div class="flex flex-col justify-center text-center">
-                    <span class="font-mono text-2xl countdown">
+                    <span class="text-2xl countdown">
                         <span>{{ minutes }}</span>
                     </span>
                     min
                 </div>
                 <div class="flex flex-col justify-center text-center">
-                    <span class="font-mono text-2xl countdown">
+                    <span class="text-2xl countdown">
                         <span>{{ seconds }}</span>
                     </span>
                     sec
