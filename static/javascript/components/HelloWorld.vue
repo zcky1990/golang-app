@@ -14,7 +14,7 @@ export default {
     methods: {
         increase: function (event) {
             this.$store.commit('increment')
-            this.$emit("showSnakeBar","Error", "test ting", "error");
+            this.$emit("showSnakeBarCallback","Error", "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam ea quo unde vel adipisci blanditiis voluptates eum. Nam, cum minima?", "error");
         }
     }
 }

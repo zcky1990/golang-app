@@ -23,7 +23,7 @@ export default {
       };
     },
     template:
-      '<snackbar :show="show" :message="snackbarMessage" :timeout="1000" :type="type" :title="title" @showSnakeBar="showSnackbar" @closeSnakeBar="closeSnackbar" />',
+      '<snackbar :show="show" :message="snackbarMessage" :timeout="1000" :type="type" :title="title" @showSnakeBarCallback="showSnackbar" @closeSnackebarCallback="closeSnackbar" />',
   }),
   argTypes: {
     snackbarMessage:
@@ -41,6 +41,10 @@ export default {
       control: "number",
     },
     showSnackbar:{
+      options: ["true", "false"],
+      control: { type: "select" },
+    },
+    closeSnackbar:{
       options: ["true", "false"],
       control: { type: "select" },
     }
@@ -62,10 +66,12 @@ export const Info = {
   args: {
     snackbarMessage:
       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam ea quo unde vel adipisci blanditiis voluptates eum. Nam, cum minima?",
-    show: true,
+    show:true,
     type: "info",
     title: "Info",
-    timeout: 100
+    timeout: 1,
+    showSnackbar: "false",
+    closeSnackbar: "false"
   },
 };
 

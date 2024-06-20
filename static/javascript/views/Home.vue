@@ -1,7 +1,7 @@
 <template>
     <div>
         <snackBar :show="snackBar.show" :message="snackBar.snackbarMessage" position="top" color="green" :timeout=1000
-            :type="snackBar.type" :title="snackBar.title" @showSnakeBar="showSnackbar" @closeSnakeBar="closeSnackbar" />
+            :type="snackBar.type" :title="snackBar.title" @showSnakeBarCallback="showSnackbar" @closeSnackebarCallback="closeSnackbar" />
         <countDown position="center" targetDate="2025-03-25"/>
         <arrumCard />
         <prokes />
@@ -15,7 +15,7 @@
             @cancelCallback="closeDialog"
         />
         <forbidden />
-        <contents :dataProperty="data" @closeSnakeBar="closeSnackbar" @showSnakeBar="showSnackbar" />
+        <contents :dataProperty="data" @closeSnackebarCallback="closeSnackbar" @showSnakeBarCallback="showSnackbar" />
         <showCount />
         <login />
         <signUp />
@@ -55,16 +55,16 @@ export default {
     data() {
         return {
             snackBar: {
-                snackbarMessage: 'test',
+                snackbarMessage: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam ea quo unde vel adipisci blanditiis voluptates eum. Nam, cum minima?',
                 show: true,
                 type: 'info',
                 title: ''
             },
             dialogPopUp: {
                 showNotification: false,
-                title: 'notification',
-                message: 'message',
-                type: 'error',
+                title: 'Notification',
+                message: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam ea quo unde vel adipisci blanditiis voluptates eum. Nam, cum minima?',
+                type: 'notification',
                 button: {
                     submit: 'Submit',
                     cancel: 'Cancel'

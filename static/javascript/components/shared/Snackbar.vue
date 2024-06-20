@@ -68,7 +68,7 @@ export default {
   },
   methods: {
     closeSnackbar() {
-      this.$emit("closeSnakeBar");
+      this.$emit("closeSnackebarCallback");
     }
   }
 };
