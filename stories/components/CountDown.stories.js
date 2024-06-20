@@ -31,6 +31,20 @@ export default {
   },
 };
 
+export const Center = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Example how countdown component renderer when position is center'
+      }
+    }
+  },
+  args: {
+    position: "center",
+    targetDate: "2025-03-25"
+  }
+}
+
 export const Left = {
   parameters: {
     docs: {
@@ -45,19 +59,7 @@ export const Left = {
   },
 };
 
-export const Center = {
-  parameters: {
-    docs: {
-      description: {
-        story: 'Example how countdown component renderer when position is center'
-      }
-    }
-  },
-  args: {
-    position: "center",
-    targetDate: "2025-03-25"
-  }
-}
+
 export const Right = {
   parameters: {
     docs: {
