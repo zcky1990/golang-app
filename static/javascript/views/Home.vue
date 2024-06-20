@@ -6,11 +6,11 @@
         <arrumCard />
         <prokes />
         <notificationWithAction 
-            :show="dialogPopUp.showNotification" 
+            :showDialog="dialogPopUp.showNotification" 
             :titleDialog="dialogPopUp.title"
             :messageDialog="dialogPopUp.message" 
             :typeDialog="dialogPopUp.type"
-            :button="dialogPopUp.button"
+            :buttonDialog="dialogPopUp.button"
             @submitCallback="closeDialog"
             @cancelCallback="closeDialog"
         />
@@ -31,7 +31,7 @@ import arrumCard from "./../components/ArrumCard.vue"
 import forbidden from "./../components/Forbidden.vue";
 import contents from "./../components/HelloWorld.vue";
 import showCount from "../components/ShowCount.vue";
-import notificationWithAction from "../components/NitificationWithAction.vue"
+import notificationWithAction from "../components/NotificationWithAction.vue"
 import prokes from "../components/Prokes.vue";
 import login from "../components/Login.vue"
 import signUp from "../components/SignUp.vue"

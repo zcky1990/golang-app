@@ -1,7 +1,6 @@
 <template>
-    <div v-if="show" class="modal fixed inset-0 z-10  overflow-auto bg-black bg-opacity-40">
+    <div v-if="showDialog" class="modal fixed inset-0 z-10  overflow-auto bg-black bg-opacity-40">
         <div class="modal-content m-24 mx-auto w-4/5 grid h-3/4  place-content-center">
-            <!-- <span class="close text-gray-500 float-right text-2xl font-bold cursor-pointer hover:text-black">&times;</span> -->
             <div class="max-w-md p-6 mx-auto h-fit">
                 <div class="rounded-2xl border border-blue-100 bg-white p-4 shadow-lg sm:p-6 lg:p-8" role="alert">
                     <div class="flex items-center gap-4">
@@ -34,13 +33,13 @@
                         <button @click="handleSubmit"
                             :class="['inline-block w-2/4 rounded-lg bg-blue-500 px-5 py-3 text-center text-sm font-light sm:w-2/4', bgSubmitButton, textColorSubmitButton]"
                             href="#">
-                            {{ button.submit }}
+                            {{ buttonDialog.submit }}
                         </button>
 
                         <button @click="handleCancel"
                             class="mt-2 inline-block w-2/4 rounded-lg bg-gray-50 px-5 py-3 text-center text-sm font-light text-gray-500 sm:mt-0 sm:w-2/4"
                             href="#">
-                            {{ button.cancel }}
+                            {{ buttonDialog.cancel }}
                         </button>
                     </div>
                 </div>
@@ -53,7 +52,7 @@
 
 export default {
     props: {
-        show: {
+        showDialog: {
             type: Boolean,
             default: true
         },
@@ -65,7 +64,7 @@ export default {
             type: String,
             default: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam ea quo unde vel adipisci blanditiis voluptates eum. Nam, cum minima?"
         },
-        button: {
+        buttonDialog: {
             type: Object,
             default: () => ({
                 submit: "Ok",
