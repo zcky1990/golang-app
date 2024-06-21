@@ -4,13 +4,14 @@
             :type="snackBar.type" :title="snackBar.title" @showSnakeBarCallback="showSnackbar" @closeSnackebarCallback="closeSnackbar" />
         <countDown position="center" targetDate="2025-03-25"/>
         <arrumCard />
+        <dividerComp :message="divider.message" :message-position="divider.messagePosition" :color="divider.color" :message-transform="divider.messageTransform"/>
         <prokes />
         <notificationWithAction 
-            :showDialog="dialogPopUp.showNotification" 
-            :titleDialog="dialogPopUp.title"
-            :messageDialog="dialogPopUp.message" 
-            :typeDialog="dialogPopUp.type"
-            :buttonDialog="dialogPopUp.button"
+            :show-dialog="dialogPopUp.showNotification" 
+            :title-dialog="dialogPopUp.title"
+            :message-dialog="dialogPopUp.message" 
+            :type-dialog="dialogPopUp.type"
+            :button-dialog="dialogPopUp.button"
             @submitCallback="closeDialog"
             @cancelCallback="closeDialog"
         />
@@ -26,6 +27,7 @@ import { inject } from 'vue';
 
 import snackBar from "./../components/shared/Snackbar.vue";
 import envelope from "./../components/Envelope.vue";
+import dividerComp from "./../components/Divider.vue";
 import countDown from "./../components/CountDown.vue"
 import arrumCard from "./../components/ArrumCard.vue"
 import forbidden from "./../components/Forbidden.vue";
@@ -43,6 +45,7 @@ export default {
         contents,
         showCount,
         countDown,
+        dividerComp,
         arrumCard,
         snackBar,
         notificationWithAction,
@@ -69,6 +72,12 @@ export default {
                     submit: 'Submit',
                     cancel: 'Cancel'
                 }
+            },
+            divider: {
+                message:"test",
+                messagePosition:"center",
+                messageTransform: "uppercase",
+                color:"red",
             }
         }
     },
@@ -99,8 +108,8 @@ export default {
         },
         closeDialog() {
             this.dialogPopUp.showNotification = false
-        }
-
+        },
+        
     }
 }
 </script>
