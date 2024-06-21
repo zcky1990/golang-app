@@ -36,7 +36,10 @@ export const Center = {
     docs: {
       description: {
         story: 'Example how countdown component renderer when position is center'
-      }
+      },
+      source: {
+        code: `<countDown position="center" targetDate="2025-03-25" />`
+      },
     }
   },
   args: {
@@ -50,7 +53,10 @@ export const Left = {
     docs: {
       description: {
         story: 'Example how countdown component renderer when position is left'
-      }
+      },
+      source: {
+        code: `<countDown position="left" targetDate="2025-03-25" />`
+      },
     }
   },
   args: {
@@ -65,7 +71,10 @@ export const Right = {
     docs: {
       description: {
         story: 'Example how countdown component renderer when position is right'
-      }
+      },
+      source: {
+        code: `<countDown position="right" targetDate="2025-03-25" />`
+      },
     }
   },
   args: {

@@ -61,6 +61,17 @@ export const Info = {
       description: {
         story: "Example how snackbar component renderer",
       },
+      source: {
+        code: `
+        <snackbar 
+          :show="true" 
+          message="Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam ea quo unde vel adipisci blanditiis voluptates eum. Nam, cum minima?" 
+          :timeout=100 
+          type="info" 
+          title="Info" 
+          @showSnakeBarCallback="showSnackbar" 
+          @closeSnackebarCallback="closeSnackbar" />`
+      },
     },
   },
   args: {
@@ -69,7 +80,7 @@ export const Info = {
     show:true,
     type: "info",
     title: "Info",
-    timeout: 1,
+    timeout: 100,
     showSnackbar: "false",
     closeSnackbar: "false"
   },
@@ -81,6 +92,17 @@ export const Error = {
       description: {
         story:
           "Example how snackbar component renderer",
+      },
+      source: {
+        code: `
+        <snackbar 
+          :show="true" 
+          message="Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam ea quo unde vel adipisci blanditiis voluptates eum. Nam, cum minima?" 
+          :timeout=100 
+          type="error" 
+          title="Error" 
+          @showSnakeBarCallback="showSnackbar" 
+          @closeSnackebarCallback="closeSnackbar" />`
       },
     },
   },

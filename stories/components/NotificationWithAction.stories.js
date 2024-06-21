@@ -42,7 +42,11 @@ export const Notification = {
     docs: {
       description: {
         story: 'Example how notification dialog will show when type is notification'
-      }
+      },
+      source: {
+        code: `<notificationWithAction :showDialog="true" titleDialog="Notification" messageDialog="Notification, Lorem ipsum dolor sit amet consectetur adipisicing elit."  
+        typeDialog="notification" :buttonDialog="buttonDialog" @submitCallback="submitCallback" @cancelCallback="cancelCallback" />`
+      },
     }
   },
   args: {
@@ -62,7 +66,11 @@ export const Warning = {
     docs: {
       description: {
         story: 'Example how notification dialog will show when type is warning'
-      }
+      },
+      source: {
+        code: `<notificationWithAction :showDialog="true" titleDialog="Warning" messageDialog="Warning, Lorem ipsum dolor sit amet consectetur adipisicing elit."  
+        typeDialog="warning" :buttonDialog="buttonDialog" @submitCallback="submitCallback" @cancelCallback="cancelCallback" />`
+      },
     }
   },
   args: {

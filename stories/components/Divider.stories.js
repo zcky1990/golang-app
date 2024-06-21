@@ -45,7 +45,10 @@ export const Center = {
     docs: {
       description: {
         story: 'Example How Divider component renderer when message position is center'
-      }
+      },
+      source: {
+        code: `<Divider message="divider" message-position="center" color="gray" message-transform="uppercase" />`
+      },
     }
   },
   args: {
@@ -61,7 +64,10 @@ export const Left = {
     docs: {
       description: {
         story: 'Example How Divider component renderer when message position is left'
-      }
+      },
+      source: {
+        code: `<Divider message="divider" message-position="left" color="gray" message-transform="uppercase" />`
+      },
     }
   },
   args: {
@@ -78,7 +84,10 @@ export const Right = {
     docs: {
       description: {
         story: 'Example How Divider component renderer when message position is right'
-      }
+      },
+      source: {
+        code: `<Divider message="divider" message-position="right" color="gray" message-transform="uppercase" />`
+      },
     }
   },
   args: {
