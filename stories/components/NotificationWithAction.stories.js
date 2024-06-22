@@ -7,9 +7,10 @@ export default {
   parameters: {
     docs: {
       description: {
-        component: 'A Notification dialog component that show message with button selection. Customize the dialog using props.'
-      }
-    }
+        component:
+          "A Notification dialog component that show message with button selection. Customize the dialog using props.",
+      },
+    },
   },
   tags: ["autodocs"],
   render: (args) => ({
@@ -21,8 +22,11 @@ export default {
         ...args,
       };
     },
-    template:
-      '<notificationWithAction :showDialog="showDialog" :titleDialog="titleDialog" :messageDialog="messageDialog"  :typeDialog="typeDialog" :buttonDialog="buttonDialog" @submitCallback="submitCallback" @cancelCallback="cancelCallback" />',
+    template: `
+    <div class="container" style="height:400px;">
+<notificationWithAction :showDialog="showDialog" :titleDialog="titleDialog" :messageDialog="messageDialog"  :typeDialog="typeDialog" :buttonDialog="buttonDialog" @submitCallback="submitCallback" @cancelCallback="cancelCallback" />
+    </div>
+    `,
   }),
   argTypes: {
     showDialog: { control: "boolean" },
@@ -41,18 +45,20 @@ export const Notification = {
   parameters: {
     docs: {
       description: {
-        story: 'Example how notification dialog will show when type is notification'
+        story:
+          "Example how notification dialog will show when type is notification",
       },
       source: {
         code: `<notificationWithAction :showDialog="true" titleDialog="Notification" messageDialog="Notification, Lorem ipsum dolor sit amet consectetur adipisicing elit."  
-        typeDialog="notification" :buttonDialog="buttonDialog" @submitCallback="submitCallback" @cancelCallback="cancelCallback" />`
+        typeDialog="notification" :buttonDialog="buttonDialog" @submitCallback="submitCallback" @cancelCallback="cancelCallback" />`,
       },
-    }
+    },
   },
   args: {
     showDialog: true,
     titleDialog: "Notification",
-    messageDialog: "Notification, Lorem ipsum dolor sit amet consectetur adipisicing elit.",
+    messageDialog:
+      "Notification, Lorem ipsum dolor sit amet consectetur adipisicing elit.",
     buttonDialog: {
       submit: "Ok",
       cancel: "Cancel",
@@ -65,18 +71,19 @@ export const Warning = {
   parameters: {
     docs: {
       description: {
-        story: 'Example how notification dialog will show when type is warning'
+        story: "Example how notification dialog will show when type is warning",
       },
       source: {
         code: `<notificationWithAction :showDialog="true" titleDialog="Warning" messageDialog="Warning, Lorem ipsum dolor sit amet consectetur adipisicing elit."  
-        typeDialog="warning" :buttonDialog="buttonDialog" @submitCallback="submitCallback" @cancelCallback="cancelCallback" />`
+        typeDialog="warning" :buttonDialog="buttonDialog" @submitCallback="submitCallback" @cancelCallback="cancelCallback" />`,
       },
-    }
+    },
   },
   args: {
     showDialog: true,
     titleDialog: "Warning",
-    messageDialog: "Warning, Lorem ipsum dolor sit amet consectetur adipisicing elit.",
+    messageDialog:
+      "Warning, Lorem ipsum dolor sit amet consectetur adipisicing elit.",
     buttonDialog: {
       submit: "Ok",
       cancel: "Cancel",

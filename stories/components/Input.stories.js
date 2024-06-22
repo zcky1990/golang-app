@@ -21,7 +21,7 @@ export default {
       };
     },
     template:
-      '<Input v-model:value="value" :input-label="label" :input-type="type" :show-error="showError" :input-error-label="messageError" />',
+      '<Input v-model:value="value" :input-label="label" :input-type="type" v-model:show-error="showError" :input-error-label="messageError" />',
   }),
   argTypes: {
     value: { control: "text" },
@@ -38,14 +38,14 @@ export default {
   },
 };
 
-export const Text = {
+export const InputWithTextAsType = {
   parameters: {
     docs: {
       description: {
         story: "An input component example with text as the input type.",
       },
       source: {
-        code: `<Input v-model:value="value" input-label="Username" input-type="text" :show-error="false" input-error-label="Example error message" />`
+        code: `<Input v-model:value="value" input-label="Username" input-type="text" v-model:show-error="false" input-error-label="Example error message" />`
       },
     },
   },
@@ -58,14 +58,14 @@ export const Text = {
   },
 };
 
-export const TextWithError = {
+export const InputWithTextAsTypeWithError = {
   parameters: {
     docs: {
       description: {
         story: "An input component example with text as the input type and showing an error message.",
       },
       source: {
-        code: `<Input v-model:value="value" input-label="Username" input-type="text" :show-error="true" input-error-label="Example error message" />`
+        code: `<Input v-model:value="value" input-label="Username" input-type="text" v-model:show-error="true" input-error-label="Example error message" />`
       },
     },
   },
@@ -78,14 +78,14 @@ export const TextWithError = {
   },
 };
 
-export const Password = {
+export const InputWithPasswordAsType = {
   parameters: {
     docs: {
       description: {
         story: "An input component example with password as the input type.",
       },
       source: {
-        code: `<Input v-model:value="value" input-label="Password" input-type="password" :show-error="false" input-error-label="Example error message" />`
+        code: `<Input v-model:value="value" input-label="Password" input-type="password" v-model:show-error="false" input-error-label="Example error message" />`
       },
     },
   },
@@ -98,14 +98,14 @@ export const Password = {
   },
 };
 
-export const PasswordWithError = {
+export const InputWithPasswordAsTypeWithError = {
   parameters: {
     docs: {
       description: {
         story: "An input component example with password as the input type and showing an error message.",
       },
       source: {
-        code: `<Input v-model:value="value" input-label="Password" input-type="password" :show-error="true" input-error-label="Example error message" />`
+        code: `<Input v-model:value="value" input-label="Password" input-type="password" v-model:show-error="true" input-error-label="Example error message" />`
       },
     },
   },
@@ -118,14 +118,14 @@ export const PasswordWithError = {
   },
 };
 
-export const Email = {
+export const InputWithEmailAsType = {
   parameters: {
     docs: {
       description: {
         story: "An input component example with email as the input type.",
       },
       source: {
-        code: `<Input v-model:value="value" input-label="Email" input-type="email" :show-error="false" input-error-label="Example error message" />`
+        code: `<Input v-model:value="value" input-label="Email" input-type="email" v-model:show-error="false" input-error-label="Example error message" />`
       },
     },
   },
@@ -138,14 +138,14 @@ export const Email = {
   },
 };
 
-export const EmailWithError = {
+export const InputWithEmailAsTypeWithError = {
   parameters: {
     docs: {
       description: {
         story: "An input component example with email as the input type and showing an error message.",
       },
       source: {
-        code: `<Input v-model:value="value" input-label="Email" input-type="email" :show-error="true" input-error-label="Example error message" />`
+        code: `<Input v-model:value="value" input-label="Email" input-type="email" v-model:show-error="true" input-error-label="Example error message" />`
       },
     },
   },

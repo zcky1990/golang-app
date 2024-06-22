@@ -1,16 +1,10 @@
 <template>
     <div class="flex flex-col gap-2">
+        <label :class="['block text-xs font-light', getLabelTextColor]"> {{ inputLabel }} </label>
         <label :class="['relative block rounded-md border shadow-sm', getHoverClassInput, getBorderClassInput]">
-            <input 
-                :type="inputType"
-                :class="['text-sm font-light p-2 peer border-none bg-transparent placeholder-transparent focus:border-transparent focus:outline-none focus:ring-0', getLabelTextColor]"
-                :value="value" 
-                @input="$emit('update:value', $event.target.value)" 
-                placeholder=" " />
-            <span
-                :class="[getLabelTextColor, 'text-xs bg-white font-light pointer-events-none absolute left-2.5 top-0 -translate-y-1/2 p-0.5 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-sm peer-focus:top-0 peer-focus:text-xs']">
-                {{ inputLabel }}
-            </span>
+            <input :type="inputType"
+                :class="['text-xs w-full font-light p-2 peer border-none bg-transparent placeholder-transparent focus:border-transparent focus:outline-none focus:ring-0', getLabelTextColor]"
+                :value="value" @input="$emit('update:value', $event.target.value)" placeholder=" " />
         </label>
         <span v-show="showError" class="text-xs font-light text-red-400 pointer-events-none pl-2">
             {{ inputErrorLabel }}

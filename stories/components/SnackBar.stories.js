@@ -22,8 +22,11 @@ export default {
         ...args,
       };
     },
-    template:
-      '<snackbar :show="show" :message="snackbarMessage" :timeout="1000" :type="type" :title="title" @showSnakeBarCallback="showSnackbar" @closeSnackebarCallback="closeSnackbar" />',
+    template: `
+    <div class="container" style="height:200px;">
+<snackbar :show="show" :message="snackbarMessage" :timeout="1000" :type="type" :title="title" @showSnakeBarCallback="showSnackbar" @closeSnackebarCallback="closeSnackbar" />
+    </div>
+    `,
   }),
   argTypes: {
     snackbarMessage:
@@ -40,14 +43,14 @@ export default {
     timeout: {
       control: "number",
     },
-    showSnackbar:{
+    showSnackbar: {
       options: ["true", "false"],
       control: { type: "select" },
     },
-    closeSnackbar:{
+    closeSnackbar: {
       options: ["true", "false"],
       control: { type: "select" },
-    }
+    },
   },
   args: {
     showSnackbar: fn(),
@@ -70,19 +73,19 @@ export const Info = {
           type="info" 
           title="Info" 
           @showSnakeBarCallback="showSnackbar" 
-          @closeSnackebarCallback="closeSnackbar" />`
+          @closeSnackebarCallback="closeSnackbar" />`,
       },
     },
   },
   args: {
     snackbarMessage:
       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam ea quo unde vel adipisci blanditiis voluptates eum. Nam, cum minima?",
-    show:true,
+    show: true,
     type: "info",
     title: "Info",
     timeout: 100,
     showSnackbar: "false",
-    closeSnackbar: "false"
+    closeSnackbar: "false",
   },
 };
 
@@ -90,8 +93,7 @@ export const Error = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Example how snackbar component renderer",
+        story: "Example how snackbar component renderer",
       },
       source: {
         code: `
@@ -102,7 +104,7 @@ export const Error = {
           type="error" 
           title="Error" 
           @showSnakeBarCallback="showSnackbar" 
-          @closeSnackebarCallback="closeSnackbar" />`
+          @closeSnackebarCallback="closeSnackbar" />`,
       },
     },
   },
@@ -112,6 +114,6 @@ export const Error = {
     show: true,
     type: "error",
     title: "Error",
-    timeout: 100
+    timeout: 100,
   },
 };
