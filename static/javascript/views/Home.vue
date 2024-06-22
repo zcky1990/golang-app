@@ -4,6 +4,8 @@
             :type="snackBar.type" :title="snackBar.title" @showSnakeBarCallback="showSnackbar"
             @closeSnackebarCallback="closeSnackbar" />
         <countDown position="center" targetDate="2025-03-25" />
+        <TextArea v-model:value="dropdown.value" :text-area-label="dropdown.dropdownLabel" v-model:show-error="dropdown.error" />
+        {{ dropdown.value }}
         <dropdown v-model:value="dropdown.value" :dropdown-label="dropdown.dropdownLabel" :dropdown-items="dropdown.dropdownItem" v-model:show-error="dropdown.error" />
         <selectComp v-model:value="dropdown.value" :select-label="dropdown.dropdownLabel" :select-items="dropdown.dropdownItem" v-model:show-error="dropdown.error"/>
         <dividerComp :message="divider.message" :message-position="divider.messagePosition" :color="divider.color"
@@ -26,6 +28,7 @@ import snackBar from "./../components/shared/Snackbar.vue";
 import envelope from "./../components/Envelope.vue";
 import dividerComp from "./../components/Divider.vue";
 import countDown from "./../components/CountDown.vue"
+import TextArea from "./../components/TextArea.vue"
 import dropdown from "./../components/Dropdown.vue"
 import selectComp from "./../components/Select.vue"
 import forbidden from "./../components/Forbidden.vue";
@@ -43,6 +46,7 @@ export default {
         contents,
         showCount,
         dropdown,
+        TextArea,
         selectComp,
         countDown,
         dividerComp,
