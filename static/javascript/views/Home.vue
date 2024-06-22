@@ -5,7 +5,7 @@
             @closeSnackebarCallback="closeSnackbar" />
         <countDown position="center" targetDate="2025-03-25" />
         <dropdown v-model:value="dropdown.value" :dropdown-label="dropdown.dropdownLabel" :dropdown-items="dropdown.dropdownItem" v-model:show-error="dropdown.error" />
-        <p>nilai adalah {{ dropdown.value }}</p>
+        <selectComp v-model:value="dropdown.value" :select-label="dropdown.dropdownLabel" :select-items="dropdown.dropdownItem" v-model:show-error="dropdown.error"/>
         <dividerComp :message="divider.message" :message-position="divider.messagePosition" :color="divider.color"
             :message-transform="divider.messageTransform" />
         <prokes />
@@ -27,6 +27,7 @@ import envelope from "./../components/Envelope.vue";
 import dividerComp from "./../components/Divider.vue";
 import countDown from "./../components/CountDown.vue"
 import dropdown from "./../components/Dropdown.vue"
+import selectComp from "./../components/Select.vue"
 import forbidden from "./../components/Forbidden.vue";
 import contents from "./../components/HelloWorld.vue";
 import showCount from "../components/ShowCount.vue";
@@ -42,6 +43,7 @@ export default {
         contents,
         showCount,
         dropdown,
+        selectComp,
         countDown,
         dividerComp,
         snackBar,
