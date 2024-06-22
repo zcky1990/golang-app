@@ -83,6 +83,9 @@ Run specific unit tests with .env.test:
 ````
 ENV=test go test ./test/models
 ````
+# Component Guidelines
+
+The components used in this project follow the guidelines from [HyperUI](https://www.hyperui.dev/).
 
 # Running StoryBook
 ````
