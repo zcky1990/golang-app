@@ -4,6 +4,7 @@
         <label :class="['relative block rounded-md border shadow-sm', getHoverClassInput, getBorderClassInput]">
             <textarea
                 :class="['text-xs w-full font-light p-2 peer border-none bg-transparent placeholder-transparent focus:border-transparent focus:outline-none focus:ring-0', getLabelTextColor]"
+                placeholder="write something here.."
                 v-model="text">
         </textarea>
         </label>
