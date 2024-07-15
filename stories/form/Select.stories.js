@@ -1,7 +1,7 @@
-import SelectComponents from "../../static/javascript/components/Select.vue";
+import SelectComponents from "../../static/javascript/form/Select.vue";
 
 export default {
-  title: "Components/Select",
+  title: "Form/Select",
   component: SelectComponents,
   tags: ["autodocs"],
   parameters: {

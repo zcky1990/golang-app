@@ -17,7 +17,7 @@
 
 <script>
 export default {
-    name: 'Dropdown',
+    name: 'SelectComponent',
     props: {
         value: {
             type: String,

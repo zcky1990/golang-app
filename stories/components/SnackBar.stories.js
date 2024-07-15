@@ -1,5 +1,5 @@
 import { fn } from "@storybook/test";
-import snackbar from "../../static/javascript/components/shared/Snackbar.vue";
+import snackbar from "../../static/javascript/components/Snackbar.vue";
 
 export default {
   title: "Components/SnackBar",
@@ -24,7 +24,7 @@ export default {
     },
     template: `
     <div class="container" style="height:200px;">
-<snackbar :show="show" :message="snackbarMessage" :timeout="1000" :type="type" :title="title" @showSnakeBarCallback="showSnackbar" @closeSnackebarCallback="closeSnackbar" />
+<snackbar :show="show" :message="snackbarMessage" :timeout="1000" :type="type" :title="title"  @close="closeSnackbar" />
     </div>
     `,
   }),
@@ -72,8 +72,7 @@ export const Info = {
           :timeout=100 
           type="info" 
           title="Info" 
-          @showSnakeBarCallback="showSnackbar" 
-          @closeSnackebarCallback="closeSnackbar" />`,
+          @close="closeSnackbar" />`,
       },
     },
   },
@@ -103,8 +102,7 @@ export const Error = {
           :timeout=100 
           type="error" 
           title="Error" 
-          @showSnakeBarCallback="showSnackbar" 
-          @closeSnackebarCallback="closeSnackbar" />`,
+          @close="closeSnackbar" />`,
       },
     },
   },

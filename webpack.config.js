@@ -1,5 +1,5 @@
 const path = require('path');
-// const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ENV = process.env.NODE_ENV || 'development';
 
 // Set the output directory based on the environment
@@ -32,7 +32,12 @@ module.exports = {
     ]
 },
 plugins: [
-    new VueLoaderPlugin()
+    new VueLoaderPlugin(),
+    new HtmlWebpackPlugin({
+        template: path.resolve(__dirname, 'app/views/layouts/application.html'),
+        filename: '../home.html',
+        chunks: ['home'],
+    })
 ],
 //use this plugin if you want to generate html file
     // new HtmlWebpackPlugin({

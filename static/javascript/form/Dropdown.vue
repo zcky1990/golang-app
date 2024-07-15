@@ -37,7 +37,7 @@
 
 <script>
 export default {
-    name: 'Dropdown',
+    name: 'DropdownComponent',
     props: {
         value: {
             type: String,
@@ -68,8 +68,8 @@ export default {
             return this.dropdownOpen ? '' : 'hidden';
         },
         selectedValue() {
-            const selectedItem = this.dropdownItems.find(item => item.value === this.value);
-            return selectedItem ? selectedItem.key : this.selectedItem;
+            const itemSelected = this.dropdownItems.find(item => item.value === this.value);
+            return itemSelected ? itemSelected.key : this.selectedItem;
         },
         showDropdownLabel() {
             return this.dropdownLabel !== '' ? true : false;

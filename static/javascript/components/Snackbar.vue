@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed w-full">
+  <div class="fixed w-full z-10">
     <div v-if="show" class="max-w-md p-6 mx-auto">
       <div role="alert" :class="['p-4', bgColor, textColor, 'border', 'border-gray-100', 'rounded-xl']">
         <div class="flex items-start gap-4">
@@ -68,7 +68,7 @@ export default {
   },
   methods: {
     closeSnackbar() {
-      this.$emit("closeSnackebarCallback");
+      this.$emit("close");
     }
   }
 };

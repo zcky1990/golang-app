@@ -1,8 +1,8 @@
 <template>
     <div>
-        <snackBar :show="snackBar.show" :message="snackBar.snackbarMessage" position="top" color="green" :timeout=1000
-            :type="snackBar.type" :title="snackBar.title" @showSnakeBarCallback="showSnackbar"
-            @closeSnackebarCallback="closeSnackbar" />
+        <snackBar :show="snackBar.show" :message="snackBar.snackbarMessage" position="top" color="green" :timeout=10000
+            :type="snackBar.type" :title="snackBar.title"
+            @close="closeSnackbar" />
         <countDown position="center" targetDate="2025-03-25" />
         <TextArea v-model:value="dropdown.value" :text-area-label="dropdown.dropdownLabel" v-model:show-error="dropdown.error" />
         {{ dropdown.value }}
@@ -24,13 +24,13 @@
 <script>
 import { inject } from 'vue';
 
-import snackBar from "./../components/shared/Snackbar.vue";
+import snackBar from "./../components/Snackbar.vue";
 import envelope from "./../components/Envelope.vue";
 import dividerComp from "./../components/Divider.vue";
 import countDown from "./../components/CountDown.vue"
-import TextArea from "./../components/TextArea.vue"
-import dropdown from "./../components/Dropdown.vue"
-import selectComp from "./../components/Select.vue"
+import TextArea from "./../form/TextArea.vue"
+import dropdown from "./../form/Dropdown.vue"
+import selectComp from "./../form/Select.vue"
 import forbidden from "./../components/Forbidden.vue";
 import contents from "./../components/HelloWorld.vue";
 import showCount from "../components/ShowCount.vue";
@@ -62,7 +62,7 @@ export default {
         return {
             snackBar: {
                 snackbarMessage: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam ea quo unde vel adipisci blanditiis voluptates eum. Nam, cum minima?',
-                show: false,
+                show: true,
                 type: 'info',
                 title: ''
             },

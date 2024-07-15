@@ -1,7 +1,7 @@
-import Input from "../../static/javascript/components/Input.vue";
+import Input from "../../static/javascript/form/Input.vue";
 
 export default {
-  title: "Components/Input",
+  title: "Form/Input",
   component: Input,
   tags: ["autodocs"],
   parameters: {
