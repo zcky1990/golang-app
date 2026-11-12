@@ -3,30 +3,36 @@ package middlewares
 import (
 	c "golang_app/golangApp/constants"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
-func CheckJWTandSessionMiddleware() func(ctx *fiber.Ctx) error {
-	return func(ctx *fiber.Ctx) error {
-		err := ValidateJWTToken(ctx)
-
-		if err != nil {
-			return ctx.JSON(generateErrorMessage(err.Error()))
+// CheckJWTandSessionMiddleware is the Fiber v3 replacement of the old
+// `func(ctx *fiber.Ctx) error` middleware.
+//
+// Every failure is answered once, here, with a proper 401 status; the helpers in
+// jwt.go/session.go only return errors now, so an invalid token can never fall
+// through to ctx.Next().
+func CheckJWTandSessionMiddleware() fiber.Handler {
+	return func(ctx fiber.Ctx) error {
+		if err := ValidateJWTToken(ctx); err != nil {
+			return unauthorizedResponse(ctx, err)
 		}
 
 		email, err := GetEmailFromToken(ctx)
 		if err != nil {
-			return ctx.JSON(generateErrorMessage(err.Error()))
+			return unauthorizedResponse(ctx, err)
 		}
 
-		err = CheckSessionClaim(ctx, email)
-
-		if err != nil {
-			return ctx.JSON(generateErrorMessage(err.Error()))
+		if err := CheckSessionClaim(ctx, email); err != nil {
+			return unauthorizedResponse(ctx, err)
 		}
 
 		return ctx.Next()
 	}
+}
+
+func unauthorizedResponse(ctx fiber.Ctx, err error) error {
+	return ctx.Status(fiber.StatusUnauthorized).JSON(generateErrorMessage(err.Error()))
 }
 
 func generateErrorMessage(message string) fiber.Map {

@@ -2,23 +2,28 @@ package main
 
 import (
 	cfg "golang_app/golangApp/config"
+	"golang_app/golangApp/config/initializers"
 	"golang_app/golangApp/config/localize"
+	"golang_app/golangApp/config/postgres"
 	"golang_app/golangApp/config/redis"
 	"log"
-
-	"golang_app/golangApp/config/mongo"
 )
 
 func main() {
 	// we initiate app environment, and load env from env file
 	appCnf := cfg.GetApplicationInstance()
 
-	// initiate database
-	mongoDB, err := mongo.NewMongoDB()
-	if err != nil {
-		log.Fatalf("Failed to connect to MongoDB: %v", err)
+	// run boot-time initializers (Rails: config/initializers)
+	if err := initializers.Run(); err != nil {
+		log.Fatalf("Failed to run initializers: %v", err)
 	}
-	defer mongoDB.Disconnect()
+
+	// initiate database (PostgreSQL via GORM)
+	postgresDB, err := postgres.NewPostgres()
+	if err != nil {
+		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
+	}
+	defer postgresDB.Close()
 
 	// initiate localization
 	translation := localize.NewLocalization()
@@ -27,6 +32,11 @@ func main() {
 	redisClient := redis.NewRedisClient()
 	defer redisClient.Close()
 
-	app := cfg.RoutesNew(appCnf, mongoDB.Db, translation, redisClient)
-	app.StartServer()
+	app := cfg.RoutesNew(appCnf, postgresDB.DB, translation, redisClient)
+
+	// Fiber v3's Listen returns an error (bind failures, unexpected stop), and
+	// ShutdownWithTimeout returns one too - both end up here.
+	if err := app.StartServer(); err != nil {
+		log.Fatalf("Server stopped with error: %v", err)
+	}
 }

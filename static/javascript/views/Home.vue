@@ -38,7 +38,6 @@ import notificationWithAction from "../components/NotificationWithAction.vue"
 import prokes from "../components/Prokes.vue";
 import login from "../components/Login.vue"
 import signUp from "../components/SignUp.vue"
-import { info } from 'autoprefixer';
 
 export default {
     name: 'Home',

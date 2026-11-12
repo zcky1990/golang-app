@@ -23,6 +23,10 @@ static/dist
 static/dev
 tmp
 
+# Rails-like log directory
+log/
+*.log
+
 # Go workspace file
 go.work
 

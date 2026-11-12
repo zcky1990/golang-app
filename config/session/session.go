@@ -1,46 +1,37 @@
 package session
 
 import (
-	"os"
-	"strconv"
 	"time"
 
 	c "golang_app/golangApp/constants"
+	"golang_app/golangApp/lib"
 
-	"github.com/gofiber/fiber/v2/middleware/session"
-	"github.com/gofiber/storage/redis"
+	"github.com/gofiber/fiber/v3/middleware/session"
+	"github.com/redis/go-redis/v9"
 )
 
+// SessionStore bundles Fiber's store with the Redis adapter that backs it
+// (Rails: config/initializers/session_store.rb).
 type SessionStore struct {
 	Store      *session.Store
-	RedisStore *redis.Storage
+	RedisStore *RedisStorage
 }
 
-var RedisStore *redis.Storage
-
-func SessionStoreNew() *SessionStore {
-	redisStoreNew()
-	expiration, _ := time.ParseDuration(os.Getenv("SESSION_EXPIRATION"))
+// SessionStoreNew builds the cookie + Redis backed session store.
+//
+// The Redis client is injected instead of being created here so the whole
+// application shares one connection, one set of REDIS_* variables and one
+// driver version.
+func SessionStoreNew(client *redis.Client) *SessionStore {
+	storage := NewRedisStorage(client)
 	store := session.New(session.Config{
-		Expiration:     expiration,
+		Expiration:     lib.EnvDuration(c.SESSION_EXPIRATION, 72*time.Hour),
 		KeyLookup:      "cookie:session_id",
 		CookieSameSite: "Lax",
-		Storage:        RedisStore,
+		Storage:        storage,
 	})
 	return &SessionStore{
 		Store:      store,
-		RedisStore: RedisStore,
+		RedisStore: storage,
 	}
-}
-
-func redisStoreNew() {
-	portnum, _ := strconv.Atoi(os.Getenv(c.REDIS_PORT))
-	redisDB, _ := strconv.Atoi(os.Getenv(c.REDIS_DB))
-	RedisStore = redis.New(redis.Config{
-		Host:     os.Getenv(c.REDIS_HOST),
-		Port:     portnum,
-		Username: os.Getenv(c.REDIS_USERNAME),
-		Password: os.Getenv(c.REDIS_PASSWORD),
-		Database: redisDB,
-	})
 }

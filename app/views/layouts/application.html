@@ -1,16 +1,38 @@
 <!doctype html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<html lang="{{.Locale}}">
 <head>
-  <title>{{.Title}}</title>
-  <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script defer="defer" src="{{.Meta.ImportPath.JSPath}}/{{.Meta.Filename}}"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+
+    <title>{{.Title}}</title>
+    <meta name="description" content="{{.Description}}">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{.Title}}">
+    <meta property="og:description" content="{{.Description}}">
+    <meta name="twitter:card" content="summary_large_image">
+
+    {{/* Fonts are shipped once through /public/styles (see static/embed.go). */}}
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+          href="{{.PublicPrefix}}/styles/fonts/dosis.woff2">
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+          href="{{.PublicPrefix}}/styles/fonts/playfairdisplay.woff2">
+
+    {{/* Compiled Tailwind CSS, hashed by Vite and resolved through the manifest. */}}
+    {{range .CSS}}
+    <link rel="stylesheet" href="{{.}}">
+    {{end}}
 </head>
-<body>
-  <script>
-    window.__INITIAL_DATA__ = {{ .Data }};
-  </script>
-  <div id="app" data={{ .Data }}></div>
+<body class="antialiased">
+    {{/* Vue mounts here (app/javascript/main.js). */}}
+    <div id="app"></div>
+
+    {{/* Client props: route, params, locale, env. Never tokens. */}}
+    <script type="application/json" id="app-props">{{.PropsJSON}}</script>
+
+    {{if .JS}}
+    <script type="module" src="{{.JS}}"></script>
+    {{end}}
 </body>
 </html>

@@ -2,47 +2,53 @@ package middlewares
 
 import (
 	"errors"
+
 	"golang_app/golangApp/config/session"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
-func CheckSession(ctx *fiber.Ctx) error {
+func CheckSession(ctx fiber.Ctx) error {
 	// Retrieve session
-	sesStore := ctx.Locals("session").(*session.SessionStore)
+	sesStore, ok := ctx.Locals("session").(*session.SessionStore)
+	if !ok || sesStore == nil {
+		return errors.New("Invalid Session, Please login again")
+	}
 
 	// GET a session value
-	sec, _ := sesStore.Store.Get(ctx)
-
-	//get current session ID from cookies and send to redis
-	sec.ID()
-
-	result, err := sesStore.RedisStore.Get(sec.ID())
+	sec, err := sesStore.Store.Get(ctx)
 	if err != nil {
 		return errors.New("Invalid Session, Please login again")
-
-		// Redirect to the login route
-		// ctx.Redirect("/login", fiber.StatusTemporaryRedirect)
-		// Stop the middleware chain
-		// return nil
 	}
-	if result == nil {
-		return errors.New("Invalid Session, Please login again")
 
-		// Redirect to the login route
-		// ctx.Redirect("/login", fiber.StatusTemporaryRedirect)
-		// Stop the middleware chain
-		// return nil
+	// get current session ID from cookies and send to redis
+	result, err := sesStore.RedisStore.Get(sec.ID())
+	if err != nil {
+		// Fiber v3: c.Redirect() returns a builder, so the old
+		// c.Redirect("/login", fiber.StatusTemporaryRedirect) no longer compiles.
+		// return ctx.Redirect().Status(fiber.StatusTemporaryRedirect).To("/login")
+		return errors.New("Invalid Session, Please login again")
+	}
+	if len(result) == 0 {
+		// return ctx.Redirect().Status(fiber.StatusTemporaryRedirect).To("/login")
+		return errors.New("Invalid Session, Please login again")
 	}
 	return nil
 }
 
-// becasue we are using api, we are gonna check session value base on email
-func CheckSessionClaim(ctx *fiber.Ctx, email string) error {
-	sesStore := ctx.Locals("session").(*session.SessionStore)
-	sec, _ := sesStore.Store.Get(ctx)
-	stringSession := sec.Get(email)
+// because we are using api, we are gonna check session value base on email
+func CheckSessionClaim(ctx fiber.Ctx, email string) error {
+	sesStore, ok := ctx.Locals("session").(*session.SessionStore)
+	if !ok || sesStore == nil {
+		return errors.New("Invalid Session, Please login again")
+	}
 
+	sec, err := sesStore.Store.Get(ctx)
+	if err != nil {
+		return errors.New("Invalid Session, Please login again")
+	}
+
+	stringSession := sec.Get(email)
 	if stringSession == nil {
 		return errors.New("Invalid Session, Please login again")
 	}

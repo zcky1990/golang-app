@@ -1,10 +1,32 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
+/* Tailwind CSS v4 scans the project automatically (git-aware).
+   These directives make the scanned sources explicit; the v3 equivalent was
+   `content` inside tailwind.config.{dev,prod}.js.
+
+   app/javascript  -> SPA entry, router, views (the markup users actually see)
+   app/views       -> the embedded HTML shell (body/head classes)
+   static/javascript -> reusable components still imported through `@legacy` */
+@source "../../app/javascript";
+@source "../../app/views";
+@source "../../static/javascript";
+@source "../../stories";
+
+/* Design tokens, replacing `theme.extend` from the old tailwind.config.*.js files.
+   The `--font-*` namespace generates the `font-<name>` utilities, so
+   `--font-playfair-display` keeps the old `font-playfair-display` class working. */
+@theme {
+    --font-marsha: 'marsha', Arial, sans-serif;
+    --font-dosis: 'Dosis', Arial, sans-serif;
+    --font-playfair-display: 'Playfair Display', Arial, sans-serif;
+}
+
+/* Fonts stay a single copy in ./static and are served by Fiber at /public
+   (app/views/handler.go serves the embedded copy in production), so absolute
+   URLs are used and Vite does not emit (and hash) them. */
 @font-face {
     font-family: 'marsha';
-    src: url("../styles/fonts/marsha_belle_demo_version-webfont.woff2") format('woff2');
+    src: url("/public/styles/fonts/marsha_belle_demo_version-webfont.woff2") format('woff2');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -12,7 +34,7 @@
 
 @font-face {
     font-family: 'dosis';
-    src: url("../styles/fonts/dosis.woff2") format('woff2');
+    src: url("/public/styles/fonts/dosis.woff2") format('woff2');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -20,7 +42,7 @@
 
 @font-face {
     font-family: 'Playfair Display';
-    src: url("../styles/fonts/playfairdisplay.woff2") format('woff2');
+    src: url("/public/styles/fonts/playfairdisplay.woff2") format('woff2');
     font-weight: normal;
     font-style: normal;
     font-display: swap;

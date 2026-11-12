@@ -1,106 +1,88 @@
 package services
 
 import (
-	"context"
 	"errors"
 	m "golang_app/golangApp/app/models"
 	"golang_app/golangApp/config/localize"
 	"golang_app/golangApp/config/redis"
 
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
+	"gorm.io/gorm"
 )
 
 // Ensure WeddingService implements the BaseService interface
 var _ BaseService = (*WeddingService)(nil)
 
+// WeddingService is the ActiveRecord-ish layer for the wedding_data table.
 type WeddingService struct {
-	collection  *mongo.Collection
+	db          *gorm.DB
 	translation *localize.Localization
 	redis       *redis.RedisClient
 }
 
-func NewWeddingService(mongodb *mongo.Database, locale *localize.Localization, redis *redis.RedisClient) *WeddingService {
-	collection := mongodb.Collection(m.WEDDING_COLLECTION)
-	return &WeddingService{collection: collection, translation: locale, redis: redis}
+func NewWeddingService(database *gorm.DB, locale *localize.Localization, redis *redis.RedisClient) *WeddingService {
+	return &WeddingService{db: database, translation: locale, redis: redis}
 }
 
-func (s *WeddingService) ConvertToBSON(data interface{}) (bson.M, error) {
-	bsonData, err := bson.Marshal(data)
-	if err != nil {
-		return nil, err
-	}
-	var bsonMap bson.M
-	err = bson.Unmarshal(bsonData, &bsonMap)
-	if err != nil {
-		return nil, err
-	}
-	for key, value := range bsonMap {
-		if value == "" || value == nil {
-			delete(bsonMap, key)
-		}
-	}
-	return bsonMap, nil
+func (s *WeddingService) ConvertToMap(data interface{}) (map[string]interface{}, error) {
+	return StructToMap(data)
 }
 
 func (s *WeddingService) CreateWeddingData(data m.WeddingData, locale string) (string, error) {
-	result, err := s.collection.InsertOne(context.Background(), data)
-	if err != nil {
-		return "", err
+	if err := s.db.Create(&data).Error; err != nil {
+		return "", errors.New(s.translation.GetMessage("FAILED_CREATE_WEDDING", locale))
 	}
-
-	insertedID, ok := result.InsertedID.(primitive.ObjectID)
-	if !ok {
-		return "", errors.New(s.translation.GetMessage("FAILED_CREATE_WEDDDING", locale))
-	}
-
-	insertedIDString := insertedID.Hex()
-	return insertedIDString, nil
+	return data.ID, nil
 }
 
 func (s *WeddingService) UpdateWeddingDataById(id string, updates m.WeddingData, locale string) (string, error) {
-	objID, _ := primitive.ObjectIDFromHex(id)
-	data, _ := s.ConvertToBSON(updates)
-	result, err := s.collection.UpdateOne(
-		context.TODO(),
-		bson.M{"_id": objID},
-		bson.M{"$set": data},
-	)
-	if err != nil {
-		return "", errors.New(s.translation.GetMessage("FAILED_UPDATE_WEDDDING", locale))
+	if !ValidUUID(id) {
+		return "", gorm.ErrRecordNotFound
 	}
-	if result.ModifiedCount == 0 {
-		return "", errors.New(s.translation.GetMessage("NO_DATA_WEDDDING_UPDATED", locale))
+	if updates.UserID != nil {
+		updates.UserID = NormalizeUUID(*updates.UserID)
+	}
+
+	// Select forces every payload column to be written, including empty ones,
+	// which is what a full form submit is expected to do.
+	result := s.db.Model(&m.WeddingData{}).
+		Where("id = ?", id).
+		Select("user_id", "bride", "groom", "wedding", "love_story", "envelop", "gallery", "guest", "streaming", "gifts").
+		Updates(updates)
+	if result.Error != nil {
+		return "", errors.New(s.translation.GetMessage("FAILED_UPDATE_WEDDING", locale))
+	}
+	if result.RowsAffected == 0 {
+		return "", errors.New(s.translation.GetMessage("NO_DATA_WEDDING_UPDATED", locale))
 	}
 	return s.translation.GetMessage("SUCCESS_UPDATE_WEDDING", locale), nil
 }
 
-func (service *WeddingService) GetWeddingDataById(id string) (*m.WeddingData, error) {
+func (s *WeddingService) GetWeddingDataById(id string) (*m.WeddingData, error) {
+	if !ValidUUID(id) {
+		return nil, gorm.ErrRecordNotFound
+	}
 	result := m.WeddingData{}
-	objID, _ := primitive.ObjectIDFromHex(id)
-	err := service.collection.FindOne(context.TODO(), bson.M{"_id": objID}).Decode(&result)
-	if err != nil {
+	if err := s.db.Where("id = ?", id).First(&result).Error; err != nil {
 		return nil, err
 	}
 	return &result, nil
 }
 
-func (service *WeddingService) GetWeddingDataByUserId(userId string) (*m.WeddingData, error) {
+func (s *WeddingService) GetWeddingDataByUserId(userId string) (*m.WeddingData, error) {
+	normalized := NormalizeUUID(userId)
+	if normalized == nil {
+		return nil, gorm.ErrRecordNotFound
+	}
 	result := m.WeddingData{}
-	objID, _ := primitive.ObjectIDFromHex(userId)
-	err := service.collection.FindOne(context.TODO(), bson.M{"user_id": objID}).Decode(&result)
-	if err != nil {
+	if err := s.db.Where("user_id = ?", *normalized).First(&result).Error; err != nil {
 		return nil, err
 	}
 	return &result, nil
 }
 
-func (service *WeddingService) DeleteWeddingDataById(id string) error {
-	objID, _ := primitive.ObjectIDFromHex(id)
-	_, err := service.collection.DeleteOne(context.TODO(), bson.M{"_id": objID})
-	if err != nil {
-		return err
+func (s *WeddingService) DeleteWeddingDataById(id string) error {
+	if !ValidUUID(id) {
+		return gorm.ErrRecordNotFound
 	}
-	return nil
+	return s.db.Where("id = ?", id).Delete(&m.WeddingData{}).Error
 }

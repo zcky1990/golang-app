@@ -1,6 +1,3 @@
-{{ define "home_index" }}
-    <script>
-        window.__INITIAL_DATA__ = {{ .Data }};
-    </script>
-    <div id="app" data={{ .Data }}></div>
-{{ end }}
+<!-- Removed: pages are no longer rendered on the server.
+     The single shell lives in app/views/layouts/application.html and the markup
+     is owned by Vue (app/javascript/views/*.vue). See README -> "Views". -->

@@ -6,8 +6,10 @@ import (
 	"golang_app/golangApp/config/redis"
 	c "golang_app/golangApp/constants"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
+
+var _ BaseApiController = (*ImageController)(nil)
 
 type ImageController struct {
 	service     *services.CloudinaryService
@@ -34,25 +36,24 @@ func (ctrl *ImageController) ErrorResponse(message string) fiber.Map {
 	}
 }
 
-func (ctrl *ImageController) getLanguange(ctx *fiber.Ctx) string {
+func (ctrl *ImageController) getLanguange(ctx fiber.Ctx) string {
 	locale := ctx.Get("Accept-Language")
 	if locale == "" {
 		return ""
 	}
 	if locale == c.LOCALE_ENGLISH {
 		return c.LOCALE_ENGLISH
-	} else {
-		return c.LOCALE_INDONESIA
 	}
+	return c.LOCALE_INDONESIA
 }
 
 func (ctrl *ImageController) UploadFile() fiber.Handler {
-	return func(ctx *fiber.Ctx) error {
+	return func(ctx fiber.Ctx) error {
 		var uploadResp *services.UploadImageResponse
 		form, err := ctx.MultipartForm()
 		locale := ctrl.getLanguange(ctx)
 		if err != nil {
-			return ctx.JSON(ctrl.ErrorResponse(err.Error()))
+			return ctx.Status(fiber.StatusBadRequest).JSON(ctrl.ErrorResponse(err.Error()))
 		}
 
 		files, fileExists := form.File["file"]
@@ -62,12 +63,17 @@ func (ctrl *ImageController) UploadFile() fiber.Handler {
 
 		file, err := files[0].Open()
 		if err != nil {
-			return ctx.JSON(ctrl.ErrorResponse(ctrl.translation.GetMessage("FAILED_OPEN_FILE", locale)))
+			return ctx.Status(fiber.StatusUnprocessableEntity).JSON(ctrl.ErrorResponse(ctrl.translation.GetMessage("FAILED_OPEN_FILE", locale)))
 		}
-
 		defer file.Close()
+
 		fileName := files[0].Filename
-		directory := form.Value["directory"][0]
+		// The "directory" field is optional; indexing it directly panicked
+		// whenever the client did not send it.
+		directory := ""
+		if values := form.Value["directory"]; len(values) > 0 {
+			directory = values[0]
+		}
 
 		if directory != "" {
 			uploadResp, err = ctrl.service.UploadImageToFolder(file, fileName, directory)
@@ -75,7 +81,7 @@ func (ctrl *ImageController) UploadFile() fiber.Handler {
 			uploadResp, err = ctrl.service.UploadImage(file, fileName)
 		}
 		if err != nil {
-			return ctx.JSON(ctrl.ErrorResponse(err.Error()))
+			return ctx.Status(fiber.StatusBadGateway).JSON(ctrl.ErrorResponse(err.Error()))
 		}
 		return ctx.JSON(ctrl.SuccessResponse(uploadResp))
 	}

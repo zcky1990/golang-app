@@ -1,7 +1,21 @@
-PORT=""
+PORT="3000"
 SECRET=""
 
-#mongodb
+# session / JWT expiration, accepts a duration ("72h") or seconds ("259200")
+SESSION_EXPIRATION="72h"
+
+#postgresql (primary database)
+POSTGRES_HOST="localhost"
+POSTGRES_PORT="5432"
+POSTGRES_USER="postgres"
+POSTGRES_PASSWORD=""
+POSTGRES_DB="golang_app_development"
+POSTGRES_SSLMODE="disable"
+POSTGRES_TIMEZONE="UTC"
+POSTGRES_MAX_CONNS="25"
+POSTGRES_MAX_IDLE_CONNS="5"
+
+#mongodb (legacy, config/mongo is kept for reference/rollback)
 MONGO_HOST=""
 MONGO_TYPE=""
 MONGO_PORT=""
@@ -15,7 +29,8 @@ CLOUD_NAME=""
 CLOUD_API_KEY=""
 CLOUD_API_SECRET=""
 
-#redis
+#redis (REDIS_URL wins over the discrete variables when both are set)
+REDIS_URL=""
 REDIS_USERNAME=""
 REDIS_PASSWORD=""
 REDIS_HOST=""

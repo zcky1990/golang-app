@@ -3,6 +3,18 @@ package constants
 const (
 	PORT = "PORT"
 
+	// PostgreSQL (primary database since the migration off Mongo)
+	POSTGRES_HOST           = "POSTGRES_HOST"
+	POSTGRES_PORT           = "POSTGRES_PORT"
+	POSTGRES_USER           = "POSTGRES_USER"
+	POSTGRES_PASSWORD       = "POSTGRES_PASSWORD"
+	POSTGRES_DB             = "POSTGRES_DB"
+	POSTGRES_SSLMODE        = "POSTGRES_SSLMODE"
+	POSTGRES_TIMEZONE       = "POSTGRES_TIMEZONE"
+	POSTGRES_MAX_CONNS      = "POSTGRES_MAX_CONNS"
+	POSTGRES_MAX_IDLE_CONNS = "POSTGRES_MAX_IDLE_CONNS"
+
+	// MongoDB (legacy, config/mongo is kept for reference/rollback)
 	MONGO_HOST          = "MONGO_HOST"
 	MONGO_PORT          = "MONGO_PORT"
 	MONGO_TYPE          = "MONGO_TYPE"
@@ -23,6 +35,10 @@ const (
 	REDIS_DB       = "REDIS_DB"
 
 	SECRET = "SECRET"
+
+	// SESSION_EXPIRATION is read by both the session store and the JWT
+	// middleware; it accepts a duration ("72h") or seconds ("259200").
+	SESSION_EXPIRATION = "SESSION_EXPIRATION"
 
 	STATUS = "status"
 	DATA   = "data"

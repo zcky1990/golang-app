@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/logger"
 )
 
 type LoggerFormatter struct {
@@ -25,7 +25,7 @@ type LoggerFormatter struct {
 }
 
 var defaultConfig = LoggerFormatter{
-	LogFormat:         "[${ip}]:${port} ${pid} ${locals:requestid}] ${status} - ${method} ${path}​\n",
+	LogFormat:         "[${ip}]:${port} ${pid} ${locals:requestid}] ${status} - ${method} ${path}\u200b\n",
 	LogFormatType:     "out",
 	LogFormatDate:     "02-Jan-2006",
 	LogFormatTimeZone: "Asia/Jakarta",
@@ -67,18 +67,20 @@ func (lg *LoggerFormatter) SetLoggerFormat(App *fiber.App) {
 			TimeFormat: lg.LogFormatDate,
 			TimeZone:   lg.LogFormatTimeZone,
 		}))
-	} else {
-		file, err := os.OpenFile(fmt.Sprintf("./%s.log", lg.LogFormatFileName), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-		if err != nil {
-			log.Fatalf("error opening file: %v", err)
-		}
-		defer file.Close()
-		App.Use(logger.New(logger.Config{
-			Format:     lg.LogFormat,
-			TimeFormat: lg.LogFormatDate,
-			TimeZone:   lg.LogFormatTimeZone,
-			Output:     file,
-		}))
+		return
 	}
 
+	file, err := os.OpenFile(fmt.Sprintf("./%s.log", lg.LogFormatFileName), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("error opening file: %v", err)
+	}
+	// The file is intentionally not closed here: it has to stay open for the
+	// whole process, otherwise every request would write to a closed handle.
+	App.Use(logger.New(logger.Config{
+		Format:     lg.LogFormat,
+		TimeFormat: lg.LogFormatDate,
+		TimeZone:   lg.LogFormatTimeZone,
+		// Fiber v3 renamed the v2 `Output` field to `Stream`.
+		Stream: file,
+	}))
 }

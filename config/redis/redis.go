@@ -65,6 +65,19 @@ func NewRedisClient() *RedisClient {
 	}
 }
 
+// Client exposes the underlying go-redis client.
+//
+// Fiber v3 expects a fiber.Storage for its session middleware, and the
+// gofiber/storage/redis v1 driver is tied to Fiber v2, so config/session wraps
+// this single client with a small adapter instead of opening a second
+// connection (and pulling a second Redis driver into the project).
+func (r *RedisClient) Client() *redis.Client {
+	if r == nil {
+		return nil
+	}
+	return r.client
+}
+
 // Set sets a key-value pair with an expiration time
 func (r *RedisClient) Set(key string, value interface{}, expiration time.Duration) error {
 	err := r.client.Set(r.ctx, key, value, expiration).Err()

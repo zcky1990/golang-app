@@ -1,18 +1,4 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: [
-    "./app/views/**/*.{vue,html,js}",
-    "./static/javascript/**/*.{vue,html,js}"
-  ],
-  theme: {
-    extend: {
-      fontFamily: {
-        marsha: ['marsha', 'Arial', 'sans-serif'],
-        dosis: ['Dosis', 'Arial', 'sans-serif'],
-        'playfair-display': ['"Playfair Display"', 'Arial', 'sans-serif'],
-      },
-    }
-  },
-  plugins: [],
-}
-
+// Deprecated: Tailwind CSS v4 is configured in CSS, not JavaScript.
+// See static/css/tailwind.css (`@source` + `@theme`). The dev/prod split is now handled
+// by the Vite mode (`--mode development` / `--mode production`) in vite.config.js.
+// This file can be deleted safely.

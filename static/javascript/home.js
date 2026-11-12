@@ -1,15 +1,7 @@
-import {createApp} from 'vue';
-import App from './views/Home.vue'
-import snackBarStore from './vuex/counter-vuex-example'
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Create the Vue app
-    const app = createApp(App);
-    // Provide the Vuex store to all components
-    snackBarStore.commit('setState', window.__INITIAL_DATA__)
-    
-    app.provide('store', snackBarStore);
-    // Mount the app to the DOM
-    app.mount('#app');
-
-});
+// Deprecated: the SPA entry point moved to app/javascript/main.js when the app
+// became a single embedded shell (see README -> "Frontend: SPA + Vite + go:embed").
+//
+// This file is no longer part of the Vite build. The reusable components it used
+// to import still live in static/javascript and are imported from
+// app/javascript via the `@legacy` alias.
+export {};

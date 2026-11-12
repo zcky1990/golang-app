@@ -2,17 +2,19 @@ package middlewares
 
 import (
 	"errors"
+	"fmt"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
+	c "golang_app/golangApp/constants"
+	"golang_app/golangApp/lib"
+
+	"github.com/gofiber/fiber/v3"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtSecret []byte
-var expiration int64
+const bearerSchema = "Bearer "
 
 type Authorization struct {
 	Token    string `json:"auth_token,omitempty"`
@@ -20,20 +22,46 @@ type Authorization struct {
 	ExpireAt int64  `json:"expire_at,omitempty"`
 }
 
-func init() {
-	jwtSecret = []byte(os.Getenv("SECRET"))
-	expiration, _ = strconv.ParseInt(os.Getenv("SESSION_EXPIRATION"), 10, 64)
+// secretKey returns the JWT signing key.
+//
+// It is read lazily on purpose: init() runs before main() loads the .env file,
+// so reading SECRET there (the previous behaviour) always produced an empty
+// key and tokens were signed with "".
+func secretKey() ([]byte, error) {
+	secret := os.Getenv(c.SECRET)
+	if secret == "" {
+		return nil, errors.New("SECRET is not configured")
+	}
+	return []byte(secret), nil
+}
+
+// keyFunc also pins the signing method, so a token can never downgrade the
+// HMAC algorithm (alg confusion / "none" attacks).
+func keyFunc(token *jwt.Token) (interface{}, error) {
+	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+		return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+	}
+	return secretKey()
 }
 
 func GenerateToken(email string, password string) (*Authorization, error) {
-	token := jwt.New(jwt.SigningMethodHS256)
-	claims := token.Claims.(jwt.MapClaims)
-	expireAt := getExpireDate()
-	claims["user_email"] = email
-	claims["password"] = password
-	claims["expire"] = expireAt
+	key, err := secretKey()
+	if err != nil {
+		return &Authorization{}, err
+	}
 
-	tokenString, err := token.SignedString(jwtSecret)
+	expireAt := getExpireDate()
+	claims := jwt.MapClaims{
+		"user_email": email,
+		"password":   password,
+		"expire":     expireAt,
+		// exp makes jwt.Parse reject expired tokens for us (jwt/v5 validates it).
+		"exp": expireAt,
+		"iat": time.Now().Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(key)
 	if err != nil {
 		return &Authorization{}, err
 	}
@@ -44,69 +72,55 @@ func GenerateToken(email string, password string) (*Authorization, error) {
 	}, nil
 }
 
-func ValidateJWTToken(ctx *fiber.Ctx) error {
-	err := validateToken(ctx)
-	if err != nil {
-		return ctx.JSON(generateErrorMessage(err.Error()))
-	}
-	return nil
+// ValidateJWTToken reports whether the request carries a valid token.
+//
+// It no longer writes the response itself: ctx.JSON returns nil on success, so
+// the old implementation signalled "invalid token" by returning nil and the
+// middleware happily continued (auth bypass). The caller now decides the status
+// code and body.
+func ValidateJWTToken(ctx fiber.Ctx) error {
+	_, err := getToken(ctx)
+	return err
 }
 
-func GetEmailFromToken(ctx *fiber.Ctx) (string, error) {
+func GetEmailFromToken(ctx fiber.Ctx) (string, error) {
 	token, err := getToken(ctx)
 	if err != nil {
-		return "", ctx.JSON(generateErrorMessage(err.Error()))
+		return "", err
 	}
 	claims, err := extractClaims(token)
 	if err != nil {
-		return "", ctx.JSON(generateErrorMessage(err.Error()))
+		return "", err
 	}
 
-	email := claims["user_email"].(string)
-	if email == "" {
-		return "", ctx.JSON(generateErrorMessage("Invalid session"))
+	email, ok := claims["user_email"].(string)
+	if !ok || email == "" {
+		return "", errors.New("Invalid session")
 	}
 	return email, nil
 }
 
 // private method here
-func validateToken(ctx *fiber.Ctx) error {
-	tokenString := ctx.Get("Authorization")
-	const bearerSchema = "Bearer "
-	if tokenString == "" {
-		return errors.New("Missing Auth Token")
-	}
-	if !strings.HasPrefix(tokenString, bearerSchema) {
-		return errors.New("Invalid/Malformed Auth Token")
-	}
-
-	tokenSlice := strings.TrimPrefix(tokenString, bearerSchema)
-	token, err := jwt.Parse(tokenSlice, func(token *jwt.Token) (interface{}, error) {
-		return jwtSecret, nil
-	})
-	if err != nil {
-		return err
-	}
-	if !token.Valid {
-		return errors.New("Token Invalid")
-	}
-	return nil
-}
-
-func getToken(ctx *fiber.Ctx) (*jwt.Token, error) {
-	tokenString := ctx.Get("Authorization")
-	const bearerSchema = "Bearer "
-	if tokenString == "" {
+//
+// The token is read from the httpOnly cookie first (the SPA never sees it), with
+// the Authorization header kept as a fallback so CLI tools, curl and the existing
+// API tests keep working unchanged.
+func getToken(ctx fiber.Ctx) (*jwt.Token, error) {
+	tokenString := ""
+	if cookie := ctx.Cookies(AuthCookieName); cookie != "" {
+		tokenString = bearerSchema + cookie
+	} else if header := ctx.Get("Authorization"); header != "" {
+		tokenString = header
+	} else {
 		return nil, errors.New("Missing Auth Token")
 	}
+
 	if !strings.HasPrefix(tokenString, bearerSchema) {
 		return nil, errors.New("Invalid/Malformed Auth Token")
 	}
 
 	tokenSlice := strings.TrimPrefix(tokenString, bearerSchema)
-	token, err := jwt.Parse(tokenSlice, func(token *jwt.Token) (interface{}, error) {
-		return jwtSecret, nil
-	})
+	token, err := jwt.Parse(tokenSlice, keyFunc)
 	if err != nil {
 		return nil, err
 	}
@@ -130,8 +144,5 @@ func extractClaims(token *jwt.Token) (jwt.MapClaims, error) {
 }
 
 func getExpireDate() int64 {
-	if expiration <= 0 {
-		return time.Now().Add(time.Hour * 72).Unix()
-	}
-	return expiration
+	return time.Now().Add(lib.EnvDuration(c.SESSION_EXPIRATION, 72*time.Hour)).Unix()
 }
